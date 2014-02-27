@@ -3,9 +3,10 @@ module MESH
 
     attr_accessor :unique_id, :original_heading, :tree_numbers, :parents, :children, :natural_language_name, :summary, :entries
 
-    #def original_heading(locale = nil)
-    #  @original_heading unless locale
-    #end
+    def original_heading(locale = nil)
+      @original_heading unless locale
+
+    end
 
     def self.configure(args)
       return if @@configured
@@ -92,6 +93,7 @@ module MESH
     @@headings = []
     @@by_unique_id = {}
     @@by_tree_number = {}
+    @@default_locale = 'en-US'
 
     def initialize
       @tree_numbers = []

@@ -4,21 +4,13 @@ module MESH
   describe 'Testing MESH:Mesh core functions' do
 
     before do
-      #start = Time.now
+      start = Time.now
       MESH::Mesh.configure(filename: File.expand_path('../../data/mesh_data_2014/d2014.bin.gz', __FILE__))
-      #finish = Time.now
-      #configuration_time = finish - start
-      #assert configuration_time < 10
+      finish = Time.now
+      configuration_time = finish - start
+      assert configuration_time < 10
     end
 
-    #it 'should throw if configured without a filename' do
-    #  assert_raises(ArgumentError) { MESH::Mesh.configure({}) }
-    #end
-    #
-    #it 'should throw if not configured' do
-    #  assert_raises(RuntimeError, 'MESH::Mesh.configure(args) must be called before use') { MESH::Mesh.find('D000001') }
-    #end
-    #
     it 'should yield to a block for each' do
       block_called = false
       MESH::Mesh.each do |h|
