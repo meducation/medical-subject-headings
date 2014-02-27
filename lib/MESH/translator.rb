@@ -4,9 +4,9 @@ module MESH
     def translate(input)
       input.downcase
       @enus_to_engb.each do |match, replacement|
-        input.gsub!(/^#{Regexp.quote(word)}(\s+)/, "#{replacement}\2")
-        input.gsub!(/(\s+)#{Regexp.quote(word)}(\s+)/, "\1#{replacement}\2")
-        input.gsub!(/(\s+)#{Regexp.quote(word)}$/, "\1#{replacement}")
+        start_middle_and_end(input, match.downcase, replacement.downcase)
+        start_middle_and_end(input, match.capitalize, replacement.capitalize)
+        start_middle_and_end(input, match.upcase, replacement.upcase)
       end
       input
     end
@@ -112,5 +112,15 @@ module MESH
       }
 
     end
+
+    private
+
+    def start_middle_and_end(input, match, replacement)
+      input.gsub!(/^#{Regexp.quote(match)}$/, replacement) #alone
+      input.gsub!(/^#{Regexp.quote(match)}(\W+)/) { "#{replacement}#{$2}" } #start
+      input.gsub!(/(\W+)#{Regexp.quote(match)}(\W+)/) { "#{$1}#{replacement}#{$2}" } #middle
+      input.gsub!(/(\W+)#{Regexp.quote(match)}$/) { "#{$1}#{replacement}" } #end
+    end
+
   end
 end

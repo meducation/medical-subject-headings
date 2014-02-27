@@ -19,8 +19,18 @@ module MESH
       assert_equal expected, tr.translate(input)
     end
 
-    it 'should maintain capitalization' do
-      skip
+    it 'should match uppercase' do
+      tr = MESH::Translator.new
+      input = 'A condition with damage to the lining of the lower ESOPHAGUS resulting from chronic acid reflux (ESOPHAGITIS, REFLUX). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the INTESTINE or the salmon-pink mucosa of the STOMACH. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to ADENOCARCINOMA of the esophagus.'
+      expected = 'A condition with damage to the lining of the lower OESOPHAGUS resulting from chronic acid reflux (OESOPHAGITIS, REFLUX). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the INTESTINE or the salmon-pink mucosa of the STOMACH. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to ADENOCARCINOMA of the oesophagus.'
+      assert_equal expected, tr.translate(input)
+    end
+
+    it 'should match title case' do
+      tr = MESH::Translator.new
+      input = 'A condition with damage to the lining of the lower Esophagus resulting from chronic acid reflux (Esophagitis, REFLUX). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the INTESTINE or the salmon-pink mucosa of the STOMACH. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to ADENOCARCINOMA of the esophagus.'
+      expected = 'A condition with damage to the lining of the lower Oesophagus resulting from chronic acid reflux (Oesophagitis, REFLUX). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the INTESTINE or the salmon-pink mucosa of the STOMACH. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to ADENOCARCINOMA of the oesophagus.'
+      assert_equal expected, tr.translate(input)
     end
 
   end
