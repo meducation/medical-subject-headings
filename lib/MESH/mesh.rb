@@ -103,6 +103,20 @@ module MESH
       end
     end
 
+    def self.match_in_text(text)
+      matches = []
+      text = text.downcase
+      @@headings.each do |heading|
+        heading.entries.each do |entry|
+          entry = entry.downcase
+          if /#{Regexp.quote(entry)}/.match(text)
+            matches << { heading: heading, matched: entry }
+          end
+        end
+      end
+      matches
+    end
+
     private
 
     @@configured = false
