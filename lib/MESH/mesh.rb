@@ -109,7 +109,10 @@ module MESH
       @@headings.each do |heading|
         heading.entries.each do |entry|
           entry = entry.downcase
-          if /#{Regexp.quote(entry)}/.match(text)
+          start = /^#{Regexp.quote(entry)}\W+/
+          middle = /\W+#{Regexp.quote(entry)}\W+/
+          at_end = /\W+#{Regexp.quote(entry)}$/
+          if start.match(text) || middle.match(text) || at_end.match(text)
             matches << { heading: heading, matched: entry }
           end
         end

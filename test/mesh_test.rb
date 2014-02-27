@@ -137,6 +137,23 @@ module MESH
       end
     end
 
+    it 'should match headings at start of test' do
+      assert false
+    end
+
+    it 'should match headings at end of test' do
+      assert false
+    end
+
+    it 'should allow headings to be marked as not useful' do
+      assert false
+    end
+
+    it 'should allow headings to be found with a where() match on fields' do
+      #MESH::Mesh.where(:original_heading, /^Cyta/)
+      #MESH::Mesh.where(:entries, /.*Fish.*/)
+      assert false
+    end
 
     before do
 
