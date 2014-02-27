@@ -103,9 +103,10 @@ module MESH
       expected_entries = ['Barrett Esophagus', 'Barrett Syndrome', 'Esophagus, Barrett', 'Barrett Epithelium', 'Barrett Metaplasia', 'Barrett\'s Esophagus', 'Barrett\'s Syndrome', 'Barretts Esophagus', 'Barretts Syndrome', 'Epithelium, Barrett', 'Esophagus, Barrett\'s', 'Syndrome, Barrett', 'Syndrome, Barrett\'s']
       expected_entries_en = ['Barrett Oesophagus', 'Barrett Syndrome', 'Oesophagus, Barrett', 'Barrett Epithelium', 'Barrett Metaplasia', 'Barrett\'s Oesophagus', 'Barrett\'s Syndrome', 'Barretts Oesophagus', 'Barretts Syndrome', 'Epithelium, Barrett', 'Oesophagus, Barrett\'s', 'Syndrome, Barrett', 'Syndrome, Barrett\'s']
       expected_entries.sort!
+      expected_entries_en.sort!
       mh = MESH::Mesh.find('D001471')
       assert_equal expected_entries, mh.entries
-      assert_equal expected_entries, mh.entries('en-GB')
+      assert_equal expected_entries_en, mh.entries('en-GB')
     end
 
     it 'should have the correct parent' do
@@ -135,6 +136,10 @@ module MESH
       assert_includes parent.children, child2
       assert_includes parent.children, child3
       assert_includes parent.children, child4
+    end
+
+    it 'should match headings that occur in given text' do
+      assert false
     end
 
   end

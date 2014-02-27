@@ -1,11 +1,28 @@
+require_relative 'translator'
+
 module MESH
   class Mesh
 
     attr_accessor :unique_id, :original_heading, :tree_numbers, :parents, :children, :natural_language_name, :summary, :entries
 
     def original_heading(locale = nil)
-      @original_heading unless locale
+      return @original_heading if locale.nil?
+      @@translator.translate(@original_heading)
+    end
 
+    def natural_language_name(locale = nil)
+      return @natural_language_name if locale.nil?
+      @@translator.translate(@natural_language_name)
+    end
+
+    def summary(locale = nil)
+      return @summary if locale.nil?
+      @@translator.translate(@summary)
+    end
+
+    def entries(locale = nil)
+      return @entries if locale.nil?
+      @entries.map { |entry| @@translator.translate(entry) }.sort
     end
 
     def self.configure(args)
@@ -89,11 +106,11 @@ module MESH
     private
 
     @@configured = false
-
     @@headings = []
     @@by_unique_id = {}
     @@by_tree_number = {}
     @@default_locale = 'en-US'
+    @@translator = Translator.new
 
     def initialize
       @tree_numbers = []

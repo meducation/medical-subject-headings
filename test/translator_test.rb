@@ -33,5 +33,20 @@ module MESH
       assert_equal expected, tr.translate(input)
     end
 
+    it 'should not change the input string' do
+      tr = MESH::Translator.new
+      input = 'esophagus'
+      assert_equal 'oesophagus', tr.translate(input)
+      assert_equal 'esophagus', input
+    end
+
+    it 'should maintain punctuation' do
+      tr = MESH::Translator.new
+      input = 'Esophagus, Barrett'
+      assert_equal 'Oesophagus, Barrett', tr.translate(input)
+    end
+
   end
 end
+
+
