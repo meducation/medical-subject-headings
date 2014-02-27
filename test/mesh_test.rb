@@ -5,7 +5,7 @@ module MESH
 
     before do
       #start = Time.now
-      MESH::Mesh.configure(filename: File.expand_path('../../data/mesh_data_2014/d2014.bin', __FILE__))
+      MESH::Mesh.configure(filename: File.expand_path('../../data/mesh_data_2014/d2014.bin.gz', __FILE__))
       #finish = Time.now
       #configuration_time = finish - start
       #assert configuration_time < 10

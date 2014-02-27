@@ -10,7 +10,8 @@ module MESH
     def self.configure(args)
       return if @@configured
       raise ArgumentError.new('MeshHeadingGraph requires a filename in order to configure itself') unless not args[:filename].nil?
-      file = File.open(args[:filename])
+      gzipped_file = File.open(args[:filename])
+      file = Zlib::GzipReader.new(gzipped_file)
       current_heading = Mesh.new
       file.each_line do |line|
         if line.match(/^\*NEWRECORD$/) #Then store the previous record before continuing
