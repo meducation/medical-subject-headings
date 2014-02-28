@@ -107,7 +107,7 @@ module MESH
 
     def self.each
       for i in 0 ... @@headings.size
-        yield @@headings[i]
+        yield @@headings[i] if @@headings[i].useful
       end
     end
 

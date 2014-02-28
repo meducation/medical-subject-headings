@@ -162,6 +162,7 @@ module MESH
 
     it 'should match on conditions for useful' do
       mh = MESH::Mesh.find('D001471')
+      mh.useful = true
       assert mh.matches(useful: true)
       refute mh.matches(useful: false)
       mh.useful = false
@@ -182,9 +183,9 @@ module MESH
 
     it 'should match headings that occur in given text' do
       matches = MESH::Mesh.match_in_text(@example_text)
-      matches.each do |match|
-        puts "#{match[:heading].unique_id}, #{match[:heading].original_heading}\n\t#{match[:matched]}"
-      end
+      #matches.each do |match|
+      #  puts "#{match[:heading].unique_id}, #{match[:heading].original_heading}\n\t#{match[:matched]}"
+      #end
       assert false
     end
 
@@ -204,6 +205,7 @@ module MESH
 
     it 'should allow headings to be marked as not useful' do
       mh = MESH::Mesh.find('D055550')
+      mh.useful = true
       assert mh.useful
       mh.useful = false
       refute mh.useful
@@ -212,15 +214,35 @@ module MESH
     end
 
     it 'should match on useful in where' do
-      expected = [MESH::Mesh.find('D012000'), MESH::Mesh.find('D064906'), MESH::Mesh.find('D064966')]
-      expected.each { |mh| mh.useful = false }
-      actual = MESH::Mesh.where(useful: false)
-      assert_equal expected, actual
-      expected.each { |mh| mh.useful = true }
+      begin
+        expected = [MESH::Mesh.find('D012000'), MESH::Mesh.find('D064906'), MESH::Mesh.find('D064966')]
+        expected.each { |mh| mh.useful = false }
+        actual = MESH::Mesh.where(useful: false)
+        assert_equal expected, actual
+      ensure
+        expected.each { |mh| mh.useful = true }
+      end
     end
 
     it 'should only include useful headings in .each' do
-      skip
+      begin
+        MESH::Mesh.each do |mh|
+          mh.useful = false
+        end
+        MESH::Mesh.where(unique_id: /^D0000/).each do |mh|
+          mh.useful = true
+        end
+        count = 0
+        MESH::Mesh.each do |mh|
+          assert mh.useful
+          count += 1
+        end
+        assert_equal 95, count
+      ensure
+        MESH::Mesh.where(useful: false).each do |mh|
+          mh.useful = true
+        end
+      end
     end
 
     it 'should override inspect to prevent issues in test diagnostics' do
@@ -234,7 +256,7 @@ module MESH
       actual = MESH::Mesh.where(original_heading: /^Cyta/)
       assert_equal expected, actual
     end
-      #MESH::Mesh.where(:entries, /.*Fish.*/)
+    #MESH::Mesh.where(:entries, /.*Fish.*/)
 
     before do
 
