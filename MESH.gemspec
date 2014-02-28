@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'MESH/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "mesh"
+  spec.name          = "mesh-medical-subject-headings"
   spec.version       = Mesh::VERSION
   spec.authors       = ["mmmmmrob"]
   spec.email         = ["rob@dynamicorange.com"]
