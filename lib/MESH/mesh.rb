@@ -97,6 +97,14 @@ module MESH
       return @@by_tree_number[tree_number]
     end
 
+    def self.where(conditions)
+      matches = []
+      @@headings.each do |heading|
+        matches << heading if heading.matches(conditions)
+      end
+      matches
+    end
+
     def self.each
       for i in 0 ... @@headings.size
         yield @@headings[i]
@@ -113,11 +121,27 @@ module MESH
           middle = /\W+#{Regexp.quote(entry)}\W+/
           at_end = /\W+#{Regexp.quote(entry)}$/
           if start.match(text) || middle.match(text) || at_end.match(text)
-            matches << { heading: heading, matched: entry }
+            matches << {heading: heading, matched: entry}
           end
         end
       end
       matches
+    end
+
+    def matches(conditions)
+      conditions.each do |field, pattern|
+        field_content = self.send(field)
+        if field_content.kind_of?(Array)
+          return false unless field_content.find { |fc| pattern =~ fc }
+        else
+          return false unless pattern =~ field_content
+        end
+      end
+      return true
+    end
+
+    def inspect
+      return "#{@unique_id}, #{@original_heading}"
     end
 
     private
@@ -135,6 +159,7 @@ module MESH
       @children = []
       @entries = []
     end
+
   end
 end
 

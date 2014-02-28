@@ -137,23 +137,75 @@ module MESH
       end
     end
 
+    it 'should match on conditions for original_heading' do
+      mh = MESH::Mesh.find('D001471')
+      assert mh.matches(original_heading: /^Barrett Esophagus$/)
+    end
+
+    it 'should not match on incorrect condition for original_heading' do
+      mh = MESH::Mesh.find('D001471')
+      refute mh.matches(original_heading: /^Foo$/)
+    end
+
+    it 'should match on conditions for entries' do
+      mh = MESH::Mesh.find('D001471')
+      assert mh.matches(entries: /Metaplasia/)
+    end
+
+    it 'should not match on incorrect conditions for entries' do
+      mh = MESH::Mesh.find('D001471')
+      refute mh.matches(entries: /Foo/)
+    end
+
+    it 'should match on conditions for summary' do
+      mh = MESH::Mesh.find('D001471')
+      assert mh.matches(summary: /the lower ESOPHAGUS resulting from chronic acid reflux \(ESOPHAGITIS, REFLUX\)\./)
+    end
+
+    it 'should not match on incorrect conditions for summary' do
+      mh = MESH::Mesh.find('D001471')
+      refute mh.matches(summary: /Foo/)
+    end
+
+    it 'should match on multiple conditions' do
+      mh = MESH::Mesh.find('D001471')
+      assert mh.matches(original_heading: /^Barrett Esophagus$/, summary: /the lower ESOPHAGUS/)
+    end
+
+    it 'should not match on incorrect multiple conditions' do
+      mh = MESH::Mesh.find('D001471')
+      refute mh.matches(original_heading: /^Barrett Esophagus$/, summary: /Foo/)
+      refute mh.matches(original_heading: /^Foo/, summary: /the lower ESOPHAGUS/)
+    end
+
     it 'should match headings at start of test' do
-      assert false
+      skip
     end
 
     it 'should match headings at end of test' do
-      assert false
+      skip
     end
 
     it 'should allow headings to be marked as not useful' do
-      assert false
+      skip
     end
 
-    it 'should allow headings to be found with a where() match on fields' do
-      #MESH::Mesh.where(:original_heading, /^Cyta/)
-      #MESH::Mesh.where(:entries, /.*Fish.*/)
-      assert false
+    it 'should match on conditions for useful' do
+      skip
     end
+
+    it 'should override inspect to prevent issues in test diagnostics' do
+      mh = MESH::Mesh.find('D001471')
+      expected = "#{mh.unique_id}, #{mh.original_heading}"
+      assert_equal expected, mh.inspect
+    end
+
+    it 'should allow headings to be found with a where() match on original_heading' do
+      expected = [MESH::Mesh.find('D003561'), MESH::Mesh.find('D016238')]
+      actual = MESH::Mesh.where(original_heading: /^Cyta/)
+      assert_equal expected, actual
+    end
+      #MESH::Mesh.where(:entries, /.*Fish.*/)
 
     before do
 
