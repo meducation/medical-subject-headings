@@ -130,13 +130,6 @@ module MESH
       assert_includes parent.children, child4
     end
 
-    it 'should match headings that occur in given text' do
-      matches = MESH::Mesh.match_in_text(@example_text)
-      matches.each do |match|
-        puts "#{match[:heading].unique_id}, #{match[:heading].original_heading}\n\t#{match[:matched]}"
-      end
-    end
-
     it 'should match on conditions for original_heading' do
       mh = MESH::Mesh.find('D001471')
       assert mh.matches(original_heading: /^Barrett Esophagus$/)
@@ -167,6 +160,15 @@ module MESH
       refute mh.matches(summary: /Foo/)
     end
 
+    it 'should match on conditions for useful' do
+      mh = MESH::Mesh.find('D001471')
+      assert mh.matches(useful: true)
+      refute mh.matches(useful: false)
+      mh.useful = false
+      assert mh.matches(useful: false)
+      refute mh.matches(useful: true)
+    end
+
     it 'should match on multiple conditions' do
       mh = MESH::Mesh.find('D001471')
       assert mh.matches(original_heading: /^Barrett Esophagus$/, summary: /the lower ESOPHAGUS/)
@@ -178,19 +180,46 @@ module MESH
       refute mh.matches(original_heading: /^Foo/, summary: /the lower ESOPHAGUS/)
     end
 
+    it 'should match headings that occur in given text' do
+      matches = MESH::Mesh.match_in_text(@example_text)
+      matches.each do |match|
+        puts "#{match[:heading].unique_id}, #{match[:heading].original_heading}\n\t#{match[:matched]}"
+      end
+      assert false
+    end
+
     it 'should match headings at start of test' do
-      skip
+      text = 'Leukemia, lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu.'
+      matches = MESH::Mesh.match_in_text(text)
+      assert_equal 1, matches.length
+      assert_equal MESH::Mesh.find('D007938'), matches[0][:heading]
     end
 
     it 'should match headings at end of test' do
-      skip
+      text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu leukemia'
+      matches = MESH::Mesh.match_in_text(text)
+      assert_equal 1, matches.length
+      assert_equal MESH::Mesh.find('D007938'), matches[0][:heading]
     end
 
     it 'should allow headings to be marked as not useful' do
-      skip
+      mh = MESH::Mesh.find('D055550')
+      assert mh.useful
+      mh.useful = false
+      refute mh.useful
+      mh.useful = true
+      assert mh.useful
     end
 
-    it 'should match on conditions for useful' do
+    it 'should match on useful in where' do
+      expected = [MESH::Mesh.find('D012000'), MESH::Mesh.find('D064906'), MESH::Mesh.find('D064966')]
+      expected.each { |mh| mh.useful = false }
+      actual = MESH::Mesh.where(useful: false)
+      assert_equal expected, actual
+      expected.each { |mh| mh.useful = true }
+    end
+
+    it 'should only include useful headings in .each' do
       skip
     end
 

@@ -3,7 +3,7 @@ require_relative 'translator'
 module MESH
   class Mesh
 
-    attr_accessor :unique_id, :original_heading, :tree_numbers, :parents, :children, :natural_language_name, :summary, :entries
+    attr_accessor :unique_id, :original_heading, :tree_numbers, :parents, :children, :natural_language_name, :summary, :entries, :useful
 
     def original_heading(locale = nil)
       return @original_heading if locale.nil?
@@ -133,6 +133,8 @@ module MESH
         field_content = self.send(field)
         if field_content.kind_of?(Array)
           return false unless field_content.find { |fc| pattern =~ fc }
+        elsif field_content.is_a?(TrueClass) || field_content.is_a?(FalseClass)
+          return false unless field_content == pattern
         else
           return false unless pattern =~ field_content
         end
@@ -154,6 +156,7 @@ module MESH
     @@translator = Translator.new
 
     def initialize
+      @useful = true
       @tree_numbers = []
       @parents = []
       @children = []
