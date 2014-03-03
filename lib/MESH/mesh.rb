@@ -37,6 +37,7 @@ module MESH
             current_heading.entries.sort!
             @@headings << current_heading
             @@by_unique_id[current_heading.unique_id] = current_heading
+            @@by_original_heading[current_heading.original_heading] = current_heading
             current_heading.tree_numbers.each do |tree_number|
               @@by_tree_number[tree_number] = current_heading
             end
@@ -97,6 +98,11 @@ module MESH
       return @@by_tree_number[tree_number]
     end
 
+    def self.find_by_original_heading(heading)
+      raise 'MeshHeadingGraph.configure must be called before use' unless @@configured
+      return @@by_original_heading[heading]
+    end
+
     def self.where(conditions)
       matches = []
       @@headings.each do |heading|
@@ -152,6 +158,7 @@ module MESH
     @@headings = []
     @@by_unique_id = {}
     @@by_tree_number = {}
+    @@by_original_heading = {}
     @@default_locale = 'en-US'
     @@translator = Translator.new
 
