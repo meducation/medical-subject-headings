@@ -192,14 +192,26 @@ module MESH
       assert expected, actual
     end
 
-    it 'should match headings at start of test' do
+    it 'should only match useful headings that occur in given text' do
+      expected_ids = %w(D001491 D001769 D001792 D001842 D001853 D001853 D002470 D002477 D002648 D002648 D002875 D002965 D003062 D003561 D003593 D003643 D004194 D004314 D004314 D004314 D004314 D004813 D004912 D005091 D005123 D005123 D005293 D005333 D005385 D005385 D005544 D005796 D006128 D006225 D006309 D006321 D006331  D007107 D007231 D007231 D007231 D007239 D007938 D008099 D008168 D008214 D008214 D008423 D008533 D008607 D008722 D009035 D009055 D009132 D009154 D009154 D009190 D009196 D009369 D009666 D010372 D010641 D011153 D012008 D012106 D012146 D012306 D012307 D012380 D012680 D012867 D013534 D013577 D013601 D013812 D013921 D013961 D014034 D014157 D014171 D014314  D015032 D015994 D015995 D016424 D017584 D017668 D018387 D018388 D019021 D019070 D019368 D019369 D032882 D036801 D036801 D038042 D041905 D052016)
+
+      not_useful_ids = %w(D007246 D002477 D014960 D008533 D016433 D006664 D055016 D002999 D007223)
+      not_useful_ids.each { |id| MESH::Mesh.find(id).useful = false }
+
+      expected = expected_ids.map { |id| MESH::Mesh.find(id) }
+      actual = MESH::Mesh.match_in_text(@example_text)
+      assert expected, actual
+    end
+
+
+    it 'should match headings at start of text' do
       text = 'Leukemia, lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu.'
       matches = MESH::Mesh.match_in_text(text)
       assert_equal 1, matches.length
       assert_equal MESH::Mesh.find('D007938'), matches[0][:heading]
     end
 
-    it 'should match headings at end of test' do
+    it 'should match headings at end of text' do
       text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu leukemia'
       matches = MESH::Mesh.match_in_text(text)
       assert_equal 1, matches.length
