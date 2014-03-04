@@ -121,6 +121,7 @@ module MESH
       matches = []
       text = text.downcase
       @@headings.each do |heading|
+        next unless heading.useful
         heading.entries.each do |entry|
           entry = entry.downcase
           start = /^#{Regexp.quote(entry)}\W+/
