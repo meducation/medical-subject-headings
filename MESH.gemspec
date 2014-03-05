@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "minitest", "~> 5.0.8"
+  spec.add_development_dependency "ruby-prof"
 end

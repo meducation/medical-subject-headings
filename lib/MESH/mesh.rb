@@ -118,17 +118,16 @@ module MESH
     end
 
     def self.match_in_text(text)
-      matches = []
       text = text.downcase
+      matches = []
       @@headings.each do |heading|
         next unless heading.useful
         heading.entries.each do |entry|
-          entry = entry.downcase
-          start = /^#{Regexp.quote(entry)}\W+/
-          middle = /\W+#{Regexp.quote(entry)}\W+/
-          at_end = /\W+#{Regexp.quote(entry)}$/
-          if start.match(text) || middle.match(text) || at_end.match(text)
-            matches << {heading: heading, matched: entry}
+          if text.include? entry.downcase #This is a looser check than the regex but much, much faster
+            regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
+            if regex =~ text
+              matches << {heading: heading, matched: entry}
+            end
           end
         end
       end

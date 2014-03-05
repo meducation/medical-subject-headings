@@ -11,6 +11,7 @@ GEM
     mocha (1.0.0)
       metaclass (~> 0.0.1)
     rake (10.1.1)
+    ruby-prof (0.14.2)
     yard (0.8.7.3)
 
 PLATFORMS
@@ -22,4 +23,5 @@ DEPENDENCIES
   minitest (~> 5.0.8)
   mocha
   rake
+  ruby-prof
   yard
