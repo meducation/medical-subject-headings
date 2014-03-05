@@ -134,6 +134,24 @@ module MESH
       matches
     end
 
+    def has_ancestor(heading)
+      return false if parents.empty?
+      return true if parents.include? heading
+      in_grandparents = parents.map { |p| p.has_ancestor(heading) }
+      return in_grandparents.include? true
+    end
+
+    def has_descendant(heading)
+      return false if children.empty?
+      return true if children.include? heading
+      in_grandchildren = children.map { |p| p.has_descendant(heading) }
+      return in_grandchildren.include? true
+    end
+
+    def self.cluster(headings)
+      return headings
+    end
+
     def matches(conditions)
       conditions.each do |field, pattern|
         field_content = self.send(field)
