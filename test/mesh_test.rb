@@ -161,6 +161,20 @@ module MESH
       refute mh.matches(entries: /Foo/)
     end
 
+    it 'should match on conditions for tree numbers' do
+      mh = MESH::Mesh.find('D001471')
+      assert mh.matches(tree_numbers: /C06\.198\.102/)
+      assert mh.matches(tree_numbers: /^C06\.198\.102$/)
+      assert mh.matches(tree_numbers: /^C06/)
+      assert mh.matches(tree_numbers: /\.198\./)
+      assert mh.matches(tree_numbers: /^C06\.405\.117\.102$/)
+    end
+
+    it 'should not match on incorrect conditions for tree numbers' do
+      mh = MESH::Mesh.find('D001471')
+      refute mh.matches(tree_numbers: /Foo/)
+    end
+
     it 'should match on conditions for summary' do
       mh = MESH::Mesh.find('D001471')
       assert mh.matches(summary: /the lower ESOPHAGUS resulting from chronic acid reflux \(ESOPHAGITIS, REFLUX\)\./)
@@ -251,8 +265,17 @@ module MESH
     end
 
     it 'should match on entries in where()' do
-      #MESH::Mesh.where(:entries, /.*Fish.*/)
-      skip
+      expected_ids = %w( D002397 D003064 D003400 D003532 D004284 D004289 D004555 D005412 D006054 D006196 D007059 D007497 D007695 D009990 D010473 D012091 D012487 D012758 D013215 D015027 D020410 D023721 D023761 D023781 D024541 D029961 D037401 D037462 D048251 D049832 D052656 D057096 )
+      expected = expected_ids.map { |id| MESH::Mesh.find(id) }
+      actual = MESH::Mesh.where(entries: /fish/)
+      assert_equal expected, actual
+    end
+
+    it 'should match on tree numbers in where()' do
+      expected_ids = %w( D000005 D001415 D010388 D013909 )
+      expected = expected_ids.map { |id| MESH::Mesh.find(id) }
+      actual = MESH::Mesh.where(tree_numbers: /^A01\.923\.[0-9]{3}$/)
+      assert_equal expected, actual
     end
 
     it 'should match on useful in where' do
