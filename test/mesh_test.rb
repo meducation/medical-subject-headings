@@ -322,7 +322,6 @@ module MESH
       assert parent.has_descendant(grandchild), "should consider grandchild #{grandchild.inspect} a descendant #{parent.inspect}"
       assert parent.has_descendant(great_grandchild), "should consider great grandchild #{great_grandchild.inspect} a descendant #{parent.inspect}"
       refute parent.has_descendant(unrelated), 'should not consider an unrelated heading a descendant'
-
     end
 
     it 'should know if one heading is the ancestor of another' do
@@ -337,7 +336,21 @@ module MESH
       assert child.has_ancestor(grandparent), "should consider grandparent #{grandparent.inspect} an ancestor #{child.inspect}"
       assert child.has_ancestor(great_grandparent), "should consider great grandparent #{great_grandparent.inspect} an ancestor #{child.inspect}"
       refute child.has_ancestor(unrelated), 'should not consider an unrelated heading an ancestor'
+    end
 
+    it 'should know if headings are siblings at the same level below a common parent' do
+      parent = MESH::Mesh.find_by_tree_number('C19.053.500')
+      child1 = MESH::Mesh.find_by_tree_number('C19.053.500.263')
+      child2 = MESH::Mesh.find_by_tree_number('C19.053.500.270')
+      child3 = MESH::Mesh.find_by_tree_number('C19.053.500.480')
+      child4 = MESH::Mesh.find_by_tree_number('C19.053.500.740')
+      children = [child1, child2, child3, child4]
+
+      children.each { |c| refute parent.sibling(c) }
+      children.each { |c| refute c.sibling(parent) }
+
+      children.each { |c| assert child1.sibling(c) unless c == child1 }
+      children.each { |c| assert c.sibling(child1) unless c == child1 }
     end
 
     it 'should group headings into clusters with highest level first' do

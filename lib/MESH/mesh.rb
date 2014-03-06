@@ -148,6 +148,11 @@ module MESH
       return in_grandchildren.include? true
     end
 
+    def sibling(heading)
+      common_parents = parents & heading.parents
+      !common_parents.empty?
+    end
+
     def self.cluster(headings)
       return headings
     end
