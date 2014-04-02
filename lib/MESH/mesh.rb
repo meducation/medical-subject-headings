@@ -117,6 +117,7 @@ module MESH
     end
 
     def self.match_in_text(text)
+      return [] if text.nil?
       text = text.downcase
       matches = []
       @@headings.each do |heading|

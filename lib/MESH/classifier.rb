@@ -1,7 +1,8 @@
 module MESH
   class Classifier
     def classify(document)
-      headings = find_connected_headings(document[:title])
+      text = document[:title] || document[:abstract] || document[:content]
+      headings = find_connected_headings(text)
       root_groups = headings.reduce({}) do |rg, heading|
         heading.roots.each { |root| (rg[root] ||= []) << heading }
         rg

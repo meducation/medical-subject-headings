@@ -149,7 +149,7 @@ module MESH
     end
 
     it 'should have the correct siblings' do
-      fail
+      skip
     end
 
     it 'should match on conditions for original_heading' do
@@ -257,6 +257,10 @@ module MESH
       matches = MESH::Mesh.match_in_text(text)
       assert_equal 1, matches.length
       assert_equal MESH::Mesh.find('D007938'), matches[0][:heading]
+    end
+
+    it 'should return no matches when given nil text' do
+      assert_equal [], MESH::Mesh.match_in_text(nil)
     end
 
     it 'should allow headings to be marked as not useful' do
