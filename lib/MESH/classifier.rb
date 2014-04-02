@@ -8,7 +8,7 @@ module MESH
         rg
       end
       root_groups.reduce({}) do |chosen, (root,candidates)|
-        connections = calculate_connections(candidates)
+        connections = calculate_connections(root,candidates)
         best_score, best_connected = connections.reduce({}) { |h, (k, v)| (h[v] ||= []) << k; h }.max
         most_specific = best_connected.max_by { |h| h.deepest_position }
         chosen[root] = most_specific
@@ -18,19 +18,20 @@ module MESH
 
   private
 
-  def calculate_connections(headings)
+  def calculate_connections(root,headings)
     connections = {}
     headings.each do |h|
-      add_connection(connections, h)
+      add_connection(connections, root, h)
     end
     connections
   end
 
-  def add_connection(connections, heading)
+  def add_connection(connections, root, heading)
+    return unless heading.roots.include? root
     connections[heading] ||= 0
     connections[heading] += 1
     heading.parents.each do |p|
-      add_connection(connections, p)
+      add_connection(connections, root, p)
     end
     #heading.siblings.each do |p|
     #  add_connection(connections, p)
