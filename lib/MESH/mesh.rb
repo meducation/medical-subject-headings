@@ -1,7 +1,7 @@
 module MESH
   class Mesh
 
-    attr_accessor :unique_id, :original_heading, :tree_numbers, :roots, :parents, :children, :natural_language_name, :summary, :entries, :useful
+    attr_accessor :unique_id, :original_heading, :tree_numbers, :roots, :parents, :children, :natural_language_name, :summary, :entries, :useful, :descriptor_class
 
     def original_heading(locale = nil)
       return @original_heading if locale.nil?
@@ -52,6 +52,9 @@ module MESH
 
         matches = line.match(/^MS = (.*)/)
         current_heading.summary = matches[1] unless matches.nil?
+
+        matches = line.match(/^DC = (.*)/)
+        current_heading.descriptor_class = @@descriptor_classes[matches[1].to_i] unless matches.nil?
 
         matches = line.match(/^MH = (.*)/)
         unless matches.nil?
@@ -159,6 +162,7 @@ module MESH
     end
 
     def shallowest_position
+      raise self.inspect if tree_numbers.empty?
       shallowest_tree_number = tree_numbers.min_by { |tn| tn.length }
       shallowest_tree_number.split('.').length
     end
@@ -174,6 +178,8 @@ module MESH
           return false unless field_content.find { |fc| pattern =~ fc }
         elsif field_content.is_a?(TrueClass) || field_content.is_a?(FalseClass)
           return false unless field_content == pattern
+        elsif field_content.is_a? Symbol
+          return field_content == pattern
         else
           return false unless pattern =~ field_content
         end
@@ -194,6 +200,7 @@ module MESH
     @@by_original_heading = {}
     @@default_locale = 'en-US'
     @@translator = Translator.new
+    @@descriptor_classes = [:make_array_start_at_1, :topical_descriptor, :publication_type, :check_tag, :geographic_descriptor]
 
     def initialize
       @useful = true

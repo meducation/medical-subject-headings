@@ -62,7 +62,14 @@ module MESH
       mh = MESH::Mesh.find('D000224')
       assert_equal ['C'], mh.roots
       mh = MESH::Mesh.find('D064946')
-      assert_equal ['H','N'], mh.roots
+      assert_equal ['H', 'N'], mh.roots
+    end
+
+    it 'should have the correct descriptor class' do
+      mh = MESH::Mesh.find('D000224')
+      assert_equal :topical_descriptor, mh.descriptor_class
+      mh = MESH::Mesh.find('D005260')
+      assert_equal :check_tag, mh.descriptor_class
     end
 
     it 'should have the correct original heading' do
@@ -170,6 +177,15 @@ module MESH
     it 'should not match on incorrect conditions for entries' do
       mh = MESH::Mesh.find('D001471')
       refute mh.matches(entries: /Foo/)
+    end
+
+    it 'should match on descriptor class' do
+      mh = MESH::Mesh.find('D000224')
+      assert mh.matches(descriptor_class: :topical_descriptor)
+      refute mh.matches(descriptor_class: :check_tag)
+      mh = MESH::Mesh.find('D005260')
+      assert mh.matches(descriptor_class: :check_tag)
+      refute mh.matches(descriptor_class: :topical_descriptor)
     end
 
     it 'should match on conditions for tree numbers' do
@@ -294,13 +310,24 @@ module MESH
     end
 
     it 'should match on useful in where' do
+      expected = [MESH::Mesh.find('D012000'), MESH::Mesh.find('D064906'), MESH::Mesh.find('D064966')]
       begin
-        expected = [MESH::Mesh.find('D012000'), MESH::Mesh.find('D064906'), MESH::Mesh.find('D064966')]
         expected.each { |mh| mh.useful = false }
         actual = MESH::Mesh.where(useful: false)
         assert_equal expected, actual
       ensure
         expected.each { |mh| mh.useful = true }
+      end
+    end
+
+    it 'should match on descriptor class in where' do
+      expected = [MESH::Mesh.find('D012000'), MESH::Mesh.find('D064906'), MESH::Mesh.find('D064966')]
+      begin
+        expected.each { |mh| mh.descriptor_class = :foo }
+        actual = MESH::Mesh.where(descriptor_class: :foo)
+        assert_equal expected, actual
+      ensure
+        expected.each { |mh| mh.descriptor_class = :topical_descriptor }
       end
     end
 
