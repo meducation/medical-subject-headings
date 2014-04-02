@@ -128,13 +128,23 @@ module MESH
         heading.entries.each do |entry|
           if text.include? entry.downcase #This is a looser check than the regex but much, much faster
             regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
-            if regex =~ text
-              matches << {heading: heading, matched: entry}
+            if index = (regex =~ text)
+              matches << {heading: heading, matched: entry, index: index}
             end
           end
         end
       end
-      matches
+      confirmed_matches = []
+      matches.combination(2) do |l, r|
+        if (r[:index] >= l[:index]) && (r[:index] + r[:matched].length <= l[:index] + l[:matched].length)
+          #r is within l
+          r[:delete] = true
+        elsif (l[:index] >= r[:index]) && (l[:index] + l[:matched].length <= r[:index] + r[:matched].length)
+          #l is within r
+          l[:delete] = true
+        end
+      end
+      matches.delete_if { |match| match[:delete] }
     end
 
     def has_ancestor(heading)
@@ -157,12 +167,13 @@ module MESH
     end
 
     def deepest_position
+      return nil if tree_numbers.empty?
       deepest_tree_number = tree_numbers.max_by { |tn| tn.length }
       deepest_tree_number.split('.').length
     end
 
     def shallowest_position
-      raise self.inspect if tree_numbers.empty?
+      return nil if tree_numbers.empty?
       shallowest_tree_number = tree_numbers.min_by { |tn| tn.length }
       shallowest_tree_number.split('.').length
     end
