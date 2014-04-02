@@ -58,6 +58,13 @@ module MESH
       assert_includes mh.tree_numbers, 'C20.111.163'
     end
 
+    it 'should have the correct root letters' do
+      mh = MESH::Mesh.find('D000224')
+      assert_equal ['C'], mh.roots
+      mh = MESH::Mesh.find('D064946')
+      assert_equal ['H','N'], mh.roots
+    end
+
     it 'should have the correct original heading' do
       mh = MESH::Mesh.find('D000224')
       assert_equal 'Addison Disease', mh.original_heading
@@ -139,6 +146,10 @@ module MESH
       assert_includes parent.children, child2
       assert_includes parent.children, child3
       assert_includes parent.children, child4
+    end
+
+    it 'should have the correct siblings' do
+      fail
     end
 
     it 'should match on conditions for original_heading' do
@@ -310,6 +321,22 @@ module MESH
       end
     end
 
+    it 'should know its deepest position in the tree' do
+      #single tree numbers
+      assert_equal 1, MESH::Mesh.find('D002319').deepest_position
+      assert_equal 2, MESH::Mesh.find('D001808').deepest_position
+      assert_equal 3, MESH::Mesh.find('D001158').deepest_position
+      assert_equal 4, MESH::Mesh.find('D001981').deepest_position
+    end
+
+    it 'should know its shallowest position in the tree' do
+      #single tree numbers
+      assert_equal 1, MESH::Mesh.find('D002319').shallowest_position
+      assert_equal 2, MESH::Mesh.find('D001808').shallowest_position
+      assert_equal 3, MESH::Mesh.find('D001158').shallowest_position
+      assert_equal 4, MESH::Mesh.find('D001981').shallowest_position
+    end
+
     it 'should know if one heading is the descendant of another' do
       parent = MESH::Mesh.find('D002319')
       child = MESH::Mesh.find('D001808')
@@ -347,29 +374,19 @@ module MESH
       unrelated = MESH::Mesh.find('D008091')
       children = [child1, child2, child3, child4]
 
-      children.each { |c| refute parent.sibling(c) }
-      children.each { |c| refute c.sibling(parent) }
+      children.each { |c| refute parent.sibling?(c) }
+      children.each { |c| refute c.sibling?(parent) }
 
-      children.each { |c| assert child1.sibling(c) unless c == child1 }
-      children.each { |c| assert c.sibling(child1) unless c == child1 }
+      children.each { |c| assert child1.sibling?(c) unless c == child1 }
+      children.each { |c| assert c.sibling?(child1) unless c == child1 }
 
-      children.each { |c| refute unrelated.sibling(c) }
-      children.each { |c| refute c.sibling(unrelated) }
-    end
-
-    it 'should group headings into clusters with highest level first' do
-      skip
-      ids_to_cluster = %w(D001491 D001769 D001792 D001842 D001853 D002470 D002648 D002875 D002965 D003062 D003561 D003593 D003643 D004194 D004314 D004813 D004912 D005091 D005123 D005293 D005333 D005385 D005544 D005796 D006128 D006225 D006309 D006321 D006331 D007107 D007231 D007239 D007938 D008099 D008168 D008214 D008423 D008607 D008722 D009035 D009055 D009132 D009154 D009190 D009196 D009369 D009666 D010372 D010641 D011153 D012008 D012106 D012146 D012306 D012307 D012380 D012680 D012867 D013534 D013577 D013601 D013812 D013921 D013961 D014034 D014157 D014171 D014314 D015032 D015994 D015995 D016424 D017584 D017668 D018387 D018388 D019021 D019070 D019368 D019369 D032882 D036801 D038042 D041905 D052016)
-      headings_to_cluster = ids_to_cluster.map { |id| MESH::Mesh.find(id) }
-      expected = []
-      actual = MESH::Mesh.cluster(headings_to_cluster)
-      assert_equal expected, actual
-
+      children.each { |c| refute unrelated.sibling?(c) }
+      children.each { |c| refute c.sibling?(unrelated) }
     end
 
     it 'should override inspect to prevent issues in test diagnostics' do
       mh = MESH::Mesh.find('D001471')
-      expected = "#{mh.unique_id}, #{mh.original_heading}"
+      expected = "#{mh.unique_id}, #{mh.original_heading}, [#{mh.tree_numbers.join(',')}]"
       assert_equal expected, mh.inspect
     end
 

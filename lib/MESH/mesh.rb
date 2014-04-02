@@ -1,9 +1,7 @@
-require_relative 'translator'
-
 module MESH
   class Mesh
 
-    attr_accessor :unique_id, :original_heading, :tree_numbers, :parents, :children, :natural_language_name, :summary, :entries, :useful
+    attr_accessor :unique_id, :original_heading, :tree_numbers, :roots, :parents, :children, :natural_language_name, :summary, :entries, :useful
 
     def original_heading(locale = nil)
       return @original_heading if locale.nil?
@@ -50,6 +48,7 @@ module MESH
 
         matches = line.match(/^MN = (.*)/)
         current_heading.tree_numbers << matches[1] unless matches.nil?
+        current_heading.roots << matches[1][0] unless matches.nil? || current_heading.roots.include?(matches[1][0])
 
         matches = line.match(/^MS = (.*)/)
         current_heading.summary = matches[1] unless matches.nil?
@@ -148,9 +147,19 @@ module MESH
       return in_grandchildren.include? true
     end
 
-    def sibling(heading)
+    def sibling?(heading)
       common_parents = parents & heading.parents
       !common_parents.empty?
+    end
+
+    def deepest_position
+      deepest_tree_number = tree_numbers.max_by { |tn| tn.length }
+      deepest_tree_number.split('.').length
+    end
+
+    def shallowest_position
+      shallowest_tree_number = tree_numbers.min_by { |tn| tn.length }
+      shallowest_tree_number.split('.').length
     end
 
     def self.cluster(headings)
@@ -172,7 +181,7 @@ module MESH
     end
 
     def inspect
-      return "#{@unique_id}, #{@original_heading}"
+      return "#{@unique_id}, #{@original_heading}, [#{@tree_numbers.join(',')}]"
     end
 
     private
@@ -188,6 +197,7 @@ module MESH
     def initialize
       @useful = true
       @tree_numbers = []
+      @roots = []
       @parents = []
       @children = []
       @entries = []
