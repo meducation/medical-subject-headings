@@ -16,7 +16,7 @@ module MESH
       abstract = 'This is a guide to performing a cardiovascular examination in the context of an OSCE exam. It was created by a group of medical students for the free revision website www.geekymedics.com where you can find a written guide to accompany the video. The way in which this examination is carried out varies greatly between individuals & institutions therefore this should be used as a rough framework which you can personalise to suit your own style.'
 
       c = MESH::Classifier.new()
-      expected = {'I' => MESH::Mesh.find('D004493'), 'M' => MESH::Mesh.find('D013334')}
+      expected = {'I' => MESH::Mesh.find('D013337'), 'M' => MESH::Mesh.find('D013337')}
       assert_equal expected.sort, c.classify(abstract: abstract).sort
     end
 
@@ -27,13 +27,13 @@ module MESH
       expected = {
         'A' => MESH::Mesh.find('D001158'),
         'B' => MESH::Mesh.find('D006801'),
-        'F' => MESH::Mesh.find('D001525'),
+        'F' => MESH::Mesh.find('D035781'),
         'H' => MESH::Mesh.find('D000715'),
-        'I' => MESH::Mesh.find('D012942'),
-        'K' => MESH::Mesh.find('D006809'),
+        'I' => MESH::Mesh.find('D004493'),
+        'K' => MESH::Mesh.find('D018594'),
         'L' => MESH::Mesh.find('D019359'),
-        'M' => MESH::Mesh.find('D009272'),
-        'Z' => MESH::Mesh.find('D005842')
+        'M' => MESH::Mesh.find('D035781'),
+        'Z' => MESH::Mesh.find('D008131')
       }
       assert_equal expected.sort, c.classify(abstract: abstract).sort
     end
@@ -43,17 +43,17 @@ module MESH
       expected = {
         'A' => MESH::Mesh.find('D001829'),
         'B' => MESH::Mesh.find('D027861'),
-        'C' => MESH::Mesh.find('D014777'),
-        'D' => MESH::Mesh.find('D007287'),
-        'E' => MESH::Mesh.find('D019937'),
+        'C' => MESH::Mesh.find('D000163'),
+        'D' => MESH::Mesh.find('D007854'),
+        'E' => MESH::Mesh.find('D004562'),
         'F' => MESH::Mesh.find('D011579'),
-        'G' => MESH::Mesh.find('D055669'),
+        'G' => MESH::Mesh.find('D055585'),
         'I' => MESH::Mesh.find('D014937'),
         'K' => MESH::Mesh.find('D019368'),
-        'L' => MESH::Mesh.find('D003142'),
+        'L' => MESH::Mesh.find('D009275'),
         'M' => MESH::Mesh.find('D010361'),
-        'N' => MESH::Mesh.find('D004777'),
-        'V' => MESH::Mesh.find('D052180'),
+        'N' => MESH::Mesh.find('D014919'),
+        'V' => MESH::Mesh.find('D017203'),
         'Z' => MESH::Mesh.find('D014481')
       }
 
@@ -63,31 +63,46 @@ module MESH
     def test_it_should_classify_other_content_as_well
       c = MESH::Classifier.new()
       expected = {
-        'A' => MESH::Mesh.find('D001921'),
-        'D' => MESH::Mesh.find('D020164'),
-        'F' => MESH::Mesh.find('D001525'),
-        'G' => MESH::Mesh.find('D055669'),
-        'I' => MESH::Mesh.find('D012942'),
+        'A' => MESH::Mesh.find('D004064'),
+        'D' => MESH::Mesh.find('D002241'),
+        'F' => MESH::Mesh.find('D005190'),
+        'G' => MESH::Mesh.find('D012621'),
+        'I' => MESH::Mesh.find('D005190'),
         'J' => MESH::Mesh.find('D008420'),
         'L' => MESH::Mesh.find('D005246'),
-        'N' => MESH::Mesh.find('D004777')
+        'N' => MESH::Mesh.find('D012621')
       }
 
       assert_equal expected.sort, c.classify(content: @texts[1]).sort
     end
 
     def test_it_should_classify_title_abstract_and_content
-      skip
+      c = MESH::Classifier.new()
+
+      doc = {
+        title: 'Rotation',
+        abstract: 'Oxygen',
+        content: 'Nose'
+      }
+
+      expected = {
+        'G' => MESH::Mesh.find('D012399'),
+        'D' => MESH::Mesh.find('D010100'),
+        'A' => MESH::Mesh.find('D009666')
+      }
+
+      assert_equal expected.sort, c.classify(doc).sort
+
     end
 
     def test_uses_given_clarifier
 
     end
-    
+
     def setup
       @texts = [
         'hi in this tutorial I\'m you talk about electrocardiography so we\'ll be looking at the first principles open electrocardiogram more commonly known as an the CD or an ekgs in the United States there\'s a fairly the information in this tutorial but I\'ll try make it as simple as possible the first people were gonna look at where you attached leave them a CG machine to a patient crucible there are four leaves which are attached to the limbs the patient these are abbreviated LA left arm are a a ride home L the left leg and are I\'ll right leg there are also six leaves which we attach to the chest the patient these called chest leads missed the point of confusion for many people went first learning the PCG their these 10 leads which we\'ve attached to the patient but this is not what we mean when we talk about EC jail aids and EC Jade lead is an mathematically determined recording which is made up from a combination of these physically that are attached to the patient so from here on in when I talk about and a CG laid I\'m going to be talking about these mathematically determined recordings you don\'t need to know how these lead the calculated just know they\'re not the same thing as the lead attached to the patient so in a 12 lead the CJ which is the standard PCG they are 12 they\'d leave and each lead shows the heart from a different view so if I drop a heart like this and we\'re looking at it from me anterior aspect we can thinking these leads as little lies the h3 the heart from a different angle so there are 60 these eyes look at the heart in a corona plane and they look at the heart in the directions are shown here each of these leaves has a name this is laid one this is lead to this is lead gray and the other thing called abe et al I V on and a bf this stands for augmented Victor left right and Fort the chest leads look at the heart in a transverse plane so again these work like little eyes that each look at the heart from a different angle these are labeled much more simply they called v1 v2 b3 be full be polite and basics and that\'s the front and the back the two author now let\'s have a think about the limb leads again if I drop a diagram a the lead directions without the hard we get an image that looks like this if we extend these lines that in the opposite direction to which they point we will see that we have every direction coveted in 30 degree increments now would be a good time to talk about what I mean by looking at the heart the EC G carb see the heart in the wind x-ray came it sees it electrically that is to say it sees whether there is electrical deep polarization all repolarization occurring in the direction of peach laid if you don\'t know what I mean by D polarized nation and repolarization I\'m talking about the flow of cardiac action potentials through the heart you can check out the action potential series at WWW dot hand written tutorials dot com for more information so let me explain this a little further I\'m you draw up a hot here and we\'re gonna look at recordings the taken from lead to lead 3 and aber and we\'re going to look at the polarized nation which is occurring in this direction so any deep polarization that occurs in the direction of the lead cause away from the graph which is positive in nature that is and up with deflection so because lead to is roughly the same direction as the deep polarization the wave on the graph will look like this because lead 3 is perpendicular to the direction the polarization there will be no change in the graph and finally because aber is in the direction opposite to the direction people organization there\'s an inverted way or damn would deflection and that\'s an interview the first principles been a CG in the next tutorial will be looking at the normal patton Albany CG during the cardiac cycle for more free tutorials and the PDF this tutorial visit WWW dot hand written tutorials dot com',
-        
+
         'diabetes drug families suck my big NO inhibited gray Taurus suck my big a new inhibiting Glee Taurus so finally arias tells the pancreas you need to release more insulin so fun mines are antibiotics medics mimic natural hormones like interest in Emelin that have similar functions to insulin big one-eyed decreases the liver from making more glucose the liver is a big organ analogues have gone make peptide-1 hookah gone a comedian the increases blood sugar by releasing starch sugar in be eventually lowers blood sugar the feedback stimulate insulin release a great drug would be like glue guns eventual function be but not do function hey that drug is a GOP won analog inhibitors about the glucoside ace glucoside a season enzyme that cuts big sugars into small sugars that food in your blood it\'s the small sugars that cause problems if you give it a glucoside et sans I\'m you have less to be small problem causing sugars good his own perfect DNA use see less insulin resistant magical glitter changes your DNA per superpowers help it go help hippocampus in'
       ]
     end

@@ -1,7 +1,7 @@
 module MESH
   class Classifier
     def classify(document)
-      text = document[:title] || document[:abstract] || document[:content]
+      text = "#{document[:title]}\n#{document[:abstract]}\n#{document[:content]}"
       headings = find_connected_headings(text)
       root_groups = headings.reduce({}) do |rg, heading|
         heading.roots.each { |root| (rg[root] ||= []) << heading }
@@ -21,17 +21,17 @@ module MESH
   def calculate_connections(root,headings)
     connections = {}
     headings.each do |h|
-      add_connection(connections, root, h)
+      add_connection(connections, root, h, 1.0)
     end
     connections
   end
 
-  def add_connection(connections, root, heading)
+  def add_connection(connections, root, heading, weight)
     return unless heading.roots.include? root
     connections[heading] ||= 0
-    connections[heading] += 1
+    connections[heading] += weight
     heading.parents.each do |p|
-      add_connection(connections, root, p)
+      add_connection(connections, root, p, weight / heading.parents.length.to_f)
     end
     #heading.siblings.each do |p|
     #  add_connection(connections, p)
