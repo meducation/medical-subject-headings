@@ -80,6 +80,7 @@ module MESH
     end
 
     it 'should have anglicised original heading' do
+      MESH::Mesh.translate('en-GB', MESH::Translator.new(MESH::Translator.enus_to_engb))
       mh = MESH::Mesh.find('D001471')
       assert_equal 'Barrett Esophagus', mh.original_heading
       assert_equal 'Barrett Oesophagus', mh.original_heading('en-GB')
@@ -93,6 +94,7 @@ module MESH
     end
 
     it 'should have anglicised natural language name' do
+      MESH::Mesh.translate('en-GB', MESH::Translator.new(MESH::Translator.enus_to_engb))
       mh = MESH::Mesh.find('D001471')
       assert_equal 'Barrett Esophagus', mh.natural_language_name
       assert_equal 'Barrett Oesophagus', mh.natural_language_name('en-GB')
@@ -104,6 +106,7 @@ module MESH
     end
 
     it 'should have anglicised summary' do
+      MESH::Mesh.translate('en-GB', MESH::Translator.new(MESH::Translator.enus_to_engb))
       mh = MESH::Mesh.find('D001471')
       assert_equal 'A condition with damage to the lining of the lower ESOPHAGUS resulting from chronic acid reflux (ESOPHAGITIS, REFLUX). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the INTESTINE or the salmon-pink mucosa of the STOMACH. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to ADENOCARCINOMA of the esophagus.', mh.summary
       assert_equal 'A condition with damage to the lining of the lower OESOPHAGUS resulting from chronic acid reflux (OESOPHAGITIS, REFLUX). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the INTESTINE or the salmon-pink mucosa of the STOMACH. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to ADENOCARCINOMA of the oesophagus.', mh.summary('en-GB')
@@ -117,6 +120,7 @@ module MESH
     end
 
     it 'should have anglicised entries' do
+      MESH::Mesh.translate('en-GB', MESH::Translator.new(MESH::Translator.enus_to_engb))
       expected_entries = ['Barrett Esophagus', 'Barrett Syndrome', 'Esophagus, Barrett', 'Barrett Epithelium', 'Barrett Metaplasia', 'Barrett\'s Esophagus', 'Barrett\'s Syndrome', 'Barretts Esophagus', 'Barretts Syndrome', 'Epithelium, Barrett', 'Esophagus, Barrett\'s', 'Syndrome, Barrett', 'Syndrome, Barrett\'s']
       expected_entries_en = ['Barrett Oesophagus', 'Barrett Syndrome', 'Oesophagus, Barrett', 'Barrett Epithelium', 'Barrett Metaplasia', 'Barrett\'s Oesophagus', 'Barrett\'s Syndrome', 'Barretts Oesophagus', 'Barretts Syndrome', 'Epithelium, Barrett', 'Oesophagus, Barrett\'s', 'Syndrome, Barrett', 'Syndrome, Barrett\'s']
       expected_entries.sort!
@@ -284,6 +288,13 @@ module MESH
 
     it 'should return no matches when given nil text' do
       assert_equal [], MESH::Mesh.match_in_text(nil)
+    end
+
+    it 'should match anglicised terms in text' do
+      text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu leukaemia'
+      matches = MESH::Mesh.match_in_text(text)
+      assert_equal 1, matches.length
+      assert_equal MESH::Mesh.find('D007938'), matches[0][:heading]
     end
 
     it 'should allow headings to be marked as not useful' do

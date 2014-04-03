@@ -1,75 +1,74 @@
 module MESH
   class Mesh
 
-    attr_accessor :unique_id, :original_heading, :tree_numbers, :roots, :parents, :children, :natural_language_name, :summary, :entries, :useful, :descriptor_class
+    attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class
 
-    def original_heading(locale = nil)
-      return @original_heading if locale.nil?
-      @@translator.translate(@original_heading)
+    def original_heading(locale = @@default_locale)
+      return @original_heading[locale]
     end
 
-    def natural_language_name(locale = nil)
-      return @natural_language_name if locale.nil?
-      @@translator.translate(@natural_language_name)
+    def natural_language_name(locale = @@default_locale)
+      return @natural_language_name[locale]
     end
 
-    def summary(locale = nil)
-      return @summary if locale.nil?
-      @@translator.translate(@summary)
+    def summary(locale = @@default_locale)
+      return @summary[locale]
     end
 
-    def entries(locale = nil)
-      return @entries if locale.nil?
-      @entries.map { |entry| @@translator.translate(entry) }.sort
+    def entries(locale = @@default_locale)
+      @entries[locale] ||= []
+      return @entries[locale]
     end
 
     def self.configure(args)
       return if @@configured
       raise ArgumentError.new('MeshHeadingGraph requires a filename in order to configure itself') unless not args[:filename].nil?
+
       gzipped_file = File.open(args[:filename])
       file = Zlib::GzipReader.new(gzipped_file)
+
       current_heading = Mesh.new
       file.each_line do |line|
-        if line.match(/^\*NEWRECORD$/) #Then store the previous record before continuing
-          unless current_heading.unique_id.nil?
-            current_heading.entries.sort!
-            @@headings << current_heading
-            @@by_unique_id[current_heading.unique_id] = current_heading
-            @@by_original_heading[current_heading.original_heading] = current_heading
-            current_heading.tree_numbers.each do |tree_number|
-              @@by_tree_number[tree_number] = current_heading
+
+        case
+
+          when matches = line.match(/^\*NEWRECORD$/)
+            unless current_heading.unique_id.nil?
+              current_heading.entries.sort!
+              @@headings << current_heading
+              @@by_unique_id[current_heading.unique_id] = current_heading
+              @@by_original_heading[current_heading.original_heading] = current_heading
+              current_heading.tree_numbers.each do |tree_number|
+                @@by_tree_number[tree_number] = current_heading
+              end
             end
-          end
-          current_heading = Mesh.new
-        end
+            current_heading = Mesh.new
 
-        matches = line.match(/^UI = (.*)/)
-        current_heading.unique_id = matches[1] unless matches.nil?
+          when matches = line.match(/^UI = (.*)/)
+            current_heading.unique_id = matches[1]
 
-        matches = line.match(/^MN = (.*)/)
-        current_heading.tree_numbers << matches[1] unless matches.nil?
-        current_heading.roots << matches[1][0] unless matches.nil? || current_heading.roots.include?(matches[1][0])
+          when matches = line.match(/^MN = (.*)/)
+            current_heading.tree_numbers << matches[1]
+            current_heading.roots << matches[1][0] unless current_heading.roots.include?(matches[1][0])
 
-        matches = line.match(/^MS = (.*)/)
-        current_heading.summary = matches[1] unless matches.nil?
+          when matches = line.match(/^MS = (.*)/)
+            current_heading.set_summary(matches[1])
 
-        matches = line.match(/^DC = (.*)/)
-        current_heading.descriptor_class = @@descriptor_classes[matches[1].to_i] unless matches.nil?
+          when matches = line.match(/^DC = (.*)/)
+            current_heading.descriptor_class = @@descriptor_classes[matches[1].to_i]
 
-        matches = line.match(/^MH = (.*)/)
-        unless matches.nil?
-          mh = matches[1]
-          current_heading.original_heading = mh
-          current_heading.natural_language_name = mh
-          current_heading.entries << mh
-          librarian_parts = mh.match(/(.*), (.*)/)
-          current_heading.natural_language_name = "#{librarian_parts[2]} #{librarian_parts[1]}" unless librarian_parts.nil?
-        end
+          when matches = line.match(/^MH = (.*)/)
+            mh = matches[1]
+            current_heading.set_original_heading(mh)
+            current_heading.entries << mh
+            librarian_parts = mh.match(/(.*), (.*)/)
+            nln = librarian_parts.nil? ? mh : "#{librarian_parts[2]} #{librarian_parts[1]}"
+            current_heading.set_natural_language_name(nln)
 
-        matches = line.match(/^(?:PRINT )?ENTRY = ([^|]+)/)
-        unless matches.nil?
-          mh = matches[1].chomp
-          current_heading.entries << mh
+          when matches = line.match(/^(?:PRINT )?ENTRY = ([^|]+)/)
+            entry = matches[1].chomp
+            current_heading.entries << entry
+
         end
 
       end
@@ -88,6 +87,19 @@ module MESH
         end
       end
       @@configured = true
+    end
+
+    def self.translate(locale, tr)
+      return if @@locales.include? locale
+      @@headings.each_with_index do |h,i|
+        h.set_original_heading(tr.translate(h.original_heading), locale)
+        h.set_natural_language_name(tr.translate(h.natural_language_name), locale)
+        h.set_summary(tr.translate(h.summary), locale)
+        h.entries.each { |entry| h.entries(locale) << tr.translate(entry) }
+        h.entries(locale).sort!
+      end
+
+      @@locales << locale
     end
 
     def self.find(unique_id)
@@ -199,7 +211,19 @@ module MESH
     end
 
     def inspect
-      return "#{@unique_id}, #{@original_heading}, [#{@tree_numbers.join(',')}]"
+      return "#{unique_id}, #{original_heading}, [#{tree_numbers.join(',')}]"
+    end
+
+    def set_original_heading(heading, locale = @@default_locale)
+      @original_heading[locale] = heading
+    end
+
+    def set_natural_language_name(name, locale = @@default_locale)
+      @natural_language_name[locale] = name
+    end
+
+    def set_summary(summary, locale = @@default_locale)
+      @summary[locale] = summary
     end
 
     private
@@ -210,7 +234,8 @@ module MESH
     @@by_tree_number = {}
     @@by_original_heading = {}
     @@default_locale = 'en-US'
-    @@translator = Translator.new
+    @@locales = [@@default_locale]
+    @@us_to_gb = Translator.new(Translator.enus_to_engb)
     @@descriptor_classes = [:make_array_start_at_1, :topical_descriptor, :publication_type, :check_tag, :geographic_descriptor]
 
     def initialize
@@ -219,8 +244,13 @@ module MESH
       @roots = []
       @parents = []
       @children = []
-      @entries = []
+      @entries = {}
+      @entries[@@default_locale] = []
+      @original_heading = {}
+      @natural_language_name = {}
+      @summary = {}
     end
+
 
   end
 end

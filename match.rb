@@ -8,10 +8,16 @@ MESH::Mesh.configure(filename: 'data/mesh_data_2014/d2014.bin.gz')
 syllabus.each do |si|
 
   if mh = MESH::Mesh.find_by_original_heading(si)
-    puts "#{si}\t#{mh.inspect}\t#{mh.shallowest_position unless mh.nil?}\t#{mh.deepest_position unless mh.nil?}"
+    puts "#{si}\t1\t#{mh.inspect}\t#{mh.shallowest_position unless mh.nil?}\t#{mh.deepest_position unless mh.nil?}"
   elsif matches = MESH::Mesh.match_in_text(si)
-    print "#{si}\t"
-    puts matches.map { |m| "#{m[:heading].inspect}, #{m[:heading].shallowest_position}, #{m[:heading].deepest_position}" if m[:heading].descriptor_class == :topical_descriptor }.join("\t")
+    topical_matches = matches.map do |m|
+      if m[:heading].descriptor_class == :topical_descriptor
+        "#{m[:heading].inspect}, #{m[:heading].shallowest_position}, #{m[:heading].deepest_position}"
+      end
+    end
+    topical_matches.compact!
+    print "#{si}\t#{topical_matches.length}\t"
+    puts topical_matches.join("\t")
   else
     puts 'nil'
   end
