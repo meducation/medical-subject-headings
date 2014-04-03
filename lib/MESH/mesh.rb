@@ -1,7 +1,12 @@
 module MESH
   class Mesh
 
+    include Comparable
     attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class
+
+    def <=> other
+      self.unique_id <=> other.unique_id
+    end
 
     def original_heading(locale = @@default_locale)
       return @original_heading[locale]
@@ -141,9 +146,12 @@ module MESH
           heading.entries(locale).each do |entry|
             if text.include? entry.downcase #This is a looser check than the regex but much, much faster
               regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
-              if index = (regex =~ text)
-                matches << {heading: heading, matched: entry, index: index}
+              text.to_enum(:scan,regex).map do |m,|
+                matches << {heading: heading, matched: entry, index: $`.size}
               end
+              #if index = (regex =~ text)
+              #  matches << {heading: heading, matched: entry, index: index}
+              #end
             end
           end
         end

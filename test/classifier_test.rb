@@ -27,9 +27,9 @@ module MESH
       expected = {
         'A' => MESH::Mesh.find('D001158'),
         'B' => MESH::Mesh.find('D006801'),
-        'F' => MESH::Mesh.find('D035781'),
+        'F' => MESH::Mesh.find('D014836'),
         'H' => MESH::Mesh.find('D000715'),
-        'I' => MESH::Mesh.find('D004493'),
+        'I' => MESH::Mesh.find('D018594'),
         'K' => MESH::Mesh.find('D018594'),
         'L' => MESH::Mesh.find('D019359'),
         'M' => MESH::Mesh.find('D035781'),
@@ -96,7 +96,7 @@ module MESH
     end
 
     def test_uses_given_clarifier
-
+      skip
     end
 
     def setup
