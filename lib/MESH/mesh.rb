@@ -91,7 +91,7 @@ module MESH
 
     def self.translate(locale, tr)
       return if @@locales.include? locale
-      @@headings.each_with_index do |h,i|
+      @@headings.each_with_index do |h, i|
         h.set_original_heading(tr.translate(h.original_heading), locale)
         h.set_natural_language_name(tr.translate(h.natural_language_name), locale)
         h.set_summary(tr.translate(h.summary), locale)
@@ -137,11 +137,13 @@ module MESH
       matches = []
       @@headings.each do |heading|
         next unless heading.useful
-        heading.entries.each do |entry|
-          if text.include? entry.downcase #This is a looser check than the regex but much, much faster
-            regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
-            if index = (regex =~ text)
-              matches << {heading: heading, matched: entry, index: index}
+        @@locales.each do |locale|
+          heading.entries(locale).each do |entry|
+            if text.include? entry.downcase #This is a looser check than the regex but much, much faster
+              regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
+              if index = (regex =~ text)
+                matches << {heading: heading, matched: entry, index: index}
+              end
             end
           end
         end
