@@ -60,7 +60,7 @@ module MESH
       assert_equal expected.sort, c.classify(content: @texts[0]).sort
     end
 
-    def test_it_should_classify_content_again
+    def test_it_should_classify_other_content_as_well
       c = MESH::Classifier.new()
       expected = {
         'A' => MESH::Mesh.find('D001921'),
