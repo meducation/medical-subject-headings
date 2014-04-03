@@ -58,6 +58,20 @@ module MESH
       assert_includes mh.tree_numbers, 'C20.111.163'
     end
 
+    it 'should have the correct root letters' do
+      mh = MESH::Mesh.find('D000224')
+      assert_equal ['C'], mh.roots
+      mh = MESH::Mesh.find('D064946')
+      assert_equal ['H', 'N'], mh.roots
+    end
+
+    it 'should have the correct descriptor class' do
+      mh = MESH::Mesh.find('D000224')
+      assert_equal :topical_descriptor, mh.descriptor_class
+      mh = MESH::Mesh.find('D005260')
+      assert_equal :check_tag, mh.descriptor_class
+    end
+
     it 'should have the correct original heading' do
       mh = MESH::Mesh.find('D000224')
       assert_equal 'Addison Disease', mh.original_heading
@@ -141,6 +155,10 @@ module MESH
       assert_includes parent.children, child4
     end
 
+    it 'should have the correct siblings' do
+      skip
+    end
+
     it 'should match on conditions for original_heading' do
       mh = MESH::Mesh.find('D001471')
       assert mh.matches(original_heading: /^Barrett Esophagus$/)
@@ -159,6 +177,15 @@ module MESH
     it 'should not match on incorrect conditions for entries' do
       mh = MESH::Mesh.find('D001471')
       refute mh.matches(entries: /Foo/)
+    end
+
+    it 'should match on descriptor class' do
+      mh = MESH::Mesh.find('D000224')
+      assert mh.matches(descriptor_class: :topical_descriptor)
+      refute mh.matches(descriptor_class: :check_tag)
+      mh = MESH::Mesh.find('D005260')
+      assert mh.matches(descriptor_class: :check_tag)
+      refute mh.matches(descriptor_class: :topical_descriptor)
     end
 
     it 'should match on conditions for tree numbers' do
@@ -211,15 +238,22 @@ module MESH
     end
 
     it 'should match headings that occur in given text' do
-      expected_ids = %w(D001491 D001769 D001792 D001842 D001853 D002470 D002477 D002648 D002875 D002965 D002999 D003062 D003561 D003593 D003643 D004194 D004314 D004813 D004912 D005091 D005123 D005293 D005333 D005385 D005544 D005796 D006128 D006225 D006309 D006321 D006331 D006664 D007107 D007223 D007231 D007239 D007246 D007938 D008099 D008168 D008214 D008423 D008533 D008607 D008722 D009035 D009055 D009132 D009154 D009190 D009196 D009369 D009666 D010372 D010641 D011153 D012008 D012106 D012146 D012306 D012307 D012380 D012680 D012867 D013534 D013577 D013601 D013812 D013921 D013961 D014034 D014157 D014171 D014314 D014960 D015032 D015994 D015995 D016424 D016433 D017584 D017668 D018387 D018388 D019021 D019070 D019368 D019369 D032882 D036801 D038042 D041905 D052016 D055016)
+      expected_ids = %w(D001491 D001769 D001792 D001853 D002470 D002477 D002648 D002965 D002999 D003561 D003593 D003643 D004314 D004813 D004912 D005091 D005123 D005293 D005333 D005385 D005544 D005796 D006128 D006225 D006309 D006331 D006405 D007107 D007231 D007239 D007246 D007938 D007947 D008099 D008168 D008214 D008423 D008533 D008607 D008722 D009035 D009055 D009132 D009154 D009190 D009196 D009369 D009666 D010372 D010641 D011153 D012008 D012106 D012146 D012307 D012380 D012680 D012867 D013601 D013812 D013921 D013961 D014034 D014157 D014171 D014960 D015032 D015470 D015994 D015995 D016424 D016433 D017584 D017668 D018387 D018388 D019021 D019070 D019368 D019369 D032882 D036801 D038042 D041905 D052016 D054198 D055016)
       expected = expected_ids.map { |id| MESH::Mesh.find(id) }
       matches = MESH::Mesh.match_in_text(@example_text)
       actual = matches.map { |match| match[:heading] }.uniq
       assert_equal expected, actual
     end
 
+    it 'should only match the most specific matches in given text' do
+      expected = MESH::Mesh.find('D054144')
+      actual = MESH::Mesh.match_in_text('Diastolic Heart Failure')
+      assert_equal 1, actual.length
+      assert_equal expected, actual.first[:heading]
+    end
+
     it 'should only match useful headings that occur in given text' do
-      expected_ids = %w(D001491 D001769 D001792 D001842 D001853 D002470 D002648 D002875 D002965 D003062 D003561 D003593 D003643 D004194 D004314 D004813 D004912 D005091 D005123 D005293 D005333 D005385 D005544 D005796 D006128 D006225 D006309 D006321 D006331 D007107 D007231 D007239 D007938 D008099 D008168 D008214 D008423 D008607 D008722 D009035 D009055 D009132 D009154 D009190 D009196 D009369 D009666 D010372 D010641 D011153 D012008 D012106 D012146 D012306 D012307 D012380 D012680 D012867 D013534 D013577 D013601 D013812 D013921 D013961 D014034 D014157 D014171 D014314 D015032 D015994 D015995 D016424 D017584 D017668 D018387 D018388 D019021 D019070 D019368 D019369 D032882 D036801 D038042 D041905 D052016)
+      expected_ids = %w(D001491 D001769 D001792 D001853 D002470 D002648 D002875 D002965 D003561 D003593 D003643 D004314 D004813 D004912 D005091 D005123 D005293 D005333 D005385 D005544 D005796 D006128 D006225 D006309 D006331 D006405 D007107 D007231 D007239 D007938 D007947 D008099 D008168 D008214 D008423 D008607 D008722 D009035 D009055 D009132 D009154 D009190 D009196 D009369 D009666 D010372 D010641 D011153 D012008 D012106 D012146 D012307 D012380 D012680 D012867 D013601 D013812 D013921 D013961 D014034 D014157 D014171 D015032 D015470 D015994 D015995 D016424 D017584 D017668 D018387 D018388 D019021 D019070 D019368 D019369 D032882 D036801 D038042 D041905 D052016 D054198)
 
       not_useful_ids = %w(D007246 D002477 D014960 D008533 D016433 D006664 D055016 D002999 D007223)
       begin
@@ -243,6 +277,17 @@ module MESH
 
     it 'should match headings at end of text' do
       text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu leukemia'
+      matches = MESH::Mesh.match_in_text(text)
+      assert_equal 1, matches.length
+      assert_equal MESH::Mesh.find('D007938'), matches[0][:heading]
+    end
+
+    it 'should return no matches when given nil text' do
+      assert_equal [], MESH::Mesh.match_in_text(nil)
+    end
+
+    it 'should match anglicised terms in text' do
+      text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu leukaemia'
       matches = MESH::Mesh.match_in_text(text)
       assert_equal 1, matches.length
       assert_equal MESH::Mesh.find('D007938'), matches[0][:heading]
@@ -279,13 +324,24 @@ module MESH
     end
 
     it 'should match on useful in where' do
+      expected = [MESH::Mesh.find('D012000'), MESH::Mesh.find('D064906'), MESH::Mesh.find('D064966')]
       begin
-        expected = [MESH::Mesh.find('D012000'), MESH::Mesh.find('D064906'), MESH::Mesh.find('D064966')]
         expected.each { |mh| mh.useful = false }
         actual = MESH::Mesh.where(useful: false)
         assert_equal expected, actual
       ensure
         expected.each { |mh| mh.useful = true }
+      end
+    end
+
+    it 'should match on descriptor class in where' do
+      expected = [MESH::Mesh.find('D012000'), MESH::Mesh.find('D064906'), MESH::Mesh.find('D064966')]
+      begin
+        expected.each { |mh| mh.descriptor_class = :foo }
+        actual = MESH::Mesh.where(descriptor_class: :foo)
+        assert_equal expected, actual
+      ensure
+        expected.each { |mh| mh.descriptor_class = :topical_descriptor }
       end
     end
 
@@ -308,6 +364,22 @@ module MESH
           mh.useful = true
         end
       end
+    end
+
+    it 'should know its deepest position in the tree' do
+      #single tree numbers
+      assert_equal 1, MESH::Mesh.find('D002319').deepest_position
+      assert_equal 2, MESH::Mesh.find('D001808').deepest_position
+      assert_equal 3, MESH::Mesh.find('D001158').deepest_position
+      assert_equal 4, MESH::Mesh.find('D001981').deepest_position
+    end
+
+    it 'should know its shallowest position in the tree' do
+      #single tree numbers
+      assert_equal 1, MESH::Mesh.find('D002319').shallowest_position
+      assert_equal 2, MESH::Mesh.find('D001808').shallowest_position
+      assert_equal 3, MESH::Mesh.find('D001158').shallowest_position
+      assert_equal 4, MESH::Mesh.find('D001981').shallowest_position
     end
 
     it 'should know if one heading is the descendant of another' do
@@ -347,29 +419,19 @@ module MESH
       unrelated = MESH::Mesh.find('D008091')
       children = [child1, child2, child3, child4]
 
-      children.each { |c| refute parent.sibling(c) }
-      children.each { |c| refute c.sibling(parent) }
+      children.each { |c| refute parent.sibling?(c) }
+      children.each { |c| refute c.sibling?(parent) }
 
-      children.each { |c| assert child1.sibling(c) unless c == child1 }
-      children.each { |c| assert c.sibling(child1) unless c == child1 }
+      children.each { |c| assert child1.sibling?(c) unless c == child1 }
+      children.each { |c| assert c.sibling?(child1) unless c == child1 }
 
-      children.each { |c| refute unrelated.sibling(c) }
-      children.each { |c| refute c.sibling(unrelated) }
-    end
-
-    it 'should group headings into clusters with highest level first' do
-      skip
-      ids_to_cluster = %w(D001491 D001769 D001792 D001842 D001853 D002470 D002648 D002875 D002965 D003062 D003561 D003593 D003643 D004194 D004314 D004813 D004912 D005091 D005123 D005293 D005333 D005385 D005544 D005796 D006128 D006225 D006309 D006321 D006331 D007107 D007231 D007239 D007938 D008099 D008168 D008214 D008423 D008607 D008722 D009035 D009055 D009132 D009154 D009190 D009196 D009369 D009666 D010372 D010641 D011153 D012008 D012106 D012146 D012306 D012307 D012380 D012680 D012867 D013534 D013577 D013601 D013812 D013921 D013961 D014034 D014157 D014171 D014314 D015032 D015994 D015995 D016424 D017584 D017668 D018387 D018388 D019021 D019070 D019368 D019369 D032882 D036801 D038042 D041905 D052016)
-      headings_to_cluster = ids_to_cluster.map { |id| MESH::Mesh.find(id) }
-      expected = []
-      actual = MESH::Mesh.cluster(headings_to_cluster)
-      assert_equal expected, actual
-
+      children.each { |c| refute unrelated.sibling?(c) }
+      children.each { |c| refute c.sibling?(unrelated) }
     end
 
     it 'should override inspect to prevent issues in test diagnostics' do
       mh = MESH::Mesh.find('D001471')
-      expected = "#{mh.unique_id}, #{mh.original_heading}"
+      expected = "#{mh.unique_id}, #{mh.original_heading}, [#{mh.tree_numbers.join(',')}]"
       assert_equal expected, mh.inspect
     end
 

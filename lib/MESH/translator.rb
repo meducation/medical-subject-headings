@@ -1,18 +1,35 @@
 module MESH
   class Translator
 
+    attr_accessor :dictionary
+
     def translate(input)
+      return nil if input.nil?
       input = input.clone
-      @enus_to_engb.each do |match, replacement|
-        start_middle_and_end(input, match.downcase, replacement.downcase)
-        start_middle_and_end(input, match.capitalize, replacement.capitalize)
-        start_middle_and_end(input, match.upcase, replacement.upcase)
-      end
+      @downcased.each { |match, replacement| input.gsub!(match, replacement) }
+      @capitalized.each { |match, replacement| input.gsub!(match, replacement) }
+      @upcased.each { |match, replacement| input.gsub!(match, replacement) }
       input
     end
 
-    def initialize
-      @enus_to_engb = {
+    def initialize(dictionary)
+      @dictionary = dictionary
+      @downcased = {}
+      @capitalized = {}
+      @upcased = {}
+      dictionary.each do |match,replacement|
+        @downcased[/(^|\W)#{Regexp.quote(match.downcase)}(\W|$)/] = "\\1#{replacement.downcase}\\2"
+        @capitalized[/(^|\W)#{Regexp.quote(match.capitalize)}(\W|$)/] = "\\1#{replacement.capitalize}\\2"
+        @upcased[/(^|\W)#{Regexp.quote(match.upcase)}(\W|$)/] = "\\1#{replacement.upcase}\\2"
+      end
+    end
+
+    def self.engb_to_enus
+      @@engb_to_enus ||= @@enus_to_engb.invert
+    end
+
+    def self.enus_to_engb
+      @@enus_to_engb ||= {
         'abrigment' => 'abrigement',
         'acknowledgment' => 'acknowledgement',
         'airplane' => 'aeroplane',
@@ -61,6 +78,7 @@ module MESH
         'gynecology' => 'gynaecology',
         'harbor' => 'harbour',
         'hematemesis' => 'haematemesis',
+        'hematology' => 'haematology',
         'hemoglobin' => 'haemoglobin',
         'hemorrhoid' => 'haemorrhoid',
         'homeopath' => 'homoeopath',
@@ -110,16 +128,6 @@ module MESH
         'vapor' => 'vapour',
         'vaporize' => 'vaporise'
       }
-
-    end
-
-    private
-
-    def start_middle_and_end(input, match, replacement)
-      input.gsub!(/^#{Regexp.quote(match)}$/, replacement) #alone
-      input.gsub!(/^#{Regexp.quote(match)}(\W+)/) { "#{replacement}#{$1}" } #start
-      input.gsub!(/(\W+)#{Regexp.quote(match)}(\W+)/) { "#{$1}#{replacement}#{$2}" } #middle
-      input.gsub!(/(\W+)#{Regexp.quote(match)}$/) { "#{$1}#{replacement}" } #end
     end
 
   end
