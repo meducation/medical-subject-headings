@@ -43,7 +43,7 @@ module MESH
       expected = {
         'A' => MESH::Mesh.find('D001829'),
         'B' => MESH::Mesh.find('D027861'),
-        'C' => MESH::Mesh.find('D000163'),
+        'C' => MESH::Mesh.find('D003221'),
         'D' => MESH::Mesh.find('D007854'),
         'E' => MESH::Mesh.find('D004562'),
         'F' => MESH::Mesh.find('D011579'),

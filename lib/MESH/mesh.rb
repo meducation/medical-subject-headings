@@ -138,20 +138,21 @@ module MESH
 
     def self.match_in_text(text)
       return [] if text.nil?
-      text = text.downcase
+      downcased = text.downcase
       matches = []
       @@headings.each do |heading|
         next unless heading.useful
         @@locales.each do |locale|
           heading.entries(locale).each do |entry|
-            if text.include? entry.downcase #This is a looser check than the regex but much, much faster
-              regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
-              text.to_enum(:scan,regex).map do |m,|
+            if downcased.include? entry.downcase #This is a looser check than the regex but much, much faster
+              if /^[A-Z0-9]+$/ =~ entry
+                regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/
+              else
+                regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
+              end
+              text.to_enum(:scan, regex).map do |m,|
                 matches << {heading: heading, matched: entry, index: $`.size}
               end
-              #if index = (regex =~ text)
-              #  matches << {heading: heading, matched: entry, index: index}
-              #end
             end
           end
         end

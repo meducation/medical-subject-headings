@@ -290,6 +290,15 @@ module MESH
       assert_equal [], MESH::Mesh.match_in_text(nil)
     end
 
+    it 'should only match uppercase entries with uppercase text' do
+      text = 'Lorem amet, consectetur adipiscing elit. Donec pretium ATP leo diam, quis adipiscing purus bibendum.'
+      matches = MESH::Mesh.match_in_text(text)
+      assert_equal 1, matches.length
+      assert_equal MESH::Mesh.find('D000255'), matches[0][:heading]
+      text = 'Lorem ipsum consectetur adipiscing elit. Donec pretium atp leo diam, quis adipiscing purus bibendum.'
+      assert_equal [], MESH::Mesh.match_in_text(text)
+    end
+
     it 'should match anglicised terms in text' do
       text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu leukaemia'
       matches = MESH::Mesh.match_in_text(text)
