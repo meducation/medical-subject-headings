@@ -189,9 +189,9 @@ module MESH
       !common_parents.empty?
     end
 
-    def deepest_position
+    def deepest_position(root = '')
       return nil if tree_numbers.empty?
-      deepest_tree_number = tree_numbers.max_by { |tn| tn.length }
+      deepest_tree_number = tree_numbers.max_by { |tn| tn.start_with?(root) ? tn.length : 0 }
       deepest_tree_number.split('.').length
     end
 
