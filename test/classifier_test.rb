@@ -4,6 +4,18 @@ module MESH
 
   class ClassiferTest < Minitest::Test
 
+    def assert_classification expected, actual
+      expected.each do |exp_root, (exp_best_score, exp_headings)|
+        refute_nil actual[exp_root], "Expected headings for #{exp_root} but none present in actual"
+        act_best_score, act_headings = actual[exp_root]
+        assert_equal exp_best_score, act_best_score, "Expected best score of #{exp_best_score} for root #{exp_root} but received #{act_best_score}"
+        assert_equal exp_headings.length, act_headings.length, "Expected #{exp_headings.length} headings for root #{exp_root} but received #{act_headings.length}"
+        exp_headings.each do |exp_heading, exp_score|
+          assert_equal exp_score, act_headings[exp_heading], "Expected score of #{exp_score} for #{exp_heading.unique_id} in root #{exp_root} but received #{act_headings[exp_heading]}"
+        end
+      end
+    end
+
     #def test_headers
     #  @texts.each do |k, v|
     #    matches = MESH::Mesh.match_in_text(v)
@@ -19,27 +31,27 @@ module MESH
       expected = {
         'H' => [1.0, {
           MESH::Mesh.find('D000715') => 1.0,
-          MESH::Mesh.find('D001690') => 0.3333333333333333,
-          MESH::Mesh.find('D010811') => 0.1111111111111111
+          MESH::Mesh.find('D001690') => 0.333,
+          MESH::Mesh.find('D010811') => 0.111
         }],
         'A' => [1.0, {
           MESH::Mesh.find('D005542') => 1.0,
-          MESH::Mesh.find('D034941') => 0.3333333333333333,
-          MESH::Mesh.find('D005121') => 0.1111111111111111,
-          MESH::Mesh.find('D001829') => 0.037037037037037035
+          MESH::Mesh.find('D034941') => 0.333,
+          MESH::Mesh.find('D005121') => 0.111,
+          MESH::Mesh.find('D001829') => 0.037
         }]
       }
-      assert_equal expected, c.classify([{matches: @headings[:forearm_anatomy_title], weight: 1.0}])
+      assert_classification expected, c.classify([{matches: @headings[:forearm_anatomy_title], weight: 1.0}])
 
       expected = {
         'H' => [1.0, {
           MESH::Mesh.find('D002309') => 1.0,
-          MESH::Mesh.find('D007388') => 0.3333333333333333,
-          MESH::Mesh.find('D008511') => 0.1111111111111111,
-          MESH::Mesh.find('D006281') => 0.037037037037037035
+          MESH::Mesh.find('D007388') => 0.333,
+          MESH::Mesh.find('D008511') => 0.111,
+          MESH::Mesh.find('D006281') => 0.037
         }]
       }
-      assert_equal expected, c.classify([{matches: @headings[:cardiology_title], weight: 1.0}])
+      assert_classification expected, c.classify([{matches: @headings[:cardiology_title], weight: 1.0}])
     end
 
     def test_it_should_classify_poor_abstract
@@ -47,19 +59,19 @@ module MESH
       expected = {
         'I' => [1.0, {
           MESH::Mesh.find('D013337') => 1.0,
-          MESH::Mesh.find('D013336') => 0.6666666666666666,
-          MESH::Mesh.find('D013334') => 0.4444444444444444,
-          MESH::Mesh.find('D004505') => 0.14814814814814814,
-          MESH::Mesh.find('D004493') => 0.19753086419753085
+          MESH::Mesh.find('D013336') => 0.667,
+          MESH::Mesh.find('D013334') => 0.444,
+          MESH::Mesh.find('D004505') => 0.148,
+          MESH::Mesh.find('D004493') => 0.198
         }],
         'M' => [1.0, {
           MESH::Mesh.find('D013337') => 1.0,
-          MESH::Mesh.find('D013336') => 0.6666666666666666,
-          MESH::Mesh.find('D013334') => 0.4444444444444444,
-          MESH::Mesh.find('D009272') => 0.14814814814814814
+          MESH::Mesh.find('D013336') => 0.667,
+          MESH::Mesh.find('D013334') => 0.444,
+          MESH::Mesh.find('D009272') => 0.148
         }]
       }
-      assert_equal expected.sort, c.classify([{matches: @headings[:poor_abstract], weight: 1.0}]).sort
+      assert_classification expected, c.classify([{matches: @headings[:poor_abstract], weight: 1.0}])
     end
 
     def test_it_should_classify_good_abstract
@@ -68,169 +80,166 @@ module MESH
       expected = {
         'A' => [1.0, {
           MESH::Mesh.find('D001158') => 1.0,
-          MESH::Mesh.find('D001808') => 0.3333333333333333,
-          MESH::Mesh.find('D002319') => 0.1111111111111111,
+          MESH::Mesh.find('D001808') => 0.333,
+          MESH::Mesh.find('D002319') => 0.111,
           MESH::Mesh.find('D009333') => 1.0,
-          MESH::Mesh.find('D001829') => 0.3333333333333333
+          MESH::Mesh.find('D001829') => 0.333
         }],
 
         'B' => [1.0, {
           MESH::Mesh.find('D006801') => 1.0,
-          MESH::Mesh.find('D015186') => 0.3333333333333333,
-          MESH::Mesh.find('D051079') => 0.1111111111111111,
-          MESH::Mesh.find('D000882') => 0.037037037037037035,
-          MESH::Mesh.find('D011323') => 0.012345679012345678,
-          MESH::Mesh.find('D008322') => 0.004115226337448559,
-          MESH::Mesh.find('D014714') => 0.0013717421124828531,
-          MESH::Mesh.find('D043344') => 0.0004572473708276177,
-          MESH::Mesh.find('D000818') => 0.00015241579027587258,
-          MESH::Mesh.find('D056890') => 5.0805263425290864e-05
+          MESH::Mesh.find('D015186') => 0.333,
+          MESH::Mesh.find('D051079') => 0.111,
+          MESH::Mesh.find('D000882') => 0.037,
+          MESH::Mesh.find('D011323') => 0.012,
+          MESH::Mesh.find('D008322') => 0.004,
+          MESH::Mesh.find('D014714') => 0.001,
         }],
         'F' => [2.0, {
           MESH::Mesh.find('D014836') => 2.0,
-          MESH::Mesh.find('D008606') => 0.6666666666666666,
-          MESH::Mesh.find('D011579') => 0.2222222222222222,
+          MESH::Mesh.find('D008606') => 0.667,
+          MESH::Mesh.find('D011579') => 0.222,
           MESH::Mesh.find('D035781') => 1.0,
-          MESH::Mesh.find('D009679') => 0.6666666666666666,
-          MESH::Mesh.find('D005190') => 0.4444444444444444,
-          MESH::Mesh.find('D011593') => 0.14814814814814814,
-          MESH::Mesh.find('D001520') => 0.04938271604938271,
-          MESH::Mesh.find('D011584') => 0.04938271604938271,
-          MESH::Mesh.find('D001525') => 0.04938271604938272,
-          MESH::Mesh.find('D004191') => 0.016460905349794237,
-          MESH::Mesh.find('D012961') => 0.14814814814814814,
-          MESH::Mesh.find('D012942') => 0.09876543209876543
+          MESH::Mesh.find('D009679') => 0.667,
+          MESH::Mesh.find('D005190') => 0.444,
+          MESH::Mesh.find('D011593') => 0.148,
+          MESH::Mesh.find('D001520') => 0.049,
+          MESH::Mesh.find('D011584') => 0.049,
+          MESH::Mesh.find('D001525') => 0.049,
+          MESH::Mesh.find('D004191') => 0.016,
+          MESH::Mesh.find('D012961') => 0.148,
+          MESH::Mesh.find('D012942') => 0.099
         }],
         'H' => [3.0, {
           MESH::Mesh.find('D000715') => 3.0,
           MESH::Mesh.find('D001690') => 1.0,
-          MESH::Mesh.find('D010811') => 0.3333333333333333
+          MESH::Mesh.find('D010811') => 0.333
         }],
         'I' => [2.0, {
           MESH::Mesh.find('D013334') => 1.0,
-          MESH::Mesh.find('D004505') => 0.3333333333333333,
-          MESH::Mesh.find('D004493') => 0.7777777777777777,
+          MESH::Mesh.find('D004505') => 0.333,
+          MESH::Mesh.find('D004493') => 0.778,
           MESH::Mesh.find('D013663') => 1.0,
           MESH::Mesh.find('D014937') => 1.0,
-          MESH::Mesh.find('D006802') => 0.3333333333333333,
+          MESH::Mesh.find('D006802') => 0.333,
           MESH::Mesh.find('D018594') => 2.0,
-          MESH::Mesh.find('D003469') => 0.6666666666666666,
-          MESH::Mesh.find('D000884') => 0.2222222222222222,
-          MESH::Mesh.find('D000883') => 0.07407407407407407,
-          MESH::Mesh.find('D012942') => 0.2962962962962963,
-          MESH::Mesh.find('D012961') => 0.37037037037037035,
+          MESH::Mesh.find('D003469') => 0.667,
+          MESH::Mesh.find('D000884') => 0.222,
+          MESH::Mesh.find('D000883') => 0.074,
+          MESH::Mesh.find('D012942') => 0.296,
+          MESH::Mesh.find('D012961') => 0.370,
           MESH::Mesh.find('D035781') => 1.0,
-          MESH::Mesh.find('D009679') => 0.6666666666666666,
-          MESH::Mesh.find('D005190') => 0.4444444444444444
+          MESH::Mesh.find('D009679') => 0.667,
+          MESH::Mesh.find('D005190') => 0.444
         }],
         'K' => [2.0, {
           MESH::Mesh.find('D018594') => 2.0,
-          MESH::Mesh.find('D001154') => 0.6666666666666666,
-          MESH::Mesh.find('D006809') => 0.5555555555555556,
+          MESH::Mesh.find('D001154') => 0.667,
+          MESH::Mesh.find('D006809') => 0.556,
           MESH::Mesh.find('D019359') => 1.0
         }],
         'L' => [1.0, {
           MESH::Mesh.find('D019359') => 1.0,
-          MESH::Mesh.find('D007254') => 0.3333333333333333
+          MESH::Mesh.find('D007254') => 0.333
         }],
         'M' => [1.0, {
           MESH::Mesh.find('D013334') => 1.0,
-          MESH::Mesh.find('D009272') => 0.6666666666666666,
+          MESH::Mesh.find('D009272') => 0.667,
           MESH::Mesh.find('D035781') => 1.0
         }],
         'Z' => [3.0, {
           MESH::Mesh.find('D008131') => 3.0,
           MESH::Mesh.find('D002947') => 1.0,
-          MESH::Mesh.find('D005842') => 0.48148148148148145,
+          MESH::Mesh.find('D005842') => 0.481,
           MESH::Mesh.find('D004739') => 1.0,
-          MESH::Mesh.find('D006113') => 0.6666666666666667,
-          MESH::Mesh.find('D005060') => 0.2222222222222222,
-          MESH::Mesh.find('D062312') => 0.2222222222222222
+          MESH::Mesh.find('D006113') => 0.667,
+          MESH::Mesh.find('D005060') => 0.222,
+          MESH::Mesh.find('D062312') => 0.222
         }]
 
       }
-      assert_equal expected.sort, c.classify([{matches: @headings[:good_abstract], weight: 1.0}]).sort
+      assert_classification expected, c.classify([{matches: @headings[:good_abstract], weight: 1.0}])
     end
 
     def test_it_should_classify_content
       c = MESH::Classifier.new()
       expected = {
         'A' => [10.0, {
-          MESH::Mesh.find('D001132') => 1.0, MESH::Mesh.find('D034941') => 1.0, MESH::Mesh.find('D005121') => 2.555555555555556, MESH::Mesh.find('D001829') => 1.3703703703703702, MESH::Mesh.find('D001415') => 1.0, MESH::Mesh.find('D060726') => 1.3333333333333333, MESH::Mesh.find('D005123') => 2.0, MESH::Mesh.find('D005145') => 0.6666666666666666, MESH::Mesh.find('D006257') => 0.2222222222222222, MESH::Mesh.find('D012679') => 0.6666666666666666, MESH::Mesh.find('D006225') => 2.0, MESH::Mesh.find('D006321') => 10.0, MESH::Mesh.find('D002319') => 3.3333333333333335, MESH::Mesh.find('D007866') => 2.0, MESH::Mesh.find('D035002') => 0.6666666666666666, MESH::Mesh.find('D013909') => 3.0, MESH::Mesh.find('D001842') => 1.0, MESH::Mesh.find('D012863') => 0.3333333333333333, MESH::Mesh.find('D009141') => 0.1111111111111111, MESH::Mesh.find('D003238') => 0.3333333333333333, MESH::Mesh.find('D014024') => 0.1111111111111111
+          MESH::Mesh.find('D001132') => 1.0, MESH::Mesh.find('D034941') => 1.0, MESH::Mesh.find('D005121') => 2.556, MESH::Mesh.find('D001829') => 1.370, MESH::Mesh.find('D001415') => 1.0, MESH::Mesh.find('D060726') => 1.333, MESH::Mesh.find('D005123') => 2.0, MESH::Mesh.find('D005145') => 0.667, MESH::Mesh.find('D006257') => 0.222, MESH::Mesh.find('D012679') => 0.667, MESH::Mesh.find('D006225') => 2.0, MESH::Mesh.find('D006321') => 10.0, MESH::Mesh.find('D002319') => 3.333, MESH::Mesh.find('D007866') => 2.0, MESH::Mesh.find('D035002') => 0.667, MESH::Mesh.find('D013909') => 3.0, MESH::Mesh.find('D001842') => 1.0, MESH::Mesh.find('D012863') => 0.333, MESH::Mesh.find('D009141') => 0.111, MESH::Mesh.find('D003238') => 0.333, MESH::Mesh.find('D014024') => 0.111
         }],
         'B' => [1.0, {
-          MESH::Mesh.find('D027861') => 1.0, MESH::Mesh.find('D027824') => 0.3333333333333333, MESH::Mesh.find('D019685') => 0.1111111111111111, MESH::Mesh.find('D019684') => 0.037037037037037035, MESH::Mesh.find('D019669') => 0.012345679012345678, MESH::Mesh.find('D057949') => 0.004115226337448559, MESH::Mesh.find('D057948') => 0.0013717421124828531, MESH::Mesh.find('D010944') => 0.0004572473708276177, MESH::Mesh.find('D056890') => 0.00015241579027587258
+          MESH::Mesh.find('D027861') => 1.0, MESH::Mesh.find('D027824') => 0.333, MESH::Mesh.find('D019685') => 0.111, MESH::Mesh.find('D019684') => 0.037, MESH::Mesh.find('D019669') => 0.012, MESH::Mesh.find('D057949') => 0.004, MESH::Mesh.find('D057948') => 0.001
         }],
         'C' => [1.0, {
-          MESH::Mesh.find('D003221') => 1.0, MESH::Mesh.find('D019954') => 1.0, MESH::Mesh.find('D009461') => 0.6666666666666667, MESH::Mesh.find('D009422') => 0.2222222222222222, MESH::Mesh.find('D012816') => 0.2222222222222222, MESH::Mesh.find('D013568') => 0.07407407407407407
+          MESH::Mesh.find('D003221') => 1.0, MESH::Mesh.find('D019954') => 1.0, MESH::Mesh.find('D009461') => 0.667, MESH::Mesh.find('D009422') => 0.222, MESH::Mesh.find('D012816') => 0.222, MESH::Mesh.find('D013568') => 0.074
         }],
         'D' => [13.0, {
-          MESH::Mesh.find('D007854') => 13.0, MESH::Mesh.find('D019216') => 8.666666666666664, MESH::Mesh.find('D004602') => 2.8888888888888897, MESH::Mesh.find('D007287') => 1.9259259259259238, MESH::Mesh.find('D008670') => 2.8888888888888897
+          MESH::Mesh.find('D007854') => 13.0, MESH::Mesh.find('D019216') => 8.667, MESH::Mesh.find('D004602') => 2.889, MESH::Mesh.find('D007287') => 1.926, MESH::Mesh.find('D008670') => 2.889
         }],
         'E' => [2.0, {
-          MESH::Mesh.find('D004562') => 2.0, MESH::Mesh.find('D006334') => 0.6666666666666666, MESH::Mesh.find('D003935') => 0.2222222222222222, MESH::Mesh.find('D019937') => 0.2962962962962963, MESH::Mesh.find('D003933') => 0.09876543209876543, MESH::Mesh.find('D004568') => 0.6666666666666666
+          MESH::Mesh.find('D004562') => 2.0, MESH::Mesh.find('D006334') => 0.667, MESH::Mesh.find('D003935') => 0.222, MESH::Mesh.find('D019937') => 0.296, MESH::Mesh.find('D003933') => 0.099, MESH::Mesh.find('D004568') => 0.667
         }],
         'F' => [4.0, {
-          MESH::Mesh.find('D003221') => 1.0, MESH::Mesh.find('D019954') => 1.0, MESH::Mesh.find('D001520') => 0.3333333333333333, MESH::Mesh.find('D007858') => 1.0, MESH::Mesh.find('D008606') => 1.9999999999999998, MESH::Mesh.find('D011579') => 0.7037037037037037, MESH::Mesh.find('D011588') => 0.3333333333333333, MESH::Mesh.find('D011585') => 0.1111111111111111, MESH::Mesh.find('D011584') => 0.1111111111111111, MESH::Mesh.find('D001525') => 0.037037037037037035, MESH::Mesh.find('D004191') => 0.012345679012345678, MESH::Mesh.find('D013850') => 1.0, MESH::Mesh.find('D014836') => 4.0
+          MESH::Mesh.find('D003221') => 1.0, MESH::Mesh.find('D019954') => 1.0, MESH::Mesh.find('D001520') => 0.333, MESH::Mesh.find('D007858') => 1.0, MESH::Mesh.find('D008606') => 2.0, MESH::Mesh.find('D011579') => 0.704, MESH::Mesh.find('D011588') => 0.333, MESH::Mesh.find('D011585') => 0.111, MESH::Mesh.find('D011584') => 0.111, MESH::Mesh.find('D001525') => 0.037, MESH::Mesh.find('D004191') => 0.012, MESH::Mesh.find('D013850') => 1.0, MESH::Mesh.find('D014836') => 4.0
         }],
         'G' => [2.0, {
-          MESH::Mesh.find('D000200') => 2.0, MESH::Mesh.find('D008564') => 1.9999999999999998, MESH::Mesh.find('D055592') => 0.6666666666666667, MESH::Mesh.find('D055585') => 0.691358024691358, MESH::Mesh.find('D002468') => 0.6666666666666667, MESH::Mesh.find('D055724') => 0.6666666666666667, MESH::Mesh.find('D010829') => 0.2222222222222222, MESH::Mesh.find('D009424') => 0.6666666666666667, MESH::Mesh.find('D055687') => 0.2222222222222222, MESH::Mesh.find('D013995') => 1.0, MESH::Mesh.find('D014919') => 1.0, MESH::Mesh.find('D000392') => 1.0, MESH::Mesh.find('D055907') => 0.3333333333333333, MESH::Mesh.find('D055691') => 0.1111111111111111, MESH::Mesh.find('D055669') => 0.41563786008230436, MESH::Mesh.find('D001686') => 0.1385459533607681, MESH::Mesh.find('D014887') => 1.0, MESH::Mesh.find('D001272') => 0.8888888888888888, MESH::Mesh.find('D004777') => 0.5061728395061728, MESH::Mesh.find('D008685') => 0.6296296296296295, MESH::Mesh.find('D000388') => 0.3333333333333333, MESH::Mesh.find('D014965') => 1.0, MESH::Mesh.find('D060733') => 0.6666666666666666, MESH::Mesh.find('D055590') => 0.2222222222222222, MESH::Mesh.find('D060328') => 0.07407407407407407, MESH::Mesh.find('D011827') => 0.3333333333333333, MESH::Mesh.find('D011839') => 0.3333333333333333
+          MESH::Mesh.find('D000200') => 2.0, MESH::Mesh.find('D008564') => 2.0, MESH::Mesh.find('D055592') => 0.667, MESH::Mesh.find('D055585') => 0.691, MESH::Mesh.find('D002468') => 0.667, MESH::Mesh.find('D055724') => 0.667, MESH::Mesh.find('D010829') => 0.222, MESH::Mesh.find('D009424') => 0.667, MESH::Mesh.find('D055687') => 0.222, MESH::Mesh.find('D013995') => 1.0, MESH::Mesh.find('D014919') => 1.0, MESH::Mesh.find('D000392') => 1.0, MESH::Mesh.find('D055907') => 0.333, MESH::Mesh.find('D055691') => 0.111, MESH::Mesh.find('D055669') => 0.416, MESH::Mesh.find('D001686') => 0.139, MESH::Mesh.find('D014887') => 1.0, MESH::Mesh.find('D001272') => 0.889, MESH::Mesh.find('D004777') => 0.506, MESH::Mesh.find('D008685') => 0.630, MESH::Mesh.find('D000388') => 0.333, MESH::Mesh.find('D014965') => 1.0, MESH::Mesh.find('D060733') => 0.667, MESH::Mesh.find('D055590') => 0.222, MESH::Mesh.find('D060328') => 0.074, MESH::Mesh.find('D011827') => 0.333, MESH::Mesh.find('D011839') => 0.333
         }],
         'I' => [1.0, {
-          MESH::Mesh.find('D014937') => 1.0, MESH::Mesh.find('D006802') => 0.3333333333333333
+          MESH::Mesh.find('D014937') => 1.0, MESH::Mesh.find('D006802') => 0.333
         }],
         'K' => [1.0, {
-          MESH::Mesh.find('D019368') => 1.0, MESH::Mesh.find('D006809') => 0.3333333333333333
+          MESH::Mesh.find('D019368') => 1.0, MESH::Mesh.find('D006809') => 0.333
         }],
         'L' => [1.0, {
-          MESH::Mesh.find('D009275') => 1.0, MESH::Mesh.find('D009626') => 0.3333333333333333, MESH::Mesh.find('D008037') => 0.1111111111111111, MESH::Mesh.find('D007802') => 0.037037037037037035, MESH::Mesh.find('D003142') => 0.024691358024691357, MESH::Mesh.find('D007254') => 0.008230452674897118
+          MESH::Mesh.find('D009275') => 1.0, MESH::Mesh.find('D009626') => 0.333, MESH::Mesh.find('D008037') => 0.111, MESH::Mesh.find('D007802') => 0.037, MESH::Mesh.find('D003142') => 0.025, MESH::Mesh.find('D007254') => 0.008
         }],
         'M' => [6.0, {
-          MESH::Mesh.find('D010361') => 6.0, MESH::Mesh.find('D009272') => 1.9999999999999998
+          MESH::Mesh.find('D010361') => 6.0, MESH::Mesh.find('D009272') => 2.0
         }],
         'N' => [1.0, {
-          MESH::Mesh.find('D009938') => 1.0, MESH::Mesh.find('D004472') => 0.3333333333333333, MESH::Mesh.find('D014919') => 1.0, MESH::Mesh.find('D000392') => 1.0, MESH::Mesh.find('D014887') => 1.0, MESH::Mesh.find('D001272') => 0.8888888888888888, MESH::Mesh.find('D004777') => 0.5432098765432098, MESH::Mesh.find('D004778') => 0.18106995884773663, MESH::Mesh.find('D008685') => 0.6296296296296295, MESH::Mesh.find('D000388') => 0.3333333333333333, MESH::Mesh.find('D059205') => 0.3333333333333333, MESH::Mesh.find('D004736') => 0.1111111111111111
+          MESH::Mesh.find('D009938') => 1.0, MESH::Mesh.find('D004472') => 0.333, MESH::Mesh.find('D014919') => 1.0, MESH::Mesh.find('D000392') => 1.0, MESH::Mesh.find('D014887') => 1.0, MESH::Mesh.find('D001272') => 0.889, MESH::Mesh.find('D004777') => 0.543, MESH::Mesh.find('D004778') => 0.181, MESH::Mesh.find('D008685') => 0.630, MESH::Mesh.find('D000388') => 0.333, MESH::Mesh.find('D059205') => 0.333, MESH::Mesh.find('D004736') => 0.111
         }],
         'V' => [1.0, {
-          MESH::Mesh.find('D017203') => 1.0, MESH::Mesh.find('D019215') => 0.3333333333333333, MESH::Mesh.find('D052181') => 0.1111111111111111, MESH::Mesh.find('D052180') => 0.14814814814814814, MESH::Mesh.find('D016456') => 0.1111111111111111
+          MESH::Mesh.find('D017203') => 1.0, MESH::Mesh.find('D019215') => 0.333, MESH::Mesh.find('D052181') => 0.111, MESH::Mesh.find('D052180') => 0.148, MESH::Mesh.find('D016456') => 0.111
         }],
         'Z' => [1.0, {
-          MESH::Mesh.find('D014481') => 1.0, MESH::Mesh.find('D009656') => 0.3333333333333333, MESH::Mesh.find('D000569') => 0.1111111111111111, MESH::Mesh.find('D005842') => 0.037037037037037035
+          MESH::Mesh.find('D014481') => 1.0, MESH::Mesh.find('D009656') => 0.333, MESH::Mesh.find('D000569') => 0.111, MESH::Mesh.find('D005842') => 0.037
         }]
       }
 
-      assert_equal expected.sort, c.classify([{matches: @headings[:medium_content], weight: 1.0}]).sort
+      assert_classification expected, c.classify([{matches: @headings[:medium_content], weight: 1.0}])
     end
 
     def test_it_should_classify_other_content_as_well
       c = MESH::Classifier.new()
       expected = {
         'A' => [2.0, {
-          MESH::Mesh.find('D001769') => 1.0, MESH::Mesh.find('D001826') => 0.3333333333333333, MESH::Mesh.find('D005441') => 0.1111111111111111, MESH::Mesh.find('D006424') => 0.3333333333333333, MESH::Mesh.find('D006624') => 1.0, MESH::Mesh.find('D008032') => 0.3333333333333333, MESH::Mesh.find('D001921') => 0.11522633744855966, MESH::Mesh.find('D002490') => 0.03840877914951989, MESH::Mesh.find('D009420') => 0.012802926383173296, MESH::Mesh.find('D002540') => 0.3333333333333333, MESH::Mesh.find('D054022') => 0.1111111111111111, MESH::Mesh.find('D013687') => 0.037037037037037035, MESH::Mesh.find('D016548') => 0.012345679012345678, MESH::Mesh.find('D008099') => 2.0, MESH::Mesh.find('D004064') => 1.0, MESH::Mesh.find('D010179') => 1.0
+          MESH::Mesh.find('D001769') => 1.0, MESH::Mesh.find('D001826') => 0.333, MESH::Mesh.find('D005441') => 0.111, MESH::Mesh.find('D006424') => 0.333, MESH::Mesh.find('D006624') => 1.0, MESH::Mesh.find('D008032') => 0.333, MESH::Mesh.find('D001921') => 0.115, MESH::Mesh.find('D002490') => 0.038, MESH::Mesh.find('D009420') => 0.013, MESH::Mesh.find('D002540') => 0.333, MESH::Mesh.find('D054022') => 0.111, MESH::Mesh.find('D013687') => 0.037, MESH::Mesh.find('D016548') => 0.012, MESH::Mesh.find('D008099') => 2.0, MESH::Mesh.find('D004064') => 1.0, MESH::Mesh.find('D010179') => 1.0
         }],
-        'D' => [4.135802469135803, {
-          MESH::Mesh.find('D000269') => 1.0, MESH::Mesh.find('D020313') => 0.3827160493827158, MESH::Mesh.find('D020164') => 0.17111212721638047, MESH::Mesh.find('D000900') => 1.0, MESH::Mesh.find('D000890') => 0.3333333333333333, MESH::Mesh.find('D045506') => 0.1111111111111111, MESH::Mesh.find('D020228') => 0.13062033226642267, MESH::Mesh.find('D001786') => 2.0, MESH::Mesh.find('D005947') => 1.6666666666666665, MESH::Mesh.find('D006601') => 0.5555555555555556, MESH::Mesh.find('D009005') => 0.18518518518518517, MESH::Mesh.find('D002241') => 4.135802469135803, MESH::Mesh.find('D004247') => 2.0, MESH::Mesh.find('D009696') => 0.6666666666666666, MESH::Mesh.find('D009706') => 0.2222222222222222, MESH::Mesh.find('D006728') => 1.2633744855967137, MESH::Mesh.find('D006730') => 0.8422496570644663, MESH::Mesh.find('D045505') => 0.2807498856881585, MESH::Mesh.find('D007328') => 4.0, MESH::Mesh.find('D011384') => 2.6666666666666665, MESH::Mesh.find('D061385') => 1.7777777777777783, MESH::Mesh.find('D010187') => 1.1851851851851842, MESH::Mesh.find('D036361') => 0.7901234567901247, MESH::Mesh.find('D010455') => 0.26337448559670795, MESH::Mesh.find('D000602') => 0.18655692729766818, MESH::Mesh.find('D011498') => 0.8888888888888891, MESH::Mesh.find('D011506') => 0.2962962962962963, MESH::Mesh.find('D013213') => 1.0, MESH::Mesh.find('D005936') => 0.6666666666666666, MESH::Mesh.find('D001704') => 0.2222222222222222, MESH::Mesh.find('D011108') => 0.2222222222222222, MESH::Mesh.find('D046911') => 0.07407407407407407, MESH::Mesh.find('D001697') => 0.14814814814814814, MESH::Mesh.find('D011134') => 0.2222222222222222
+        'D' => [4.136, {
+          MESH::Mesh.find('D000269') => 1.0, MESH::Mesh.find('D020313') => 0.383, MESH::Mesh.find('D020164') => 0.171, MESH::Mesh.find('D000900') => 1.0, MESH::Mesh.find('D000890') => 0.333, MESH::Mesh.find('D045506') => 0.111, MESH::Mesh.find('D020228') => 0.131, MESH::Mesh.find('D001786') => 2.0, MESH::Mesh.find('D005947') => 1.667, MESH::Mesh.find('D006601') => 0.556, MESH::Mesh.find('D009005') => 0.185, MESH::Mesh.find('D002241') => 4.136, MESH::Mesh.find('D004247') => 2.0, MESH::Mesh.find('D009696') => 0.667, MESH::Mesh.find('D009706') => 0.222, MESH::Mesh.find('D006728') => 1.263, MESH::Mesh.find('D006730') => 0.842, MESH::Mesh.find('D045505') => 0.281, MESH::Mesh.find('D007328') => 4.0, MESH::Mesh.find('D011384') => 2.667, MESH::Mesh.find('D061385') => 1.778, MESH::Mesh.find('D010187') => 1.185, MESH::Mesh.find('D036361') => 0.790, MESH::Mesh.find('D010455') => 0.263, MESH::Mesh.find('D000602') => 0.187, MESH::Mesh.find('D011498') => 0.889, MESH::Mesh.find('D011506') => 0.296, MESH::Mesh.find('D013213') => 1.0, MESH::Mesh.find('D005936') => 0.667, MESH::Mesh.find('D001704') => 0.222, MESH::Mesh.find('D011108') => 0.222, MESH::Mesh.find('D046911') => 0.074, MESH::Mesh.find('D001697') => 0.148, MESH::Mesh.find('D011134') => 0.222
         }],
         'F' => [1.0, {
-          MESH::Mesh.find('D005190') => 1.0, MESH::Mesh.find('D011593') => 0.3333333333333333, MESH::Mesh.find('D001520') => 0.1111111111111111, MESH::Mesh.find('D011584') => 0.1111111111111111, MESH::Mesh.find('D001525') => 0.1111111111111111, MESH::Mesh.find('D004191') => 0.037037037037037035, MESH::Mesh.find('D012961') => 0.3333333333333333, MESH::Mesh.find('D012942') => 0.2222222222222222
+          MESH::Mesh.find('D005190') => 1.0, MESH::Mesh.find('D011593') => 0.333, MESH::Mesh.find('D001520') => 0.111, MESH::Mesh.find('D011584') => 0.111, MESH::Mesh.find('D001525') => 0.111, MESH::Mesh.find('D004191') => 0.037, MESH::Mesh.find('D012961') => 0.333, MESH::Mesh.find('D012942') => 0.222
         }],
         'G' => [1.0, {
-          MESH::Mesh.find('D012621') => 1.0, MESH::Mesh.find('D010507') => 0.3333333333333333, MESH::Mesh.find('D013995') => 0.1111111111111111, MESH::Mesh.find('D055585') => 0.037037037037037035, MESH::Mesh.find('D002909') => 0.1111111111111111, MESH::Mesh.find('D010829') => 0.037037037037037035, MESH::Mesh.find('D002980') => 0.6666666666666666, MESH::Mesh.find('D004777') => 0.32098765432098764, MESH::Mesh.find('D055669') => 0.1316872427983539, MESH::Mesh.find('D001686') => 0.0438957475994513, MESH::Mesh.find('D001272') => 0.2222222222222222, MESH::Mesh.find('D008685') => 0.07407407407407407
+          MESH::Mesh.find('D012621') => 1.0, MESH::Mesh.find('D010507') => 0.333, MESH::Mesh.find('D013995') => 0.111, MESH::Mesh.find('D055585') => 0.037, MESH::Mesh.find('D002909') => 0.111, MESH::Mesh.find('D010829') => 0.037, MESH::Mesh.find('D002980') => 0.667, MESH::Mesh.find('D004777') => 0.321, MESH::Mesh.find('D055669') => 0.132, MESH::Mesh.find('D001686') => 0.044, MESH::Mesh.find('D001272') => 0.222, MESH::Mesh.find('D008685') => 0.074
         }],
         'I' => [1.0, {
-          MESH::Mesh.find('D005190') => 1.0, MESH::Mesh.find('D012961') => 0.3333333333333333, MESH::Mesh.find('D012942') => 0.2222222222222222
+          MESH::Mesh.find('D005190') => 1.0, MESH::Mesh.find('D012961') => 0.333, MESH::Mesh.find('D012942') => 0.222
         }],
         'J' => [1.0, {
-          MESH::Mesh.find('D000269') => 1.0, MESH::Mesh.find('D008420') => 0.4444444444444444, MESH::Mesh.find('D013676') => 0.14814814814814814, MESH::Mesh.find('D005389') => 1.0, MESH::Mesh.find('D054041') => 0.3333333333333333, MESH::Mesh.find('D005502') => 1.0, MESH::Mesh.find('D019602') => 0.3333333333333333
+          MESH::Mesh.find('D000269') => 1.0, MESH::Mesh.find('D008420') => 0.444, MESH::Mesh.find('D013676') => 0.148, MESH::Mesh.find('D005389') => 1.0, MESH::Mesh.find('D054041') => 0.333, MESH::Mesh.find('D005502') => 1.0, MESH::Mesh.find('D019602') => 0.333
         }],
         'L' => [1.0, {
-          MESH::Mesh.find('D005246') => 1.0, MESH::Mesh.find('D003491') => 0.3333333333333333, MESH::Mesh.find('D003142') => 0.1111111111111111, MESH::Mesh.find('D007254') => 0.037037037037037035
+          MESH::Mesh.find('D005246') => 1.0, MESH::Mesh.find('D003491') => 0.333, MESH::Mesh.find('D003142') => 0.111, MESH::Mesh.find('D007254') => 0.037
         }],
         'N' => [1.0, {
-          MESH::Mesh.find('D012621') => 1.0, MESH::Mesh.find('D002980') => 0.6666666666666666, MESH::Mesh.find('D004777') => 0.32098765432098764, MESH::Mesh.find('D004778') => 0.10699588477366255, MESH::Mesh.find('D001272') => 0.2222222222222222, MESH::Mesh.find('D008685') => 0.07407407407407407
+          MESH::Mesh.find('D012621') => 1.0, MESH::Mesh.find('D002980') => 0.667, MESH::Mesh.find('D004777') => 0.321, MESH::Mesh.find('D004778') => 0.107, MESH::Mesh.find('D001272') => 0.222, MESH::Mesh.find('D008685') => 0.074
         }]
       }
-      assert_equal expected.sort, c.classify([{matches: @headings[:short_content], weight: 1.0}]).sort
+      assert_classification expected, c.classify([{matches: @headings[:short_content], weight: 1.0}])
     end
 
     def test_it_should_classify_title_abstract_and_content
@@ -244,38 +253,38 @@ module MESH
 
       expected = {
         'A' => [2.0, {
-          MESH::Mesh.find('D001769') => 1.0, MESH::Mesh.find('D001826') => 0.3333333333333333, MESH::Mesh.find('D005441') => 0.1111111111111111, MESH::Mesh.find('D006424') => 0.3333333333333333, MESH::Mesh.find('D006624') => 1.0, MESH::Mesh.find('D008032') => 0.3333333333333333, MESH::Mesh.find('D001921') => 0.11522633744855966, MESH::Mesh.find('D002490') => 0.03840877914951989, MESH::Mesh.find('D009420') => 0.012802926383173296, MESH::Mesh.find('D002540') => 0.3333333333333333, MESH::Mesh.find('D054022') => 0.1111111111111111, MESH::Mesh.find('D013687') => 0.037037037037037035, MESH::Mesh.find('D016548') => 0.012345679012345678, MESH::Mesh.find('D008099') => 2.0, MESH::Mesh.find('D004064') => 1.0, MESH::Mesh.find('D010179') => 1.0
+          MESH::Mesh.find('D001769') => 1.0, MESH::Mesh.find('D001826') => 0.333, MESH::Mesh.find('D005441') => 0.111, MESH::Mesh.find('D006424') => 0.333, MESH::Mesh.find('D006624') => 1.0, MESH::Mesh.find('D008032') => 0.333, MESH::Mesh.find('D001921') => 0.115, MESH::Mesh.find('D002490') => 0.038, MESH::Mesh.find('D009420') => 0.013, MESH::Mesh.find('D002540') => 0.333, MESH::Mesh.find('D054022') => 0.111, MESH::Mesh.find('D013687') => 0.037, MESH::Mesh.find('D016548') => 0.012, MESH::Mesh.find('D008099') => 2.0, MESH::Mesh.find('D004064') => 1.0, MESH::Mesh.find('D010179') => 1.0
         }],
-        'D' => [4.135802469135803, {
-          MESH::Mesh.find('D000269') => 1.0, MESH::Mesh.find('D020313') => 0.3827160493827158, MESH::Mesh.find('D020164') => 0.17111212721638047, MESH::Mesh.find('D000900') => 1.0, MESH::Mesh.find('D000890') => 0.3333333333333333, MESH::Mesh.find('D045506') => 0.1111111111111111, MESH::Mesh.find('D020228') => 0.13062033226642267, MESH::Mesh.find('D001786') => 2.0, MESH::Mesh.find('D005947') => 1.6666666666666665, MESH::Mesh.find('D006601') => 0.5555555555555556, MESH::Mesh.find('D009005') => 0.18518518518518517, MESH::Mesh.find('D002241') => 4.135802469135803, MESH::Mesh.find('D004247') => 2.0, MESH::Mesh.find('D009696') => 0.6666666666666666, MESH::Mesh.find('D009706') => 0.2222222222222222, MESH::Mesh.find('D006728') => 1.2633744855967137, MESH::Mesh.find('D006730') => 0.8422496570644663, MESH::Mesh.find('D045505') => 0.2807498856881585, MESH::Mesh.find('D007328') => 4.0, MESH::Mesh.find('D011384') => 2.6666666666666665, MESH::Mesh.find('D061385') => 1.7777777777777783, MESH::Mesh.find('D010187') => 1.1851851851851842, MESH::Mesh.find('D036361') => 0.7901234567901247, MESH::Mesh.find('D010455') => 0.26337448559670795, MESH::Mesh.find('D000602') => 0.18655692729766818, MESH::Mesh.find('D011498') => 0.8888888888888891, MESH::Mesh.find('D011506') => 0.2962962962962963, MESH::Mesh.find('D013213') => 1.0, MESH::Mesh.find('D005936') => 0.6666666666666666, MESH::Mesh.find('D001704') => 0.2222222222222222, MESH::Mesh.find('D011108') => 0.2222222222222222, MESH::Mesh.find('D046911') => 0.07407407407407407, MESH::Mesh.find('D001697') => 0.14814814814814814, MESH::Mesh.find('D011134') => 0.2222222222222222
+        'D' => [4.136, {
+          MESH::Mesh.find('D000269') => 1.0, MESH::Mesh.find('D020313') => 0.383, MESH::Mesh.find('D020164') => 0.171, MESH::Mesh.find('D000900') => 1.0, MESH::Mesh.find('D000890') => 0.333, MESH::Mesh.find('D045506') => 0.111, MESH::Mesh.find('D020228') => 0.131, MESH::Mesh.find('D001786') => 2.0, MESH::Mesh.find('D005947') => 1.667, MESH::Mesh.find('D006601') => 0.556, MESH::Mesh.find('D009005') => 0.185, MESH::Mesh.find('D002241') => 4.136, MESH::Mesh.find('D004247') => 2.0, MESH::Mesh.find('D009696') => 0.667, MESH::Mesh.find('D009706') => 0.222, MESH::Mesh.find('D006728') => 1.263, MESH::Mesh.find('D006730') => 0.842, MESH::Mesh.find('D045505') => 0.281, MESH::Mesh.find('D007328') => 4.0, MESH::Mesh.find('D011384') => 2.667, MESH::Mesh.find('D061385') => 1.778, MESH::Mesh.find('D010187') => 1.185, MESH::Mesh.find('D036361') => 0.790, MESH::Mesh.find('D010455') => 0.263, MESH::Mesh.find('D000602') => 0.187, MESH::Mesh.find('D011498') => 0.889, MESH::Mesh.find('D011506') => 0.296, MESH::Mesh.find('D013213') => 1.0, MESH::Mesh.find('D005936') => 0.667, MESH::Mesh.find('D001704') => 0.222, MESH::Mesh.find('D011108') => 0.222, MESH::Mesh.find('D046911') => 0.074, MESH::Mesh.find('D001697') => 0.148, MESH::Mesh.find('D011134') => 0.222
         }],
         'F' => [1.0, {
-          MESH::Mesh.find('D005190') => 1.0, MESH::Mesh.find('D011593') => 0.3333333333333333, MESH::Mesh.find('D001520') => 0.1111111111111111, MESH::Mesh.find('D011584') => 0.1111111111111111, MESH::Mesh.find('D001525') => 0.1111111111111111, MESH::Mesh.find('D004191') => 0.037037037037037035, MESH::Mesh.find('D012961') => 0.3333333333333333, MESH::Mesh.find('D012942') => 0.2222222222222222
+          MESH::Mesh.find('D005190') => 1.0, MESH::Mesh.find('D011593') => 0.333, MESH::Mesh.find('D001520') => 0.111, MESH::Mesh.find('D011584') => 0.111, MESH::Mesh.find('D001525') => 0.111, MESH::Mesh.find('D004191') => 0.037, MESH::Mesh.find('D012961') => 0.333, MESH::Mesh.find('D012942') => 0.222
         }],
         'G' => [1.0, {
-          MESH::Mesh.find('D012621') => 1.0, MESH::Mesh.find('D010507') => 0.3333333333333333, MESH::Mesh.find('D013995') => 0.1111111111111111, MESH::Mesh.find('D055585') => 0.037037037037037035, MESH::Mesh.find('D002909') => 0.1111111111111111, MESH::Mesh.find('D010829') => 0.037037037037037035, MESH::Mesh.find('D002980') => 0.6666666666666666, MESH::Mesh.find('D004777') => 0.32098765432098764, MESH::Mesh.find('D055669') => 0.1316872427983539, MESH::Mesh.find('D001686') => 0.0438957475994513, MESH::Mesh.find('D001272') => 0.2222222222222222, MESH::Mesh.find('D008685') => 0.07407407407407407
+          MESH::Mesh.find('D012621') => 1.0, MESH::Mesh.find('D010507') => 0.333, MESH::Mesh.find('D013995') => 0.111, MESH::Mesh.find('D055585') => 0.037, MESH::Mesh.find('D002909') => 0.111, MESH::Mesh.find('D010829') => 0.037, MESH::Mesh.find('D002980') => 0.667, MESH::Mesh.find('D004777') => 0.321, MESH::Mesh.find('D055669') => 0.132, MESH::Mesh.find('D001686') => 0.044, MESH::Mesh.find('D001272') => 0.222, MESH::Mesh.find('D008685') => 0.074
         }],
         'H' => [7.0, {
-          MESH::Mesh.find('D002309') => 7.0, MESH::Mesh.find('D007388') => 2.3333333333333335, MESH::Mesh.find('D008511') => 0.7777777777777778, MESH::Mesh.find('D006281') => 0.25925925925925924
+          MESH::Mesh.find('D002309') => 7.0, MESH::Mesh.find('D007388') => 2.333, MESH::Mesh.find('D008511') => 0.778, MESH::Mesh.find('D006281') => 0.259
         }],
         'I' => [3.0, {
-          MESH::Mesh.find('D013337') => 3.0, MESH::Mesh.find('D013336') => 2.0, MESH::Mesh.find('D013334') => 1.3333333333333333, MESH::Mesh.find('D004505') => 0.4444444444444444, MESH::Mesh.find('D004493') => 0.5925925925925926, MESH::Mesh.find('D005190') => 1.0, MESH::Mesh.find('D012961') => 0.3333333333333333, MESH::Mesh.find('D012942') => 0.2222222222222222
+          MESH::Mesh.find('D013337') => 3.0, MESH::Mesh.find('D013336') => 2.0, MESH::Mesh.find('D013334') => 1.333, MESH::Mesh.find('D004505') => 0.444, MESH::Mesh.find('D004493') => 0.593, MESH::Mesh.find('D005190') => 1.0, MESH::Mesh.find('D012961') => 0.333, MESH::Mesh.find('D012942') => 0.222
         }],
         'J' => [1.0, {
-          MESH::Mesh.find('D000269') => 1.0, MESH::Mesh.find('D008420') => 0.4444444444444444, MESH::Mesh.find('D013676') => 0.14814814814814814, MESH::Mesh.find('D005389') => 1.0, MESH::Mesh.find('D054041') => 0.3333333333333333, MESH::Mesh.find('D005502') => 1.0, MESH::Mesh.find('D019602') => 0.3333333333333333
+          MESH::Mesh.find('D000269') => 1.0, MESH::Mesh.find('D008420') => 0.444, MESH::Mesh.find('D013676') => 0.148, MESH::Mesh.find('D005389') => 1.0, MESH::Mesh.find('D054041') => 0.333, MESH::Mesh.find('D005502') => 1.0, MESH::Mesh.find('D019602') => 0.333
         }],
         'L' => [1.0, {
-          MESH::Mesh.find('D005246') => 1.0, MESH::Mesh.find('D003491') => 0.3333333333333333, MESH::Mesh.find('D003142') => 0.1111111111111111, MESH::Mesh.find('D007254') => 0.037037037037037035
+          MESH::Mesh.find('D005246') => 1.0, MESH::Mesh.find('D003491') => 0.333, MESH::Mesh.find('D003142') => 0.111, MESH::Mesh.find('D007254') => 0.037
         }],
         'M' => [3.0, {
-          MESH::Mesh.find('D013337') => 3.0, MESH::Mesh.find('D013336') => 2.0, MESH::Mesh.find('D013334') => 1.3333333333333333, MESH::Mesh.find('D009272') => 0.4444444444444444
+          MESH::Mesh.find('D013337') => 3.0, MESH::Mesh.find('D013336') => 2.0, MESH::Mesh.find('D013334') => 1.333, MESH::Mesh.find('D009272') => 0.444
         }],
         'N' => [1.0, {
-          MESH::Mesh.find('D012621') => 1.0, MESH::Mesh.find('D002980') => 0.6666666666666666, MESH::Mesh.find('D004777') => 0.32098765432098764, MESH::Mesh.find('D004778') => 0.10699588477366255, MESH::Mesh.find('D001272') => 0.2222222222222222, MESH::Mesh.find('D008685') => 0.07407407407407407
+          MESH::Mesh.find('D012621') => 1.0, MESH::Mesh.find('D002980') => 0.667, MESH::Mesh.find('D004777') => 0.321, MESH::Mesh.find('D004778') => 0.107, MESH::Mesh.find('D001272') => 0.222, MESH::Mesh.find('D008685') => 0.074
         }]
       }
 
-      assert_equal expected.sort, c.classify([{matches: @headings[:cardiology_title], weight: 7.0}, {matches: @headings[:poor_abstract], weight: 3.0}, {matches: @headings[:short_content], weight: 1.0}]).sort
+      assert_classification expected, c.classify([{matches: @headings[:cardiology_title], weight: 7.0}, {matches: @headings[:poor_abstract], weight: 3.0}, {matches: @headings[:short_content], weight: 1.0}])
 
     end
 

@@ -32,6 +32,8 @@ module MESH
           #  end
           #end
         end
+        scored.each { |h,s| scored[h] = s.round(3) }
+        scored.delete_if { |h,s| s == 0 }
         best_score, best_connected = scored.reduce({}) { |h, (k, v)| (h[v] ||= []) << k; h }.max
         most_specific = best_connected.max_by { |h| h.deepest_position(root) }
         #chosen[root] = [most_specific, best_score]
