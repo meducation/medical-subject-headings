@@ -1,4 +1,5 @@
 require 'MESH/version'
+require 'MESH/tree'
+require 'MESH/heading'
 require 'MESH/translator'
-require 'MESH/mesh'
 require 'MESH/classifier'
