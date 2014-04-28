@@ -1,3 +1,6 @@
+#2.0.0 / 2014-04-28
+* [FEATURE] Refactored to instances for future running of multiple trees
+
 #1.3.0 / 2014-04-10
 * [FEATURE] Released classifier to group and score matched headings
 
