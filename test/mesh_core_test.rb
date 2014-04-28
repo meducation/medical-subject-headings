@@ -119,11 +119,12 @@ module MESH
     def test_have_anglicised_entries
       expected_entries = ['Barrett Esophagus', 'Barrett Syndrome', 'Esophagus, Barrett', 'Barrett Epithelium', 'Barrett Metaplasia', 'Barrett\'s Esophagus', 'Barrett\'s Syndrome', 'Barretts Esophagus', 'Barretts Syndrome', 'Epithelium, Barrett', 'Esophagus, Barrett\'s', 'Syndrome, Barrett', 'Syndrome, Barrett\'s']
       expected_entries_en = ['Barrett Oesophagus', 'Barrett Syndrome', 'Oesophagus, Barrett', 'Barrett Epithelium', 'Barrett Metaplasia', 'Barrett\'s Oesophagus', 'Barrett\'s Syndrome', 'Barretts Oesophagus', 'Barretts Syndrome', 'Epithelium, Barrett', 'Oesophagus, Barrett\'s', 'Syndrome, Barrett', 'Syndrome, Barrett\'s']
+
       expected_entries.sort!
       expected_entries_en.sort!
       mh = @mesh_tree.find('D001471')
-      assert_equal expected_entries, mh.entries
-      assert_equal expected_entries_en, mh.entries(:en_gb)
+      assert_equal expected_entries.sort, mh.entries
+      assert_equal expected_entries_en.sort, mh.entries(:en_gb)
     end
 
     def test_have_the_correct_parent
@@ -448,13 +449,9 @@ module MESH
       assert_equal expected, mh.inspect
     end
 
-    @@mesh_translated = false
     def setup
       @@mesh_tree ||= MESH::Tree.new
-      if !@@mesh_translated
-        @@mesh_tree.translate(:en_gb, MESH::Translator.new(MESH::Translator.enus_to_engb))
-        @@mesh_translated
-      end
+      @@mesh_tree.load_translation(:en_gb)
       @mesh_tree = @@mesh_tree
       @example_text ||= 'Leukaemia in Downs Syndrome
 Overview

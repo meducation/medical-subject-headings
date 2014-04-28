@@ -1,3 +1,6 @@
+#2.0.1 / 2014-04-28
+* [FEATURE] Load translations from static file to improve load times
+
 #2.0.0 / 2014-04-28
 * [FEATURE] Refactored to instances for future running of multiple trees
 
