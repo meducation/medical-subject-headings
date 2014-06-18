@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/MESH'
+require 'net/http'
+require 'uri'
+
+mesh_tree = MESH::Tree.new
+
+count = 0
+mesh_tree.each do |h|
+  count += 1
+  next if count < 23424
+  STDERR.puts "\e[1;31m\t#{count}\e[0m"
+  slug = h.natural_language_name.downcase.gsub(/\s/, '_').capitalize
+  slug = CGI.escape(slug)
+  uri = URI.parse("http://en.wikipedia.org/wiki/#{slug}")
+  response = Net::HTTP.get_response(uri)
+  puts '*NEWRECORD'
+  if response.code == '200'
+    puts "\e[1;32m"
+  elsif response.code == '301'
+    uri = response['location']
+    puts "\e[32m"
+  else
+    puts "\e[1;31m"
+  end
+  puts "UI = #{h.unique_id}"
+  puts "MH = #{h.original_heading}"
+  puts "NL = #{h.natural_language_name}"
+  puts "WP = #{response.code} #{uri}"
+  puts "\e[0m"
+  STDOUT.flush
+end
