@@ -73,8 +73,8 @@ module MESH
             parts.pop
             parent_tree_number = parts.join '.'
             parent = @by_tree_number[parent_tree_number]
-            heading.parents << parent unless parent.nil?
-            parent.children << heading unless parent.nil?
+            heading.parents << parent unless parent.nil? || heading.parents.include?(parent)
+            parent.children << heading unless parent.nil? || parent.children.include?(heading)
           end
         end
       end

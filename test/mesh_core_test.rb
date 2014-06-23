@@ -142,6 +142,13 @@ module MESH
       assert_includes mh.parents, p2
     end
 
+    def test_have_the_correct_parents_again
+      child = @mesh_tree.find_by_original_heading('Questionnaires')
+      assert_equal 1, child.parents.length
+      expected_parent = @mesh_tree.find_by_original_heading('Data Collection')
+      assert_includes child.parents, expected_parent
+    end
+
     def test_have_the_correct_children
       parent = @mesh_tree.find_by_tree_number('C19.053.500')
       child1 = @mesh_tree.find_by_tree_number('C19.053.500.263')
@@ -154,6 +161,33 @@ module MESH
       assert_includes parent.children, child2
       assert_includes parent.children, child3
       assert_includes parent.children, child4
+    end
+
+    def test_have_the_correct_children_again
+      parent = @mesh_tree.find_by_original_heading('Data Collection')
+
+      expected_children = [
+        'Health Surveys',
+        'Interviews as Topic',
+        'Questionnaires',
+        'Records as Topic',
+        'Registries',
+        'Vital Statistics',
+        'Geriatric Assessment',
+        'Nutrition Assessment',
+        'Health Care Surveys',
+        'Narration',
+        'Lot Quality Assurance Sampling',
+        'Checklist',
+        'Health Impact Assessment',
+        'Crowdsourcing'
+      ].map { |oh| @mesh_tree.find_by_original_heading(oh) }
+
+
+      assert_equal expected_children.length, parent.children.length
+      expected_children.each do |ec|
+        assert_includes parent.children, ec
+      end
     end
 
     def test_have_the_correct_siblings
