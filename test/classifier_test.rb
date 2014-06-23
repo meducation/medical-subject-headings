@@ -48,16 +48,16 @@ module MESH
       expected = {
         'I' => [1.0, {
           @mesh_tree.find('D013337') => 1.0,
-          @mesh_tree.find('D013336') => 0.667,
-          @mesh_tree.find('D013334') => 0.444,
-          @mesh_tree.find('D004505') => 0.148,
-          @mesh_tree.find('D004493') => 0.198
+          @mesh_tree.find('D013334') => 0.111,
+          @mesh_tree.find('D013336') => 0.333,
+          @mesh_tree.find('D004505') => 0.037,
+          @mesh_tree.find('D004493') => 0.049
         }],
         'M' => [1.0, {
           @mesh_tree.find('D013337') => 1.0,
-          @mesh_tree.find('D013336') => 0.667,
-          @mesh_tree.find('D013334') => 0.444,
-          @mesh_tree.find('D009272') => 0.148
+          @mesh_tree.find('D013336') => 0.333,
+          @mesh_tree.find('D013334') => 0.111,
+          @mesh_tree.find('D009272') => 0.037
         }]
       }
       assert_classification expected, @classifier.classify([{matches: @headings[:poor_abstract], weight: 1.0}])
@@ -89,15 +89,15 @@ module MESH
           @mesh_tree.find('D008606') => 0.667,
           @mesh_tree.find('D011579') => 0.222,
           @mesh_tree.find('D035781') => 1.0,
-          @mesh_tree.find('D009679') => 0.667,
-          @mesh_tree.find('D005190') => 0.444,
-          @mesh_tree.find('D011593') => 0.148,
-          @mesh_tree.find('D001520') => 0.049,
-          @mesh_tree.find('D011584') => 0.049,
-          @mesh_tree.find('D001525') => 0.049,
-          @mesh_tree.find('D004191') => 0.016,
-          @mesh_tree.find('D012961') => 0.148,
-          @mesh_tree.find('D012942') => 0.099
+          @mesh_tree.find('D009679') => 0.333,
+          @mesh_tree.find('D005190') => 0.111,
+          @mesh_tree.find('D011593') => 0.037,
+          @mesh_tree.find('D001520') => 0.012,
+          @mesh_tree.find('D011584') => 0.012,
+          @mesh_tree.find('D001525') => 0.008,
+          @mesh_tree.find('D004191') => 0.003,
+          @mesh_tree.find('D012961') => 0.037,
+          @mesh_tree.find('D012942') => 0.012
         }],
         'H' => [3.0, {
           @mesh_tree.find('D000715') => 3.0,
@@ -115,11 +115,11 @@ module MESH
           @mesh_tree.find('D003469') => 0.667,
           @mesh_tree.find('D000884') => 0.222,
           @mesh_tree.find('D000883') => 0.074,
-          @mesh_tree.find('D012942') => 0.296,
-          @mesh_tree.find('D012961') => 0.370,
+          @mesh_tree.find('D012942') => 0.111,
+          @mesh_tree.find('D012961') => 0.259,
           @mesh_tree.find('D035781') => 1.0,
-          @mesh_tree.find('D009679') => 0.667,
-          @mesh_tree.find('D005190') => 0.444
+          @mesh_tree.find('D009679') => 0.333,
+          @mesh_tree.find('D005190') => 0.111
         }],
         'K' => [2.0, {
           @mesh_tree.find('D018594') => 2.0,
@@ -139,11 +139,11 @@ module MESH
         'Z' => [3.0, {
           @mesh_tree.find('D008131') => 3.0,
           @mesh_tree.find('D002947') => 1.0,
-          @mesh_tree.find('D005842') => 0.481,
+          @mesh_tree.find('D005842') => 0.407,
           @mesh_tree.find('D004739') => 1.0,
-          @mesh_tree.find('D006113') => 0.667,
-          @mesh_tree.find('D005060') => 0.222,
-          @mesh_tree.find('D062312') => 0.222
+          @mesh_tree.find('D006113') => 0.333,
+          @mesh_tree.find('D005060') => 0.111,
+          @mesh_tree.find('D062312') => 0.111
         }]
 
       }
@@ -160,19 +160,19 @@ module MESH
           @mesh_tree.find('D027861') => 1.0, @mesh_tree.find('D027824') => 0.333, @mesh_tree.find('D019685') => 0.111, @mesh_tree.find('D019684') => 0.037, @mesh_tree.find('D019669') => 0.012, @mesh_tree.find('D057949') => 0.004, @mesh_tree.find('D057948') => 0.001
         }],
         'C' => [1.0, {
-          @mesh_tree.find('D003221') => 1.0, @mesh_tree.find('D019954') => 1.0, @mesh_tree.find('D009461') => 0.667, @mesh_tree.find('D009422') => 0.222, @mesh_tree.find('D012816') => 0.222, @mesh_tree.find('D013568') => 0.074
+          @mesh_tree.find('D003221') => 1.0, @mesh_tree.find('D019954') => 0.333, @mesh_tree.find('D009461') => 0.111, @mesh_tree.find('D009422') => 0.037, @mesh_tree.find('D012816') => 0.037, @mesh_tree.find('D013568') => 0.012
         }],
         'D' => [13.0, {
-          @mesh_tree.find('D007854') => 13.0, @mesh_tree.find('D019216') => 8.667, @mesh_tree.find('D004602') => 2.889, @mesh_tree.find('D007287') => 1.926, @mesh_tree.find('D008670') => 2.889
+          @mesh_tree.find('D007854') => 13.0, @mesh_tree.find('D019216') => 4.333, @mesh_tree.find('D004602') => 1.444, @mesh_tree.find('D007287') => 0.963, @mesh_tree.find('D008670') => 1.444
         }],
         'E' => [2.0, {
           @mesh_tree.find('D004562') => 2.0, @mesh_tree.find('D006334') => 0.667, @mesh_tree.find('D003935') => 0.222, @mesh_tree.find('D019937') => 0.296, @mesh_tree.find('D003933') => 0.099, @mesh_tree.find('D004568') => 0.667
         }],
         'F' => [4.0, {
-          @mesh_tree.find('D003221') => 1.0, @mesh_tree.find('D019954') => 1.0, @mesh_tree.find('D001520') => 0.333, @mesh_tree.find('D007858') => 1.0, @mesh_tree.find('D008606') => 2.0, @mesh_tree.find('D011579') => 0.704, @mesh_tree.find('D011588') => 0.333, @mesh_tree.find('D011585') => 0.111, @mesh_tree.find('D011584') => 0.111, @mesh_tree.find('D001525') => 0.037, @mesh_tree.find('D004191') => 0.012, @mesh_tree.find('D013850') => 1.0, @mesh_tree.find('D014836') => 4.0
+          @mesh_tree.find('D003221') => 1.0, @mesh_tree.find('D019954') => 0.333, @mesh_tree.find('D001520') => 0.111, @mesh_tree.find('D007858') => 1.0, @mesh_tree.find('D008606') => 2.0, @mesh_tree.find('D011579') => 0.704, @mesh_tree.find('D011588') => 0.333, @mesh_tree.find('D011585') => 0.111, @mesh_tree.find('D011584') => 0.111, @mesh_tree.find('D001525') => 0.037, @mesh_tree.find('D004191') => 0.012, @mesh_tree.find('D013850') => 1.0, @mesh_tree.find('D014836') => 4.0
         }],
         'G' => [2.0, {
-          @mesh_tree.find('D000200') => 2.0, @mesh_tree.find('D008564') => 2.0, @mesh_tree.find('D055592') => 0.667, @mesh_tree.find('D055585') => 0.691, @mesh_tree.find('D002468') => 0.667, @mesh_tree.find('D055724') => 0.667, @mesh_tree.find('D010829') => 0.222, @mesh_tree.find('D009424') => 0.667, @mesh_tree.find('D055687') => 0.222, @mesh_tree.find('D013995') => 1.0, @mesh_tree.find('D014919') => 1.0, @mesh_tree.find('D000392') => 1.0, @mesh_tree.find('D055907') => 0.333, @mesh_tree.find('D055691') => 0.111, @mesh_tree.find('D055669') => 0.416, @mesh_tree.find('D001686') => 0.139, @mesh_tree.find('D014887') => 1.0, @mesh_tree.find('D001272') => 0.889, @mesh_tree.find('D004777') => 0.506, @mesh_tree.find('D008685') => 0.630, @mesh_tree.find('D000388') => 0.333, @mesh_tree.find('D014965') => 1.0, @mesh_tree.find('D060733') => 0.667, @mesh_tree.find('D055590') => 0.222, @mesh_tree.find('D060328') => 0.074, @mesh_tree.find('D011827') => 0.333, @mesh_tree.find('D011839') => 0.333
+          @mesh_tree.find('D000200') => 2.0, @mesh_tree.find('D008564') => 0.667, @mesh_tree.find('D055592') => 0.222, @mesh_tree.find('D055585') => 0.494, @mesh_tree.find('D002468') => 0.222, @mesh_tree.find('D055724') => 0.222, @mesh_tree.find('D010829') => 0.074, @mesh_tree.find('D009424') => 0.222, @mesh_tree.find('D055687') => 0.074, @mesh_tree.find('D013995') => 1.0, @mesh_tree.find('D014919') => 1.0, @mesh_tree.find('D000392') => 0.333, @mesh_tree.find('D055907') => 0.111, @mesh_tree.find('D055691') => 0.037, @mesh_tree.find('D055669') => 0.126, @mesh_tree.find('D001686') => 0.042, @mesh_tree.find('D014887') => 0.444, @mesh_tree.find('D001272') => 0.185, @mesh_tree.find('D004777') => 0.132, @mesh_tree.find('D008685') => 0.210, @mesh_tree.find('D000388') => 0.111, @mesh_tree.find('D014965') => 1.0, @mesh_tree.find('D060733') => 0.333, @mesh_tree.find('D055590') => 0.111, @mesh_tree.find('D060328') => 0.037, @mesh_tree.find('D011827') => 0.222, @mesh_tree.find('D011839') => 0.333
         }],
         'I' => [1.0, {
           @mesh_tree.find('D014937') => 1.0, @mesh_tree.find('D006802') => 0.333
@@ -181,13 +181,13 @@ module MESH
           @mesh_tree.find('D019368') => 1.0, @mesh_tree.find('D006809') => 0.333
         }],
         'L' => [1.0, {
-          @mesh_tree.find('D009275') => 1.0, @mesh_tree.find('D009626') => 0.333, @mesh_tree.find('D008037') => 0.111, @mesh_tree.find('D007802') => 0.037, @mesh_tree.find('D003142') => 0.025, @mesh_tree.find('D007254') => 0.008
+          @mesh_tree.find('D009275') => 1.0, @mesh_tree.find('D009626') => 0.333, @mesh_tree.find('D008037') => 0.111, @mesh_tree.find('D007802') => 0.037, @mesh_tree.find('D003142') => 0.012, @mesh_tree.find('D007254') => 0.004
         }],
         'M' => [6.0, {
           @mesh_tree.find('D010361') => 6.0, @mesh_tree.find('D009272') => 2.0
         }],
         'N' => [1.0, {
-          @mesh_tree.find('D009938') => 1.0, @mesh_tree.find('D004472') => 0.333, @mesh_tree.find('D014919') => 1.0, @mesh_tree.find('D000392') => 1.0, @mesh_tree.find('D014887') => 1.0, @mesh_tree.find('D001272') => 0.889, @mesh_tree.find('D004777') => 0.543, @mesh_tree.find('D004778') => 0.181, @mesh_tree.find('D008685') => 0.630, @mesh_tree.find('D000388') => 0.333, @mesh_tree.find('D059205') => 0.333, @mesh_tree.find('D004736') => 0.111
+          @mesh_tree.find('D009938') => 1.0, @mesh_tree.find('D004472') => 0.333, @mesh_tree.find('D014919') => 1.0, @mesh_tree.find('D000392') => 0.333, @mesh_tree.find('D014887') => 0.444, @mesh_tree.find('D001272') => 0.185, @mesh_tree.find('D004777') => 0.169, @mesh_tree.find('D004778') => 0.056, @mesh_tree.find('D008685') => 0.210, @mesh_tree.find('D000388') => 0.111, @mesh_tree.find('D059205') => 0.333, @mesh_tree.find('D004736') => 0.111
         }],
         'V' => [1.0, {
           @mesh_tree.find('D017203') => 1.0, @mesh_tree.find('D019215') => 0.333, @mesh_tree.find('D052181') => 0.111, @mesh_tree.find('D052180') => 0.148, @mesh_tree.find('D016456') => 0.111
@@ -206,17 +206,17 @@ module MESH
         'A' => [2.0, {
           @mesh_tree.find('D001769') => 1.0, @mesh_tree.find('D001826') => 0.333, @mesh_tree.find('D005441') => 0.111, @mesh_tree.find('D006424') => 0.333, @mesh_tree.find('D006624') => 1.0, @mesh_tree.find('D008032') => 0.333, @mesh_tree.find('D001921') => 0.115, @mesh_tree.find('D002490') => 0.038, @mesh_tree.find('D009420') => 0.013, @mesh_tree.find('D002540') => 0.333, @mesh_tree.find('D054022') => 0.111, @mesh_tree.find('D013687') => 0.037, @mesh_tree.find('D016548') => 0.012, @mesh_tree.find('D008099') => 2.0, @mesh_tree.find('D004064') => 1.0, @mesh_tree.find('D010179') => 1.0
         }],
-        'D' => [4.136, {
-          @mesh_tree.find('D000269') => 1.0, @mesh_tree.find('D020313') => 0.383, @mesh_tree.find('D020164') => 0.171, @mesh_tree.find('D000900') => 1.0, @mesh_tree.find('D000890') => 0.333, @mesh_tree.find('D045506') => 0.111, @mesh_tree.find('D020228') => 0.131, @mesh_tree.find('D001786') => 2.0, @mesh_tree.find('D005947') => 1.667, @mesh_tree.find('D006601') => 0.556, @mesh_tree.find('D009005') => 0.185, @mesh_tree.find('D002241') => 4.136, @mesh_tree.find('D004247') => 2.0, @mesh_tree.find('D009696') => 0.667, @mesh_tree.find('D009706') => 0.222, @mesh_tree.find('D006728') => 1.263, @mesh_tree.find('D006730') => 0.842, @mesh_tree.find('D045505') => 0.281, @mesh_tree.find('D007328') => 4.0, @mesh_tree.find('D011384') => 2.667, @mesh_tree.find('D061385') => 1.778, @mesh_tree.find('D010187') => 1.185, @mesh_tree.find('D036361') => 0.790, @mesh_tree.find('D010455') => 0.263, @mesh_tree.find('D000602') => 0.187, @mesh_tree.find('D011498') => 0.889, @mesh_tree.find('D011506') => 0.296, @mesh_tree.find('D013213') => 1.0, @mesh_tree.find('D005936') => 0.667, @mesh_tree.find('D001704') => 0.222, @mesh_tree.find('D011108') => 0.222, @mesh_tree.find('D046911') => 0.074, @mesh_tree.find('D001697') => 0.148, @mesh_tree.find('D011134') => 0.222
+        'D' => [4.099, {
+          @mesh_tree.find('D000269') => 1.0, @mesh_tree.find('D020313') => 0.337, @mesh_tree.find('D020164') => 0.137, @mesh_tree.find('D000900') => 1.0, @mesh_tree.find('D000890') => 0.333, @mesh_tree.find('D045506') => 0.111, @mesh_tree.find('D020228') => 0.075, @mesh_tree.find('D001786') => 2.0, @mesh_tree.find('D005947') => 1.667, @mesh_tree.find('D006601') => 0.556, @mesh_tree.find('D009005') => 0.185, @mesh_tree.find('D002241') => 4.099, @mesh_tree.find('D004247') => 2.0, @mesh_tree.find('D009696') => 0.667, @mesh_tree.find('D009706') => 0.222, @mesh_tree.find('D006728') => 1.016, @mesh_tree.find('D006730') => 0.339, @mesh_tree.find('D045505') => 0.113, @mesh_tree.find('D007328') => 4.0, @mesh_tree.find('D011384') => 1.333, @mesh_tree.find('D061385') => 0.444, @mesh_tree.find('D010187') => 0.148, @mesh_tree.find('D036361') => 0.049, @mesh_tree.find('D010455') => 0.016, @mesh_tree.find('D000602') => 0.055, @mesh_tree.find('D011498') => 0.444, @mesh_tree.find('D011506') => 0.148, @mesh_tree.find('D013213') => 1.0, @mesh_tree.find('D005936') => 0.333, @mesh_tree.find('D001704') => 0.111, @mesh_tree.find('D011108') => 0.037, @mesh_tree.find('D046911') => 0.012, @mesh_tree.find('D001697') => 0.012, @mesh_tree.find('D011134') => 0.111
         }],
         'F' => [1.0, {
-          @mesh_tree.find('D005190') => 1.0, @mesh_tree.find('D011593') => 0.333, @mesh_tree.find('D001520') => 0.111, @mesh_tree.find('D011584') => 0.111, @mesh_tree.find('D001525') => 0.111, @mesh_tree.find('D004191') => 0.037, @mesh_tree.find('D012961') => 0.333, @mesh_tree.find('D012942') => 0.222
+          @mesh_tree.find('D005190') => 1.0, @mesh_tree.find('D011593') => 0.333, @mesh_tree.find('D001520') => 0.111, @mesh_tree.find('D011584') => 0.111, @mesh_tree.find('D001525') => 0.074, @mesh_tree.find('D004191') => 0.025, @mesh_tree.find('D012961') => 0.333, @mesh_tree.find('D012942') => 0.111
         }],
         'G' => [1.0, {
-          @mesh_tree.find('D012621') => 1.0, @mesh_tree.find('D010507') => 0.333, @mesh_tree.find('D013995') => 0.111, @mesh_tree.find('D055585') => 0.037, @mesh_tree.find('D002909') => 0.111, @mesh_tree.find('D010829') => 0.037, @mesh_tree.find('D002980') => 0.667, @mesh_tree.find('D004777') => 0.321, @mesh_tree.find('D055669') => 0.132, @mesh_tree.find('D001686') => 0.044, @mesh_tree.find('D001272') => 0.222, @mesh_tree.find('D008685') => 0.074
+          @mesh_tree.find('D012621') => 1.0, @mesh_tree.find('D010507') => 0.333, @mesh_tree.find('D013995') => 0.111, @mesh_tree.find('D055585') => 0.037, @mesh_tree.find('D002909') => 0.111, @mesh_tree.find('D010829') => 0.037, @mesh_tree.find('D002980') => 0.333, @mesh_tree.find('D004777') => 0.16, @mesh_tree.find('D055669') => 0.066, @mesh_tree.find('D001686') => 0.022, @mesh_tree.find('D001272') => 0.111, @mesh_tree.find('D008685') => 0.037
         }],
         'I' => [1.0, {
-          @mesh_tree.find('D005190') => 1.0, @mesh_tree.find('D012961') => 0.333, @mesh_tree.find('D012942') => 0.222
+          @mesh_tree.find('D005190') => 1.0, @mesh_tree.find('D012961') => 0.333, @mesh_tree.find('D012942') => 0.111
         }],
         'J' => [1.0, {
           @mesh_tree.find('D000269') => 1.0, @mesh_tree.find('D008420') => 0.444, @mesh_tree.find('D013676') => 0.148, @mesh_tree.find('D005389') => 1.0, @mesh_tree.find('D054041') => 0.333, @mesh_tree.find('D005502') => 1.0, @mesh_tree.find('D019602') => 0.333
@@ -225,7 +225,7 @@ module MESH
           @mesh_tree.find('D005246') => 1.0, @mesh_tree.find('D003491') => 0.333, @mesh_tree.find('D003142') => 0.111, @mesh_tree.find('D007254') => 0.037
         }],
         'N' => [1.0, {
-          @mesh_tree.find('D012621') => 1.0, @mesh_tree.find('D002980') => 0.667, @mesh_tree.find('D004777') => 0.321, @mesh_tree.find('D004778') => 0.107, @mesh_tree.find('D001272') => 0.222, @mesh_tree.find('D008685') => 0.074
+          @mesh_tree.find('D012621') => 1.0, @mesh_tree.find('D002980') => 0.333, @mesh_tree.find('D004777') => 0.16, @mesh_tree.find('D004778') => 0.053, @mesh_tree.find('D001272') => 0.111, @mesh_tree.find('D008685') => 0.037
         }]
       }
       assert_classification expected, @classifier.classify([{matches: @headings[:short_content], weight: 1.0}])
@@ -244,20 +244,20 @@ module MESH
         'A' => [2.0, {
           @mesh_tree.find('D001769') => 1.0, @mesh_tree.find('D001826') => 0.333, @mesh_tree.find('D005441') => 0.111, @mesh_tree.find('D006424') => 0.333, @mesh_tree.find('D006624') => 1.0, @mesh_tree.find('D008032') => 0.333, @mesh_tree.find('D001921') => 0.115, @mesh_tree.find('D002490') => 0.038, @mesh_tree.find('D009420') => 0.013, @mesh_tree.find('D002540') => 0.333, @mesh_tree.find('D054022') => 0.111, @mesh_tree.find('D013687') => 0.037, @mesh_tree.find('D016548') => 0.012, @mesh_tree.find('D008099') => 2.0, @mesh_tree.find('D004064') => 1.0, @mesh_tree.find('D010179') => 1.0
         }],
-        'D' => [4.136, {
-          @mesh_tree.find('D000269') => 1.0, @mesh_tree.find('D020313') => 0.383, @mesh_tree.find('D020164') => 0.171, @mesh_tree.find('D000900') => 1.0, @mesh_tree.find('D000890') => 0.333, @mesh_tree.find('D045506') => 0.111, @mesh_tree.find('D020228') => 0.131, @mesh_tree.find('D001786') => 2.0, @mesh_tree.find('D005947') => 1.667, @mesh_tree.find('D006601') => 0.556, @mesh_tree.find('D009005') => 0.185, @mesh_tree.find('D002241') => 4.136, @mesh_tree.find('D004247') => 2.0, @mesh_tree.find('D009696') => 0.667, @mesh_tree.find('D009706') => 0.222, @mesh_tree.find('D006728') => 1.263, @mesh_tree.find('D006730') => 0.842, @mesh_tree.find('D045505') => 0.281, @mesh_tree.find('D007328') => 4.0, @mesh_tree.find('D011384') => 2.667, @mesh_tree.find('D061385') => 1.778, @mesh_tree.find('D010187') => 1.185, @mesh_tree.find('D036361') => 0.790, @mesh_tree.find('D010455') => 0.263, @mesh_tree.find('D000602') => 0.187, @mesh_tree.find('D011498') => 0.889, @mesh_tree.find('D011506') => 0.296, @mesh_tree.find('D013213') => 1.0, @mesh_tree.find('D005936') => 0.667, @mesh_tree.find('D001704') => 0.222, @mesh_tree.find('D011108') => 0.222, @mesh_tree.find('D046911') => 0.074, @mesh_tree.find('D001697') => 0.148, @mesh_tree.find('D011134') => 0.222
+        'D' => [4.099, {
+          @mesh_tree.find('D000269') => 1.0, @mesh_tree.find('D020313') => 0.337, @mesh_tree.find('D020164') => 0.137, @mesh_tree.find('D000900') => 1.0, @mesh_tree.find('D000890') => 0.333, @mesh_tree.find('D045506') => 0.111, @mesh_tree.find('D020228') => 0.075, @mesh_tree.find('D001786') => 2.0, @mesh_tree.find('D005947') => 1.667, @mesh_tree.find('D006601') => 0.556, @mesh_tree.find('D009005') => 0.185, @mesh_tree.find('D002241') => 4.099, @mesh_tree.find('D004247') => 2.0, @mesh_tree.find('D009696') => 0.667, @mesh_tree.find('D009706') => 0.222, @mesh_tree.find('D006728') => 1.016, @mesh_tree.find('D006730') => 0.339, @mesh_tree.find('D045505') => 0.113, @mesh_tree.find('D007328') => 4.0, @mesh_tree.find('D011384') => 1.333, @mesh_tree.find('D061385') => 0.444, @mesh_tree.find('D010187') => 0.148, @mesh_tree.find('D036361') => 0.049, @mesh_tree.find('D010455') => 0.016, @mesh_tree.find('D000602') => 0.055, @mesh_tree.find('D011498') => 0.444, @mesh_tree.find('D011506') => 0.148, @mesh_tree.find('D013213') => 1.0, @mesh_tree.find('D005936') => 0.333, @mesh_tree.find('D001704') => 0.111, @mesh_tree.find('D011108') => 0.037, @mesh_tree.find('D046911') => 0.012, @mesh_tree.find('D001697') => 0.012, @mesh_tree.find('D011134') => 0.111
         }],
         'F' => [1.0, {
-          @mesh_tree.find('D005190') => 1.0, @mesh_tree.find('D011593') => 0.333, @mesh_tree.find('D001520') => 0.111, @mesh_tree.find('D011584') => 0.111, @mesh_tree.find('D001525') => 0.111, @mesh_tree.find('D004191') => 0.037, @mesh_tree.find('D012961') => 0.333, @mesh_tree.find('D012942') => 0.222
+          @mesh_tree.find('D005190') => 1.0, @mesh_tree.find('D011593') => 0.333, @mesh_tree.find('D001520') => 0.111, @mesh_tree.find('D011584') => 0.111, @mesh_tree.find('D001525') => 0.074, @mesh_tree.find('D004191') => 0.025, @mesh_tree.find('D012961') => 0.333, @mesh_tree.find('D012942') => 0.111
         }],
         'G' => [1.0, {
-          @mesh_tree.find('D012621') => 1.0, @mesh_tree.find('D010507') => 0.333, @mesh_tree.find('D013995') => 0.111, @mesh_tree.find('D055585') => 0.037, @mesh_tree.find('D002909') => 0.111, @mesh_tree.find('D010829') => 0.037, @mesh_tree.find('D002980') => 0.667, @mesh_tree.find('D004777') => 0.321, @mesh_tree.find('D055669') => 0.132, @mesh_tree.find('D001686') => 0.044, @mesh_tree.find('D001272') => 0.222, @mesh_tree.find('D008685') => 0.074
+          @mesh_tree.find('D012621') => 1.0, @mesh_tree.find('D010507') => 0.333, @mesh_tree.find('D013995') => 0.111, @mesh_tree.find('D055585') => 0.037, @mesh_tree.find('D002909') => 0.111, @mesh_tree.find('D010829') => 0.037, @mesh_tree.find('D002980') => 0.333, @mesh_tree.find('D004777') => 0.160, @mesh_tree.find('D055669') => 0.066, @mesh_tree.find('D001686') => 0.022, @mesh_tree.find('D001272') => 0.111, @mesh_tree.find('D008685') => 0.037
         }],
         'H' => [7.0, {
           @mesh_tree.find('D002309') => 7.0, @mesh_tree.find('D007388') => 2.333, @mesh_tree.find('D008511') => 0.778, @mesh_tree.find('D006281') => 0.259
         }],
         'I' => [3.0, {
-          @mesh_tree.find('D013337') => 3.0, @mesh_tree.find('D013336') => 2.0, @mesh_tree.find('D013334') => 1.333, @mesh_tree.find('D004505') => 0.444, @mesh_tree.find('D004493') => 0.593, @mesh_tree.find('D005190') => 1.0, @mesh_tree.find('D012961') => 0.333, @mesh_tree.find('D012942') => 0.222
+          @mesh_tree.find('D013337') => 3.0, @mesh_tree.find('D013336') => 1.0, @mesh_tree.find('D013334') => 0.333, @mesh_tree.find('D004505') => 0.111, @mesh_tree.find('D004493') => 0.148, @mesh_tree.find('D005190') => 1.0, @mesh_tree.find('D012961') => 0.333, @mesh_tree.find('D012942') => 0.111
         }],
         'J' => [1.0, {
           @mesh_tree.find('D000269') => 1.0, @mesh_tree.find('D008420') => 0.444, @mesh_tree.find('D013676') => 0.148, @mesh_tree.find('D005389') => 1.0, @mesh_tree.find('D054041') => 0.333, @mesh_tree.find('D005502') => 1.0, @mesh_tree.find('D019602') => 0.333
@@ -266,10 +266,10 @@ module MESH
           @mesh_tree.find('D005246') => 1.0, @mesh_tree.find('D003491') => 0.333, @mesh_tree.find('D003142') => 0.111, @mesh_tree.find('D007254') => 0.037
         }],
         'M' => [3.0, {
-          @mesh_tree.find('D013337') => 3.0, @mesh_tree.find('D013336') => 2.0, @mesh_tree.find('D013334') => 1.333, @mesh_tree.find('D009272') => 0.444
+          @mesh_tree.find('D013337') => 3.0, @mesh_tree.find('D013336') => 1.0, @mesh_tree.find('D013334') => 0.333, @mesh_tree.find('D009272') => 0.111
         }],
         'N' => [1.0, {
-          @mesh_tree.find('D012621') => 1.0, @mesh_tree.find('D002980') => 0.667, @mesh_tree.find('D004777') => 0.321, @mesh_tree.find('D004778') => 0.107, @mesh_tree.find('D001272') => 0.222, @mesh_tree.find('D008685') => 0.074
+          @mesh_tree.find('D012621') => 1.0, @mesh_tree.find('D002980') => 0.333, @mesh_tree.find('D004777') => 0.16, @mesh_tree.find('D004778') => 0.053, @mesh_tree.find('D001272') => 0.111, @mesh_tree.find('D008685') => 0.037
         }]
       }
 

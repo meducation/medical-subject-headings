@@ -1,3 +1,7 @@
+#2.0.2 / 2014-06-23
+* [BUGFIX] Removed duplicates in children and parents
+* [BUGFIX] Added require for zlib
+
 #2.0.1 / 2014-04-28
 * [FEATURE] Load translations from static file to improve load times
 
