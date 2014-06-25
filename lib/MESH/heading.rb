@@ -10,33 +10,27 @@ module MESH
     end
 
     def original_heading(locale = default_locale)
-      return @original_heading[locale]
+      @original_heading[locale]
     end
 
     def natural_language_name(locale = default_locale)
-      return @natural_language_name[locale]
+      @natural_language_name[locale]
     end
 
     def summary(locale = default_locale)
-      return @summary[locale]
+      @summary[locale]
     end
 
     def linkify_summary
       return if summary.nil?
-      @linkified_summary = summary.dup
-      @linkified_summary.scan(/[A-Z]+[A-Z,\s]+[A-Z]+/).each do |text|
+      @linkified_summary = summary.gsub(/[A-Z]+[A-Z,\s]+[A-Z]+/).each do |text|
         heading = @tree.find_by_entry(text)
-        if heading
-          replacement_text = yield text, heading
-          @linkified_summary.sub!(text, replacement_text)
-        end
+        heading ? yield(text, heading) : text
       end
-      @linkified_summary
     end
 
     def entries(locale = default_locale)
       @entries[locale] ||= []
-      return @entries[locale]
     end
 
 
@@ -88,7 +82,7 @@ module MESH
     end
 
     def to_s
-      return "#{unique_id}, #{original_heading}, [#{tree_numbers.join(',')}]"
+      "#{unique_id}, #{original_heading}, [#{tree_numbers.join(',')}]"
     end
 
     def inspect

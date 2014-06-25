@@ -144,7 +144,8 @@ module MESH
 
     def test_linkify_summary
       mh = @mesh_tree.find('D001471')
-      assert_equal 'A condition with damage to the lining of the lower ESOPHAGUS resulting from chronic acid reflux (ESOPHAGITIS, REFLUX). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the INTESTINE or the salmon-pink mucosa of the STOMACH. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to ADENOCARCINOMA of the esophagus.', mh.summary
+      original_summary = 'A condition with damage to the lining of the lower ESOPHAGUS resulting from chronic acid reflux (ESOPHAGITIS, REFLUX). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the INTESTINE or the salmon-pink mucosa of the STOMACH. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to ADENOCARCINOMA of the esophagus.'
+      assert_equal original_summary, mh.summary
 
       found = {
         'ESOPHAGUS' => false,
@@ -154,15 +155,15 @@ module MESH
         'ADENOCARCINOMA' => false
       }
 
-      # start = Time.now
+      #start = Time.now
       linkified_summary = mh.linkify_summary do |text, heading|
         found[text] = true unless heading.nil?
         "<foo>#{text.downcase}</foo>"
       end
-      # finish = Time.now
-      # puts start
-      # puts finish
-      # puts finish - start
+      #finish = Time.now
+      #puts start
+      #puts finish
+      #puts finish - start
 
       assert_equal 5, found.length
       assert found['ESOPHAGUS']
@@ -171,6 +172,7 @@ module MESH
       assert found['STOMACH']
       assert found['ADENOCARCINOMA']
 
+      assert_equal original_summary, mh.summary
       assert_equal 'A condition with damage to the lining of the lower <foo>esophagus</foo> resulting from chronic acid reflux (<foo>esophagitis, reflux</foo>). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the <foo>intestine</foo> or the salmon-pink mucosa of the <foo>stomach</foo>. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to <foo>adenocarcinoma</foo> of the esophagus.', linkified_summary
 
     end
