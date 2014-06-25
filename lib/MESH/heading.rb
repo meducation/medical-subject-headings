@@ -83,8 +83,12 @@ module MESH
       return true
     end
 
-    def inspect
+    def to_s
       return "#{unique_id}, #{original_heading}, [#{tree_numbers.join(',')}]"
+    end
+
+    def inspect
+      to_s
     end
 
     def set_original_heading(heading, locale = default_locale)

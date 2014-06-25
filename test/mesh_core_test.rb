@@ -139,7 +139,7 @@ module MESH
 
     def test_to_s
       mh = @mesh_tree.find('D001471')
-      puts mh.inspect
+      assert_equal 'D001471, Barrett Esophagus, [C06.198.102,C06.405.117.102]', mh.to_s
     end
 
     def test_have_the_correct_entries
