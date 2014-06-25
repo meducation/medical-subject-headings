@@ -25,9 +25,11 @@ module MESH
       return if summary.nil?
       @linkified_summary = summary.dup
       @linkified_summary.scan(/[A-Z]+[A-Z,\s]+[A-Z]+/).each do |text|
-        heading = @tree.where(entries: /^#{text.strip}$/i).first
-        replacement_text = yield text, heading
-        @linkified_summary.sub!(text, replacement_text)
+        heading = @tree.find_by_entry(text)
+        if heading
+          replacement_text = yield text, heading
+          @linkified_summary.sub!(text, replacement_text)
+        end
       end
       @linkified_summary
     end

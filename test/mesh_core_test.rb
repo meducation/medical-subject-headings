@@ -154,14 +154,15 @@ module MESH
         'ADENOCARCINOMA' => false
       }
 
-      start = Time.now
+      # start = Time.now
       linkified_summary = mh.linkify_summary do |text, heading|
         found[text] = true unless heading.nil?
         "<foo>#{text.downcase}</foo>"
       end
-      finish = Time.now
-      puts finish - start
-
+      # finish = Time.now
+      # puts start
+      # puts finish
+      # puts finish - start
 
       assert_equal 5, found.length
       assert found['ESOPHAGUS']
@@ -174,22 +175,14 @@ module MESH
 
     end
 
-    # def test_linkifies_all_summaries
-    #   mesh = MESH::Tree.new
-    #
-    #   start = Time.now
-    #   mesh.linkify_summaries do |text, heading|
-    #     "<bar>#{text.downcase}</bar>"
-    #   end
-    #   finish = Time.now
-    #   puts finish - start
-    #
-    #   mh = @mesh_tree.find('D001471')
-    #
-    #   assert_equal 'A condition with damage to the lining of the lower <bar>esophagus</bar> resulting from chronic acid reflux (<bar>esophagitis, reflux</bar>). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the <bar>intestine</bar> or the salmon-pink mucosa of the <bar>stomach</bar>. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to <bar>adenocarcinoma</bar> of the esophagus.', mh.linkified_summary
-    #
-    #
-    # end
+    def test_linkifies_all_summaries
+      mesh = MESH::Tree.new
+      mesh.linkify_summaries do |text, heading|
+        "<bar>#{text.downcase}</bar>"
+      end
+      mh = mesh.find('D001471')
+      assert_equal 'A condition with damage to the lining of the lower <bar>esophagus</bar> resulting from chronic acid reflux (<bar>esophagitis, reflux</bar>). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the <bar>intestine</bar> or the salmon-pink mucosa of the <bar>stomach</bar>. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to <bar>adenocarcinoma</bar> of the esophagus.', mh.linkified_summary
+    end
 
     def test_to_s
       mh = @mesh_tree.find('D001471')
