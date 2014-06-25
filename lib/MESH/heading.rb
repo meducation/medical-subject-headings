@@ -3,6 +3,7 @@ module MESH
 
     include Comparable
     attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class, :default_locale
+    attr_reader :linkified_summary
 
     def <=> other
       self.unique_id <=> other.unique_id
@@ -21,13 +22,14 @@ module MESH
     end
 
     def linkify_summary
-      linkified_summary = summary.dup
-      linkified_summary.scan(/[A-Z]+[A-Z,\s]+[A-Z]+/).each do |text|
+      return if summary.nil?
+      @linkified_summary = summary.dup
+      @linkified_summary.scan(/[A-Z]+[A-Z,\s]+[A-Z]+/).each do |text|
         heading = @tree.where(entries: /^#{text.strip}$/i).first
         replacement_text = yield text, heading
-        linkified_summary.sub!(text, replacement_text)
+        @linkified_summary.sub!(text, replacement_text)
       end
-      linkified_summary
+      @linkified_summary
     end
 
     def entries(locale = default_locale)
