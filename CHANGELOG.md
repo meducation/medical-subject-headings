@@ -1,3 +1,6 @@
+#2.0.4 / 2014-06-25
+* [FEATURE] tree can now linkify_summaries for all headings. Performance optimisations to make this viable.
+
 #2.0.3 / 2014-06-25
 * [FEATURE] You can now link cross-references in heading.summary by passing a block to heading.linkify_summary
 

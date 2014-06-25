@@ -11,6 +11,7 @@ module MESH
       @by_unique_id = {}
       @by_tree_number = {}
       @by_original_heading = {}
+      @by_entry = {}
       @locales = [@@default_locale]
 
       filename = File.expand_path('../../../data/mesh_data_2014/d2014.bin.gz', __FILE__)
@@ -30,7 +31,13 @@ module MESH
               @by_unique_id[current_heading.unique_id] = current_heading
               @by_original_heading[current_heading.original_heading] = current_heading
               current_heading.tree_numbers.each do |tree_number|
+                raise if @by_tree_number[tree_number]
                 @by_tree_number[tree_number] = current_heading
+              end
+              match_headings = current_heading.entries.map { |e| entry_match_key(e) }.uniq
+              match_headings.each do |entry|
+                raise "#{@by_entry[entry]} vs #{current_heading} on #{entry}\n\n#{@by_entry[entry].entries}\n\n#{current_heading.entries}" if @by_entry[entry]
+                @by_entry[entry] = current_heading
               end
             end
             current_heading = MESH::Heading.new(self)
@@ -52,14 +59,14 @@ module MESH
           when matches = line.match(/^MH = (.*)/)
             mh = matches[1]
             current_heading.set_original_heading(mh)
-            current_heading.entries << mh
+            current_heading.entries << mh unless current_heading.entries.include? mh
             librarian_parts = mh.match(/(.*), (.*)/)
             nln = librarian_parts.nil? ? mh : "#{librarian_parts[2]} #{librarian_parts[1]}"
             current_heading.set_natural_language_name(nln)
 
           when matches = line.match(/^(?:PRINT )?ENTRY = ([^|]+)/)
             entry = matches[1].chomp
-            current_heading.entries << entry
+            current_heading.entries << entry unless current_heading.entries.include? entry
 
         end
 
@@ -79,6 +86,10 @@ module MESH
         end
       end
 
+    end
+
+    def entry_match_key(e)
+      e.strip.upcase
     end
 
     def load_translation(locale)
@@ -136,6 +147,12 @@ module MESH
       @locales << locale
     end
 
+    def linkify_summaries &block
+      @headings.each do |h|
+        h.linkify_summary &block
+      end
+    end
+
     # NO LONGER COVERED BY TESTS
     # def translate(locale, tr)
     #   return if @locales.include? locale
@@ -160,6 +177,10 @@ module MESH
 
     def find_by_original_heading(heading)
       return @by_original_heading[heading]
+    end
+
+    def find_by_entry(entry)
+      return @by_entry[entry_match_key(entry)]
     end
 
     def where(conditions)

@@ -40,6 +40,39 @@ module MESH
       assert_nil mh
     end
 
+    def test_find_by_entry
+
+      expected_entries = [
+        'Adult Reye Syndrome',
+        'Adult Reye\'s Syndrome',
+        'Fatty Liver with Encephalopathy',
+        'Reye Johnson Syndrome',
+        'Reye Like Syndrome',
+        'Reye Syndrome',
+        'Reye Syndrome, Adult',
+        'Reye\'s Like Syndrome',
+        'Reye\'s Syndrome',
+        'Reye\'s Syndrome, Adult',
+        'Reye\'s-Like Syndrome',
+        'Reye-Johnson Syndrome',
+        'Reye-Like Syndrome'
+      ]
+
+      entries_to_test = expected_entries.flat_map do |e|
+        [e, e.upcase, e.downcase, " #{e.downcase} ", "\n\n\t #{e.downcase}\t "]
+      end
+
+      entries_to_test.each do |entry|
+        refute_nil mh = @mesh_tree.find_by_entry(entry), "Failed to find heading by entry '#{entry}'"
+        assert_equal 'D012202', mh.unique_id, "Found wrong heading by entry '#{entry}'"
+      end
+
+    end
+
+    def test_find_by_entry_doesnt_match
+      assert_nil @mesh_tree.find_by_entry('foo')
+    end
+
     def test_have_the_correct_unique_id
       mh = @mesh_tree.find('D000001')
       assert_equal 'D000001', mh.unique_id
@@ -121,10 +154,15 @@ module MESH
         'ADENOCARCINOMA' => false
       }
 
+      # start = Time.now
       linkified_summary = mh.linkify_summary do |text, heading|
         found[text] = true unless heading.nil?
         "<foo>#{text.downcase}</foo>"
       end
+      # finish = Time.now
+      # puts start
+      # puts finish
+      # puts finish - start
 
       assert_equal 5, found.length
       assert found['ESOPHAGUS']
@@ -135,6 +173,15 @@ module MESH
 
       assert_equal 'A condition with damage to the lining of the lower <foo>esophagus</foo> resulting from chronic acid reflux (<foo>esophagitis, reflux</foo>). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the <foo>intestine</foo> or the salmon-pink mucosa of the <foo>stomach</foo>. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to <foo>adenocarcinoma</foo> of the esophagus.', linkified_summary
 
+    end
+
+    def test_linkifies_all_summaries
+      mesh = MESH::Tree.new
+      mesh.linkify_summaries do |text, heading|
+        "<bar>#{text.downcase}</bar>"
+      end
+      mh = mesh.find('D001471')
+      assert_equal 'A condition with damage to the lining of the lower <bar>esophagus</bar> resulting from chronic acid reflux (<bar>esophagitis, reflux</bar>). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the <bar>intestine</bar> or the salmon-pink mucosa of the <bar>stomach</bar>. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to <bar>adenocarcinoma</bar> of the esophagus.', mh.linkified_summary
     end
 
     def test_to_s
