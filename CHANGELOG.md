@@ -1,3 +1,6 @@
+#2.0.5 / 2014-06-25
+* [FEATURE] Improve performance of linkify_summaries further.
+
 #2.0.4 / 2014-06-25
 * [FEATURE] tree can now linkify_summaries for all headings. Performance optimisations to make this viable.
 
