@@ -17,7 +17,7 @@ module MESH
       gzipped_file = File.open(filename)
       file = Zlib::GzipReader.new(gzipped_file)
 
-      current_heading = MESH::Heading.new
+      current_heading = MESH::Heading.new(self)
       current_heading.default_locale = @@default_locale
       file.each_line do |line|
 
@@ -33,7 +33,7 @@ module MESH
                 @by_tree_number[tree_number] = current_heading
               end
             end
-            current_heading = MESH::Heading.new
+            current_heading = MESH::Heading.new(self)
             current_heading.default_locale = @@default_locale
 
           when matches = line.match(/^UI = (.*)/)
