@@ -1,3 +1,6 @@
+#2.0.3 / 2014-06-25
+* [FEATURE] You can now link cross-references in heading.summary by passing a block to heading.linkify_summary
+
 #2.0.2 / 2014-06-23
 * [BUGFIX] Removed duplicates in children and parents
 * [BUGFIX] Added require for zlib

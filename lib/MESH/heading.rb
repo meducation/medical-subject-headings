@@ -20,6 +20,16 @@ module MESH
       return @summary[locale]
     end
 
+    def linkify_summary
+      linkified_summary = summary.dup
+      linkified_summary.scan(/[A-Z]+[A-Z,\s]+[A-Z]+/).each do |text|
+        heading = @tree.where(entries: /^#{text.strip}$/i).first
+        replacement_text = yield text, heading
+        linkified_summary.sub!(text, replacement_text)
+      end
+      linkified_summary
+    end
+
     def entries(locale = default_locale)
       @entries[locale] ||= []
       return @entries[locale]
@@ -73,8 +83,12 @@ module MESH
       return true
     end
 
-    def inspect
+    def to_s
       return "#{unique_id}, #{original_heading}, [#{tree_numbers.join(',')}]"
+    end
+
+    def inspect
+      to_s
     end
 
     def set_original_heading(heading, locale = default_locale)
@@ -91,7 +105,8 @@ module MESH
 
     private
 
-    def initialize
+    def initialize(tree)
+      @tree = tree
       @useful = true
       @tree_numbers = []
       @roots = []
