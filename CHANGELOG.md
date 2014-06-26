@@ -1,3 +1,6 @@
+#2.0.6 / 2014-06-26
+* [BUGFIX] Match on summary links with hyphens in
+
 #2.0.5 / 2014-06-25
 * [FEATURE] Improve performance of linkify_summaries further.
 

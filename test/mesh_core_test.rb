@@ -155,15 +155,10 @@ module MESH
         'ADENOCARCINOMA' => false
       }
 
-      #start = Time.now
       linkified_summary = mh.linkify_summary do |text, heading|
         found[text] = true unless heading.nil?
         "<foo>#{text.downcase}</foo>"
       end
-      #finish = Time.now
-      #puts start
-      #puts finish
-      #puts finish - start
 
       assert_equal 5, found.length
       assert found['ESOPHAGUS']
@@ -175,6 +170,21 @@ module MESH
       assert_equal original_summary, mh.summary
       assert_equal 'A condition with damage to the lining of the lower <foo>esophagus</foo> resulting from chronic acid reflux (<foo>esophagitis, reflux</foo>). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the <foo>intestine</foo> or the salmon-pink mucosa of the <foo>stomach</foo>. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to <foo>adenocarcinoma</foo> of the esophagus.', linkified_summary
 
+    end
+
+    def test_linkifies_another_summary
+      mh = @mesh_tree.find_by_original_heading('Diabetic Nephropathies')
+      linkified_summary = mh.linkify_summary do |text, heading|
+        "<linky href=\"#{heading.unique_id}\">#{text.downcase}</linky>"
+      end
+
+      expected_summary = 'KIDNEY injuries associated with diabetes mellitus and affecting KIDNEY GLOMERULUS; ARTERIOLES; KIDNEY TUBULES; and the interstitium. Clinical signs include persistent PROTEINURIA, from microalbuminuria progressing to ALBUMINURIA of greater than 300 mg/24 h, leading to reduced GLOMERULAR FILTRATION RATE and END-STAGE RENAL DISEASE.'
+
+      expected_linkified = '<linky href="D007668">kidney</linky> injuries associated with diabetes mellitus and affecting <linky href="D007678">kidney glomerulus</linky>; <linky href="D001160">arterioles</linky>; <linky href="D007684">kidney tubules</linky>; and the interstitium. Clinical signs include persistent <linky href="D011507">proteinuria</linky>, from microalbuminuria progressing to <linky href="D000419">albuminuria</linky> of greater than 300 mg/24 h, leading to reduced <linky href="D005919">glomerular filtration rate</linky> and <linky href="D007676">end-stage renal disease</linky>.'
+
+
+      assert_equal expected_summary, mh.summary
+      assert_equal expected_linkified, linkified_summary
     end
 
     def test_linkifies_all_summaries
