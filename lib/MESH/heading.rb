@@ -23,7 +23,7 @@ module MESH
 
     def linkify_summary
       return if summary.nil?
-      @linkified_summary = summary.gsub(/[A-Z]+[A-Z,\s]+[A-Z]+/).each do |text|
+      @linkified_summary = summary.gsub(/[A-Z]+[A-Z,\s-]+[A-Z]+/).each do |text|
         heading = @tree.find_by_entry(text)
         heading ? yield(text, heading) : text
       end
