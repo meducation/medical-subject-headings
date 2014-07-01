@@ -2,32 +2,52 @@
 
 require_relative '../lib/MESH'
 require 'net/http'
+require 'nokogiri'
 require 'uri'
 
 mesh_tree = MESH::Tree.new
 
+def sluggify(name)
+  CGI.escape(name.downcase.gsub(/\s/, '_').capitalize)
+end
+
 count = 0
 mesh_tree.each do |h|
   count += 1
-  next if count < 23424
-  STDERR.puts "\e[1;31m\t#{count}\e[0m"
-  slug = h.natural_language_name.downcase.gsub(/\s/, '_').capitalize
-  slug = CGI.escape(slug)
-  uri = URI.parse("http://en.wikipedia.org/wiki/#{slug}")
-  response = Net::HTTP.get_response(uri)
-  puts '*NEWRECORD'
-  if response.code == '200'
-    puts "\e[1;32m"
-  elsif response.code == '301'
-    uri = response['location']
-    puts "\e[32m"
-  else
-    puts "\e[1;31m"
+
+  candidates = {}
+  images = {}
+  h.entries.each do |e|
+
+    slug = sluggify(e)
+    uri = URI.parse("http://en.wikipedia.org/wiki/#{slug}")
+    response = Net::HTTP.get_response(uri)
+    if response.code == '200'
+      doc = Nokogiri::HTML(response.body)
+      # heading = doc.css('#firstHeading > span')
+      canonical = doc.xpath('/html/head/link[@rel="canonical"]/@href')
+      candidates[canonical.text] ||= 0
+      candidates[canonical.text] += 1
+      img_node = doc.xpath('(//table[@class="infobox"]//img)[1]/@src')
+      images[canonical.text] ||= img_node.text unless img_node.nil?
+    end
+
+    sleep 0.1
   end
-  puts "UI = #{h.unique_id}"
-  puts "MH = #{h.original_heading}"
-  puts "NL = #{h.natural_language_name}"
-  puts "WP = #{response.code} #{uri}"
-  puts "\e[0m"
-  STDOUT.flush
+
+  best_candidates = candidates.reduce({}) { |h, (k, v)| (h[v] ||= []) << k; h }.max
+  if best_candidates && !best_candidates.empty?
+    score, candidates = best_candidates
+    puts "UI = #{h.unique_id}"
+    puts "MH = #{h.original_heading}"
+    puts "ENTRIES = #{h.entries.join(' -- ')}"
+    candidates.each do |c|
+      puts "WK = #{score}; #{c}"
+      puts "WI = #{images[c]}" unless images[c].nil? || images[c].empty?
+    end
+    puts ''
+    STDOUT.flush
+  end
+
+
 end

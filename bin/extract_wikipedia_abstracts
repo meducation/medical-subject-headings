@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/MESH'
+require 'nokogiri'
+
+class Wikidoc < Nokogiri::XML::SAX::Document
+
+  def initialize
+    super
+    @mesh_tree = MESH::Tree.new
+  end
+
+  def start_element name, attrs = []
+    @elements ||= []
+    @elements.push(name)
+    if name == 'doc'
+      @current_title = ''
+      @current_abstract = ''
+    end
+  end
+
+  def characters string
+    if @elements.last == 'title'
+      @current_title = string
+    elsif @elements.last == 'abstract'
+      @current_abstract = string
+    end
+    # puts "#{@elements.last} — #{string}"
+  end
+
+  def end_element name
+    if name == 'doc'
+      title = @current_title.gsub(/^Wikipedia: /, '')
+      h = @mesh_tree.find_by_entry(title)
+      if h
+        puts "#{title} matched to #{h.original_heading}"
+        puts "MeSH: #{h.summary}"
+        puts "Wikipedia: #{@current_abstract}"
+      end
+    end
+    @elements.pop
+  end
+
+end
+
+parser = Nokogiri::XML::SAX::Parser.new(Wikidoc.new)
+parser.parse(File.open(ARGV[0]))
