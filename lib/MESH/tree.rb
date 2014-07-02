@@ -56,6 +56,9 @@ module MESH
           when matches = line.match(/^DC = (.*)/)
             current_heading.descriptor_class = @@descriptor_classes[matches[1].to_i]
 
+          when matches = line.match(/^ST = (.*)/)
+            current_heading.semantic_type = MESH::SemanticTypes[matches[1]]
+
           when matches = line.match(/^MH = (.*)/)
             mh = matches[1]
             current_heading.set_original_heading(mh)

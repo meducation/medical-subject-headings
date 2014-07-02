@@ -105,6 +105,13 @@ module MESH
       assert_equal :check_tag, mh.descriptor_class
     end
 
+    def test_have_the_correct_semantic_type
+      mh = @mesh_tree.find('D000224')
+      assert_equal 'Disease or Syndrome', mh.semantic_type
+      mh = @mesh_tree.find('D005260')
+      assert_equal 'Organism Attribute', mh.semantic_type
+    end
+
     def test_have_the_correct_original_heading
       mh = @mesh_tree.find('D000224')
       assert_equal 'Addison Disease', mh.original_heading

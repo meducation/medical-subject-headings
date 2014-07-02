@@ -2,7 +2,7 @@ module MESH
   class Heading
 
     include Comparable
-    attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class, :default_locale
+    attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class, :default_locale, :semantic_type
     attr_reader :linkified_summary
 
     def <=> other
