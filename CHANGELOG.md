@@ -1,3 +1,6 @@
+#2.1.0 / 2014-07-04
+* [FEATURE] Headings matched with Wikipedia, infobox images and abstracts imported
+
 #2.0.6 / 2014-06-26
 * [BUGFIX] Match on summary links with hyphens in
 

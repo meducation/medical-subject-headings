@@ -105,6 +105,16 @@ module MESH
       assert_equal :check_tag, mh.descriptor_class
     end
 
+    def test_have_the_correct_semantic_type
+      mh = @mesh_tree.find('D000224')
+      assert_equal ['Disease or Syndrome'], mh.semantic_types
+      mh = @mesh_tree.find('D005260')
+      assert_equal ['Organism Attribute'], mh.semantic_types
+      mh = @mesh_tree.find('D014148')
+      assert_equal ['Organic Chemical', 'Pharmacologic Substance'], mh.semantic_types
+
+    end
+
     def test_have_the_correct_original_heading
       mh = @mesh_tree.find('D000224')
       assert_equal 'Addison Disease', mh.original_heading
@@ -217,6 +227,95 @@ module MESH
       mh = @mesh_tree.find('D001471')
       assert_equal expected_entries.sort, mh.entries
       assert_equal expected_entries_en.sort, mh.entries(:en_gb)
+    end
+
+    def test_have_a_single_wikipedia_link
+
+      expected = {
+        'D000001' => 'http://en.wikipedia.org/wiki/A23187',
+        'D000005' => 'http://en.wikipedia.org/wiki/Abdomen',
+        'D000082' => 'http://en.wikipedia.org/wiki/Paracetamol'
+      }
+
+      expected.each do |id, expected_link|
+        mh = @mesh_tree.find(id)
+        assert_equal 1, mh.wikipedia_links.length
+        assert_equal expected_link, mh.wikipedia_links[0][:link]
+      end
+
+    end
+
+    def test_have_a_single_wikipedia_score
+      expected = {
+        'D000001' => 0.5,
+        'D000005' => 1.0,
+        'D000082' => 0.35
+      }
+
+      expected.each do |id, expected_score|
+        mh = @mesh_tree.find(id)
+        assert_equal 1, mh.wikipedia_links.length
+        assert_equal expected_score, mh.wikipedia_links[0][:score]
+      end
+
+    end
+
+    def test_have_a_single_wikipedia_image
+      expected = {
+        'D000001' => 'http://upload.wikimedia.org/wikipedia/commons/thumb/1/17/A23187.png/220px-A23187.png',
+        'D000005' => 'http://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Abdomen_%28PSF%29.jpg/250px-Abdomen_%28PSF%29.jpg',
+        'D000082' => 'http://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Paracetamol-skeletal.svg/150px-Paracetamol-skeletal.svg.png'
+      }
+
+      expected.each do |id, expected_image|
+        mh = @mesh_tree.find(id)
+        assert_equal 1, mh.wikipedia_links.length
+        assert_equal expected_image, mh.wikipedia_links[0][:image]
+      end
+    end
+
+    def test_have_a_single_wikipedia_abstract
+      expected = {
+        'D000001' => '| CAS_number = 52665-69-7',
+        'D000005' => 'The abdomen (less formally called the belly, stomach, or tummy), in vertebrates such as mammals, constitutes the part of the body between the thorax (chest) and pelvis. The region enclosed by the abdomen is termed the abdominal cavity.',
+        'D000082' => '| MedlinePlus = a681004'
+      }
+
+      expected.each do |id, expected_abstract|
+        mh = @mesh_tree.find(id)
+        assert_equal 1, mh.wikipedia_links.length
+        assert_equal expected_abstract, mh.wikipedia_links[0][:abstract]
+      end
+    end
+
+    def test_have_more_than_one_wikipedia_link
+      mh = @mesh_tree.find('D000100')
+      expected = %w(
+        http://en.wikipedia.org/wiki/Sodium_acetrizoate
+        http://en.wikipedia.org/wiki/Acetrizoic_acid
+      )
+      assert_equal expected, mh.wikipedia_links.map { |l| l[:link] }
+    end
+
+    def test_have_more_than_one_wikipedia_score
+      mh = @mesh_tree.find('D000100')
+      expected = [0.09, 0.09]
+      assert_equal expected, mh.wikipedia_links.map { |l| l[:score] }
+    end
+
+    def test_have_more_than_one_wikipedia_image
+      mh = @mesh_tree.find('D000100')
+      expected = %w(
+        http://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Sodium_acetrizoate.svg/150px-Sodium_acetrizoate.svg.png
+        http://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Acetrizoic_acid.png/220px-Acetrizoic_acid.png
+      )
+      assert_equal expected, mh.wikipedia_links.map { |l| l[:image] }
+    end
+
+    def test_have_more_than_one_wikipedia_abstract
+      mh = @mesh_tree.find('D000100')
+      expected = ['| CAS_number = 129-63-5', '| CAS_number = 85-36-9']
+      assert_equal expected, mh.wikipedia_links.map { |l| l[:abstract] }
     end
 
     def test_have_the_correct_parent
@@ -578,6 +677,7 @@ module MESH
     def setup
       @@mesh_tree ||= MESH::Tree.new
       @@mesh_tree.load_translation(:en_gb)
+      @@mesh_tree.load_wikipedia
       @mesh_tree = @@mesh_tree
       @example_text ||= 'Leukaemia in Downs Syndrome
 Overview

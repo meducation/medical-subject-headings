@@ -7,9 +7,12 @@ GEM
   remote: https://rubygems.org/
   specs:
     metaclass (0.0.4)
+    mini_portile (0.6.0)
     minitest (5.0.8)
     mocha (1.0.0)
       metaclass (~> 0.0.1)
+    nokogiri (1.6.2.1)
+      mini_portile (= 0.6.0)
     rake (10.2.2)
     ruby-prof (0.14.2)
     yard (0.8.7.4)
@@ -22,6 +25,7 @@ DEPENDENCIES
   mesh-medical-subject-headings!
   minitest (~> 5.0.8)
   mocha
+  nokogiri
   rake
   ruby-prof
   yard

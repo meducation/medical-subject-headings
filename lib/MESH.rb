@@ -1,6 +1,8 @@
+require 'json'
 require 'zlib'
 require 'MESH/version'
 require 'MESH/tree'
 require 'MESH/heading'
 require 'MESH/translator'
 require 'MESH/classifier'
+require 'MESH/semantic_types'

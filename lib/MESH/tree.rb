@@ -24,7 +24,7 @@ module MESH
 
         case
 
-          when matches = line.match(/^\*NEWRECORD$/)
+          when line.match(/^\*NEWRECORD$/)
             unless current_heading.unique_id.nil?
               current_heading.entries.sort!
               @headings << current_heading
@@ -55,6 +55,9 @@ module MESH
 
           when matches = line.match(/^DC = (.*)/)
             current_heading.descriptor_class = @@descriptor_classes[matches[1].to_i]
+
+          when matches = line.match(/^ST = (.*)/)
+            current_heading.semantic_types << MESH::SemanticTypes[matches[1]]
 
           when matches = line.match(/^MH = (.*)/)
             mh = matches[1]
@@ -107,7 +110,7 @@ module MESH
 
         case
 
-          when matches = line.match(/^\*NEWRECORD$/)
+          when line.match(/^\*NEWRECORD$/)
             unless unique_id.nil?
               entries.sort!
               entries.uniq!
@@ -146,6 +149,45 @@ module MESH
       end
       @locales << locale
     end
+
+    def load_wikipedia
+      return if @wikipedia_loaded
+      filename = File.expand_path("../../../data/mesh_data_2014/d2014.wikipedia.bin.gz", __FILE__)
+      gzipped_file = File.open(filename)
+      file = Zlib::GzipReader.new(gzipped_file)
+
+      unique_id = nil
+      wikipedia_links = []
+      file.each_line do |line|
+
+        case
+
+          when line.match(/^\*NEWRECORD$/)
+            unless unique_id.nil?
+              if heading = find(unique_id)
+                wikipedia_links.each do |wl|
+                  wl[:score] = (wl[:score].to_f / heading.entries.length.to_f).round(2)
+                end
+                heading.wikipedia_links = wikipedia_links
+              end
+
+              wikipedia_links = []
+              unique_id = nil
+            end
+
+          when matches = line.match(/^UI = (.*)/)
+            unique_id = matches[1]
+
+          when matches = line.match(/^WK = (.*)/)
+            hash = JSON.parse(matches[1], symbolize_names: true)
+            wikipedia_links << hash
+
+        end
+
+      end
+      @wikipedia_loaded = true
+    end
+
 
     def linkify_summaries &block
       @headings.each do |h|

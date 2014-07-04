@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/MESH'
+
+mesh_tree = MESH::Tree.new
+tr = MESH::Translator.new(MESH::Translator.enus_to_engb)
+
+mesh_tree.each do |h|
+  puts "*NEWRECORD"
+  puts "MH = #{tr.translate(h.original_heading)}"
+  puts "MS = #{tr.translate(h.summary)}"
+  h.entries.each { |e| puts "ENTRY = #{tr.translate(e)}" }
+  puts "UI = #{h.unique_id}"
+  puts ''
+end
