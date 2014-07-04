@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mesh-medical-subject-headings (2.0.6)
+    mesh-medical-subject-headings (2.1.0)
 
 GEM
   remote: https://rubygems.org/
