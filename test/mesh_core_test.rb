@@ -107,9 +107,12 @@ module MESH
 
     def test_have_the_correct_semantic_type
       mh = @mesh_tree.find('D000224')
-      assert_equal 'Disease or Syndrome', mh.semantic_type
+      assert_equal ['Disease or Syndrome'], mh.semantic_types
       mh = @mesh_tree.find('D005260')
-      assert_equal 'Organism Attribute', mh.semantic_type
+      assert_equal ['Organism Attribute'], mh.semantic_types
+      mh = @mesh_tree.find('D014148')
+      assert_equal ['Organic Chemical', 'Pharmacologic Substance'], mh.semantic_types
+
     end
 
     def test_have_the_correct_original_heading
@@ -224,6 +227,62 @@ module MESH
       mh = @mesh_tree.find('D001471')
       assert_equal expected_entries.sort, mh.entries
       assert_equal expected_entries_en.sort, mh.entries(:en_gb)
+    end
+
+    def test_have_a_single_wikipedia_link
+
+      mh = @mesh_tree.find('D000001')
+      expected = [{
+        score: 0.5,
+        link: 'http://en.wikipedia.org/wiki/A23187',
+        image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/1/17/A23187.png/220px-A23187.png'
+      }]
+      assert_equal expected, mh.wikipedia_links
+
+      mh = @mesh_tree.find('D000005')
+      expected = [{
+        score: 1.0,
+        link: 'http://en.wikipedia.org/wiki/Abdomen',
+        image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Abdomen_%28PSF%29.jpg/250px-Abdomen_%28PSF%29.jpg'
+      }]
+      assert_equal expected, mh.wikipedia_links
+
+      mh = @mesh_tree.find('D000082')
+      expected = [{
+        score: 0.35,
+        link: 'http://en.wikipedia.org/wiki/Paracetamol',
+        image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Paracetamol-skeletal.svg/150px-Paracetamol-skeletal.svg.png'
+      }]
+      assert_equal expected, mh.wikipedia_links
+
+    end
+
+    def test_have_more_than_one_wikipedia_link
+      mh = @mesh_tree.find('D000100')
+      expected = [
+        { score: 0.09,
+          link: 'http://en.wikipedia.org/wiki/Sodium_acetrizoate',
+          image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Sodium_acetrizoate.svg/150px-Sodium_acetrizoate.svg.png' },
+        { score: 0.09,
+          link: 'http://en.wikipedia.org/wiki/Acetrizoic_acid',
+          image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Acetrizoic_acid.png/220px-Acetrizoic_acid.png'
+        }
+      ]
+      assert_equal expected, mh.wikipedia_links
+    end
+
+    def test_have_four_wikipedia_links
+      mh = @mesh_tree.find('D000141')
+      expected = [
+        { score: 0.03, link: 'http://en.wikipedia.org/wiki/Hyperchloremic_acidosis' },
+        { score: 0.03, link: 'http://en.wikipedia.org/wiki/Distal_renal_tubular_acidosis' },
+        { score: 0.03, link: 'http://en.wikipedia.org/wiki/Proximal_renal_tubular_acidosis' },
+        { score: 0.03,
+          link: 'http://en.wikipedia.org/wiki/Renal_tubular_acidosis',
+          image: 'http://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Nephrocalcinosis.jpg/230px-Nephrocalcinosis.jpg'
+        }
+      ]
+      assert_equal expected, mh.wikipedia_links
     end
 
     def test_have_the_correct_parent
@@ -585,6 +644,7 @@ module MESH
     def setup
       @@mesh_tree ||= MESH::Tree.new
       @@mesh_tree.load_translation(:en_gb)
+      @@mesh_tree.load_wikipedia
       @mesh_tree = @@mesh_tree
       @example_text ||= 'Leukaemia in Downs Syndrome
 Overview
