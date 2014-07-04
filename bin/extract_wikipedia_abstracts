@@ -1,13 +1,14 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/MESH'
+require 'json'
 require 'nokogiri'
 
 class Wikidoc < Nokogiri::XML::SAX::Document
 
-  def initialize
-    super
-    @mesh_tree = MESH::Tree.new
+  def initialize(links_by_uri)
+    super()
+    @links_by_uri = links_by_uri
   end
 
   def start_element name, attrs = []
@@ -16,6 +17,7 @@ class Wikidoc < Nokogiri::XML::SAX::Document
     if name == 'doc'
       @current_title = ''
       @current_abstract = ''
+      @current_url = ''
     end
   end
 
@@ -24,24 +26,86 @@ class Wikidoc < Nokogiri::XML::SAX::Document
       @current_title = string
     elsif @elements.last == 'abstract'
       @current_abstract = string
+    elsif @elements.last == 'url'
+      @current_url = string
     end
-    # puts "#{@elements.last} — #{string}"
   end
 
   def end_element name
-    if name == 'doc'
-      title = @current_title.gsub(/^Wikipedia: /, '')
-      h = @mesh_tree.find_by_entry(title)
-      if h
-        puts "#{title} matched to #{h.original_heading}"
-        puts "MeSH: #{h.summary}"
-        puts "Wikipedia: #{@current_abstract}"
+    if name == 'doc' && @links_by_uri[@current_url]
+      STDERR.print '.'
+      @links_by_uri[@current_url].each do |l|
+        title = @current_title.gsub(/^Wikipedia: /, '')
+        l[:title] = title
+        l[:abstract] = @current_abstract
+        # puts l
       end
+    elsif name == 'doc'
+      STDERR.print '-'
     end
     @elements.pop
   end
 
 end
 
-parser = Nokogiri::XML::SAX::Parser.new(Wikidoc.new)
+filename = File.expand_path("../../data/mesh_data_2014/d2014.wikipedia.bin.gz", __FILE__)
+gzipped_file = File.open(filename)
+file = Zlib::GzipReader.new(gzipped_file)
+
+unique_id = nil
+mh = nil
+wikipedia_links = []
+by_uri = {}
+headings = []
+
+file.each_line do |line|
+
+  case
+
+    when line.match(/^\*NEWRECORD$/)
+      unless unique_id.nil?
+        hash = {
+          ui: unique_id,
+          mh: mh,
+          wikipedia_links: wikipedia_links
+        }
+
+        headings << hash
+
+        wikipedia_links.each do |wl|
+          by_uri[wl[:link]] ||= []
+          by_uri[wl[:link]] << wl
+        end
+
+        wikipedia_links = []
+        unique_id = nil
+        mh = nil
+      end
+
+    when matches = line.match(/^UI = (.*)/)
+      unique_id = matches[1]
+
+    when matches = line.match(/^MH = (.*)/)
+      mh = matches[1]
+
+    when matches = line.match(/^WK = (.*)/)
+      score, link, image = matches[1].split ';'
+      hash = {score: score, link: link.strip}
+      hash[:image] = image.strip unless image.nil?
+      wikipedia_links << hash
+  end
+
+end
+
+parser = Nokogiri::XML::SAX::Parser.new(Wikidoc.new(by_uri))
 parser.parse(File.open(ARGV[0]))
+
+headings.each do |h|
+  puts '*NEWRECORD'
+  puts "UI = #{h[:ui]}"
+  puts "MH = #{h[:mh]}"
+  h[:wikipedia_links].each do |wl|
+    puts "WK = #{wl.to_json}"
+  end
+  puts ''
+end

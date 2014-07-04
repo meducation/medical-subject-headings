@@ -179,9 +179,7 @@ module MESH
             unique_id = matches[1]
 
           when matches = line.match(/^WK = (.*)/)
-            score, link, image = matches[1].split ';'
-            hash = { score: score, link: link.strip }
-            hash[:image] = image.strip unless image.nil?
+            hash = JSON.parse(matches[1], symbolize_names: true)
             wikipedia_links << hash
 
         end

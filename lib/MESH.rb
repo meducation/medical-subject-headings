@@ -1,3 +1,4 @@
+require 'json'
 require 'zlib'
 require 'MESH/version'
 require 'MESH/tree'

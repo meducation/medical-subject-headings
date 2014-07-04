@@ -231,58 +231,91 @@ module MESH
 
     def test_have_a_single_wikipedia_link
 
-      mh = @mesh_tree.find('D000001')
-      expected = [{
-        score: 0.5,
-        link: 'http://en.wikipedia.org/wiki/A23187',
-        image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/1/17/A23187.png/220px-A23187.png'
-      }]
-      assert_equal expected, mh.wikipedia_links
+      expected = {
+        'D000001' => 'http://en.wikipedia.org/wiki/A23187',
+        'D000005' => 'http://en.wikipedia.org/wiki/Abdomen',
+        'D000082' => 'http://en.wikipedia.org/wiki/Paracetamol'
+      }
 
-      mh = @mesh_tree.find('D000005')
-      expected = [{
-        score: 1.0,
-        link: 'http://en.wikipedia.org/wiki/Abdomen',
-        image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Abdomen_%28PSF%29.jpg/250px-Abdomen_%28PSF%29.jpg'
-      }]
-      assert_equal expected, mh.wikipedia_links
+      expected.each do |id, expected_link|
+        mh = @mesh_tree.find(id)
+        assert_equal 1, mh.wikipedia_links.length
+        assert_equal expected_link, mh.wikipedia_links[0][:link]
+      end
 
-      mh = @mesh_tree.find('D000082')
-      expected = [{
-        score: 0.35,
-        link: 'http://en.wikipedia.org/wiki/Paracetamol',
-        image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Paracetamol-skeletal.svg/150px-Paracetamol-skeletal.svg.png'
-      }]
-      assert_equal expected, mh.wikipedia_links
+    end
 
+    def test_have_a_single_wikipedia_score
+      expected = {
+        'D000001' => 0.5,
+        'D000005' => 1.0,
+        'D000082' => 0.35
+      }
+
+      expected.each do |id, expected_score|
+        mh = @mesh_tree.find(id)
+        assert_equal 1, mh.wikipedia_links.length
+        assert_equal expected_score, mh.wikipedia_links[0][:score]
+      end
+
+    end
+
+    def test_have_a_single_wikipedia_image
+      expected = {
+        'D000001' => 'http://upload.wikimedia.org/wikipedia/commons/thumb/1/17/A23187.png/220px-A23187.png',
+        'D000005' => 'http://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Abdomen_%28PSF%29.jpg/250px-Abdomen_%28PSF%29.jpg',
+        'D000082' => 'http://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Paracetamol-skeletal.svg/150px-Paracetamol-skeletal.svg.png'
+      }
+
+      expected.each do |id, expected_image|
+        mh = @mesh_tree.find(id)
+        assert_equal 1, mh.wikipedia_links.length
+        assert_equal expected_image, mh.wikipedia_links[0][:image]
+      end
+    end
+
+    def test_have_a_single_wikipedia_abstract
+      expected = {
+        'D000001' => '| CAS_number = 52665-69-7',
+        'D000005' => 'The abdomen (less formally called the belly, stomach, or tummy), in vertebrates such as mammals, constitutes the part of the body between the thorax (chest) and pelvis. The region enclosed by the abdomen is termed the abdominal cavity.',
+        'D000082' => '| MedlinePlus = a681004'
+      }
+
+      expected.each do |id, expected_abstract|
+        mh = @mesh_tree.find(id)
+        assert_equal 1, mh.wikipedia_links.length
+        assert_equal expected_abstract, mh.wikipedia_links[0][:abstract]
+      end
     end
 
     def test_have_more_than_one_wikipedia_link
       mh = @mesh_tree.find('D000100')
-      expected = [
-        { score: 0.09,
-          link: 'http://en.wikipedia.org/wiki/Sodium_acetrizoate',
-          image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Sodium_acetrizoate.svg/150px-Sodium_acetrizoate.svg.png' },
-        { score: 0.09,
-          link: 'http://en.wikipedia.org/wiki/Acetrizoic_acid',
-          image: 'http://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Acetrizoic_acid.png/220px-Acetrizoic_acid.png'
-        }
-      ]
-      assert_equal expected, mh.wikipedia_links
+      expected = %w(
+        http://en.wikipedia.org/wiki/Sodium_acetrizoate
+        http://en.wikipedia.org/wiki/Acetrizoic_acid
+      )
+      assert_equal expected, mh.wikipedia_links.map { |l| l[:link] }
     end
 
-    def test_have_four_wikipedia_links
-      mh = @mesh_tree.find('D000141')
-      expected = [
-        { score: 0.03, link: 'http://en.wikipedia.org/wiki/Hyperchloremic_acidosis' },
-        { score: 0.03, link: 'http://en.wikipedia.org/wiki/Distal_renal_tubular_acidosis' },
-        { score: 0.03, link: 'http://en.wikipedia.org/wiki/Proximal_renal_tubular_acidosis' },
-        { score: 0.03,
-          link: 'http://en.wikipedia.org/wiki/Renal_tubular_acidosis',
-          image: 'http://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Nephrocalcinosis.jpg/230px-Nephrocalcinosis.jpg'
-        }
-      ]
-      assert_equal expected, mh.wikipedia_links
+    def test_have_more_than_one_wikipedia_score
+      mh = @mesh_tree.find('D000100')
+      expected = [0.09, 0.09]
+      assert_equal expected, mh.wikipedia_links.map { |l| l[:score] }
+    end
+
+    def test_have_more_than_one_wikipedia_image
+      mh = @mesh_tree.find('D000100')
+      expected = %w(
+        http://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Sodium_acetrizoate.svg/150px-Sodium_acetrizoate.svg.png
+        http://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Acetrizoic_acid.png/220px-Acetrizoic_acid.png
+      )
+      assert_equal expected, mh.wikipedia_links.map { |l| l[:image] }
+    end
+
+    def test_have_more_than_one_wikipedia_abstract
+      mh = @mesh_tree.find('D000100')
+      expected = ['| CAS_number = 129-63-5', '| CAS_number = 85-36-9']
+      assert_equal expected, mh.wikipedia_links.map { |l| l[:abstract] }
     end
 
     def test_have_the_correct_parent
