@@ -150,15 +150,16 @@ module MESH
       assert_equal expected_entries_en.sort, mh.entries(:en_gb)
     end
 
-    def test_has_trade_names
+    def test_has_structured_entries
 
       mh = @mesh_tree.find_by_original_heading('Acetaminophen')
-      assert_equal 7, mh.trade_names.length
+      assert_equal 19, mh.structured_entries.length
 
-      expected_entries = %W( Acamol Acephen Acetaco Algotropyl Anacin-3 Panadol Tylenol )
-      actual_entries = mh.trade_names.map { |tn| tn.entry }
+      expected_terms = ['Acetamidophenol', 'Hydroxyacetanilide', 'Paracetamol', 'APAP', 'Acamol', 'Acephen', 'Acetaco', 'Acetominophen', 'Algotropyl', 'Anacin-3', 'Datril', 'N-(4-Hydroxyphenyl)acetanilide', 'N-Acetyl-p-aminophenol', 'Panadol', 'Tylenol', 'p-Acetamidophenol', 'p-Hydroxyacetanilide', 'Anacin 3', 'Anacin3']
 
+      actual_terms = mh.structured_entries.map { |tn| tn.term }
 
+      assert_equal actual_terms, expected_terms
 
 
 # PRINT ENTRY = Acetamidophenol|T109|T121|NON|EQV|UNK (19XX)|771118|abbcdef
