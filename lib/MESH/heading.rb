@@ -2,7 +2,7 @@ module MESH
   class Heading
 
     include Comparable
-    attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class, :default_locale, :semantic_types, :wikipedia_links
+    attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class, :default_locale, :semantic_types, :wikipedia_links, :structured_entries
     attr_reader :linkified_summary
 
     def <=> other
@@ -32,7 +32,6 @@ module MESH
     def entries(locale = default_locale)
       @entries[locale] ||= []
     end
-
 
     def has_ancestor(heading)
       return false if parents.empty?
@@ -112,6 +111,7 @@ module MESH
       @parents = []
       @children = []
       @entries = {}
+      @structured_entries = []
       @original_heading = {}
       @natural_language_name = {}
       @summary = {}

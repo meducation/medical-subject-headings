@@ -67,9 +67,15 @@ module MESH
             nln = librarian_parts.nil? ? mh : "#{librarian_parts[2]} #{librarian_parts[1]}"
             current_heading.set_natural_language_name(nln)
 
-          when matches = line.match(/^(?:PRINT )?ENTRY = ([^|]+)/)
-            entry = matches[1].chomp
-            current_heading.entries << entry unless current_heading.entries.include? entry
+          # when matches = line.match(/^(?:PRINT )?ENTRY = ([^|]+)/)
+          #   entry = matches[1].chomp
+          #   current_heading.entries << entry unless current_heading.entries.include? entry
+          #
+          when matches = line.match(/^(?:PRINT )?ENTRY = (.*)/)
+            entry = matches[1]
+            term = entry.match(/([^|]+)/)
+            current_heading.entries << term[1] unless current_heading.entries.include? term[1]
+            current_heading.structured_entries << MESH::Entry.new(current_heading, entry)
 
         end
 

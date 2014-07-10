@@ -7,7 +7,8 @@ require "mocha/setup"
 lib = File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require "MESH"
+require 'MESH'
+require_relative 'test_base'
 
 # puts 'Configuring MESH::Mesh — this may take up to 10 seconds.'
 # start = Time.now
