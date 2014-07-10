@@ -1,3 +1,6 @@
+#2.2.0 / 2014-07-10
+* [FEATURE] Headings now have structured_entries which include semantic and lexical information
+
 #2.1.0 / 2014-07-04
 * [FEATURE] Headings matched with Wikipedia, infobox images and abstracts imported
 
