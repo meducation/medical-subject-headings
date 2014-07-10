@@ -33,6 +33,10 @@ module MESH
       @entries[locale] ||= []
     end
 
+    def trade_names
+      @trade_names
+    end
+
 
     def has_ancestor(heading)
       return false if parents.empty?

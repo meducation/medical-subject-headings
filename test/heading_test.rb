@@ -150,6 +150,39 @@ module MESH
       assert_equal expected_entries_en.sort, mh.entries(:en_gb)
     end
 
+    def test_has_trade_names
+
+      mh = @mesh_tree.find_by_original_heading('Acetaminophen')
+      assert_equal 7, mh.trade_names.length
+
+      expected_entries = %W( Acamol Acephen Acetaco Algotropyl Anacin-3 Panadol Tylenol )
+      actual_entries = mh.trade_names.map { |tn| tn.entry }
+
+
+
+
+# PRINT ENTRY = Acetamidophenol|T109|T121|NON|EQV|UNK (19XX)|771118|abbcdef
+# PRINT ENTRY = Hydroxyacetanilide|T109|T121|NON|EQV|UNK (19XX)|740329|abbcdef
+# PRINT ENTRY = Paracetamol|T109|T121|NON|EQV|BAN (19XX)|FDA SRS (2014)|INN (19XX)|740329|abbcdeeef
+# ENTRY = APAP|T109|T121|NON|EQV|BAN (19XX)|FDA SRS (2014)|020515|abbcdeef
+# ENTRY = Acamol|T109|T121|TRD|NRW|NLM (1995)|930902|abbcdef
+# ENTRY = Acephen|T109|T121|TRD|NRW|NLM (1991)|900509|abbcdef
+# ENTRY = Acetaco|T109|T121|TRD|REL|UNK (19XX)|861022|abbcdef
+# ENTRY = Acetominophen|T109|T121|NON|EQV|UNK (19XX)|810625|abbcdef
+# ENTRY = Algotropyl|T109|T121|TRD|REL|UNK (19XX)|800825|abbcdef
+# ENTRY = Anacin-3|T109|T121|TRD|NRW|UNK (19XX)|861119|abbcdef
+# ENTRY = Datril|T109|T121|NON|NRW|UNK (19XX)|861119|abbcdef
+# ENTRY = N-(4-Hydroxyphenyl)acetanilide|T109|T121|NON|EQV|NLM (1996)|950330|abbcdef
+# ENTRY = N-Acetyl-p-aminophenol|T109|T121|NON|EQV|UNK (19XX)|800813|abbcdef
+# ENTRY = Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef
+# ENTRY = Tylenol|T109|T121|TRD|NRW|UNK (19XX)|830223|abbcdef
+# ENTRY = p-Acetamidophenol|T109|T121|NON|EQV|UNK (19XX)|800813|abbcdef
+# ENTRY = p-Hydroxyacetanilide|T109|T121|NON|EQV|UNK (19XX)|800801|abbcdef
+# ENTRY = Anacin 3
+# ENTRY = Anacin3
+
+    end
+
     def test_have_a_single_wikipedia_link
 
       expected = {
