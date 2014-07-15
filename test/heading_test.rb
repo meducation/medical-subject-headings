@@ -336,6 +336,24 @@ module MESH
       end
     end
 
+    def test_has_one_forward_reference
+      mh = @mesh_tree.find_by_original_heading('Abdominal Muscles')
+      fx = @mesh_tree.find_by_original_heading('Abdominal Wall')
+      assert_equal [fx], mh.forward_references
+    end
+
+    def test_has_several_forward_references
+      mh = @mesh_tree.find_by_original_heading('Acquired Immunodeficiency Syndrome')
+      fx1 = @mesh_tree.find_by_original_heading('AIDS Arteritis, Central Nervous System')
+      fx2 = @mesh_tree.find_by_original_heading('AIDS Dementia Complex')
+      fx3 = @mesh_tree.find_by_original_heading('AIDS Serodiagnosis')
+      fx4 = @mesh_tree.find_by_original_heading('HIV Seropositivity')
+      fx5 = @mesh_tree.find_by_original_heading('HIV Seroprevalence')
+      fx6 = @mesh_tree.find_by_original_heading('Lymphoma, AIDS-Related')
+
+      assert_equal [fx1, fx2, fx3, fx4, fx5, fx6], mh.forward_references
+    end
+
     def test_have_the_correct_siblings
       skip
     end
