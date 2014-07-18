@@ -1,8 +1,10 @@
 module MESH
   class Heading
 
+    @@descriptor_classes = [:make_array_start_at_1, :topical_descriptor, :publication_type, :check_tag, :geographic_descriptor]
+
     include Comparable
-    attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class, :default_locale, :semantic_types, :wikipedia_links, :structured_entries
+    attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class, :default_locale, :semantic_types, :wikipedia_links, :structured_entries, :forward_references
     attr_reader :linkified_summary
 
     def <=> other
@@ -100,25 +102,94 @@ module MESH
       @summary[locale] = summary
     end
 
+    def connect_to_parents
+      if !@connected_to_parents
+        @tree_numbers.each do |tree_number|
+          #D03.438.221.173
+          parts = tree_number.split('.')
+          if parts.size > 1
+            parts.pop
+            parent_tree_number = parts.join '.'
+            parent = @tree.find_by_tree_number(parent_tree_number)
+            @parents << parent unless parent.nil? || @parents.include?(parent)
+            parent.children << self unless parent.nil? || parent.children.include?(self)
+          end
+        end
+        @connected_to_parents = true
+      end
+    end
+
+    def connect_to_forward_references
+      if !@connected_to_forward_references
+        @forward_references = @forward_reference_terms.map do |term|
+          @tree.find_by_original_heading(term)
+        end
+        @connected_to_forward_references = true
+      end
+    end
+
     private
 
-    def initialize(tree)
+    def initialize(tree, default_locale, lines)
       @tree = tree
+      @default_locale = default_locale
       @useful = true
       @tree_numbers = []
       @semantic_types = []
       @roots = []
       @parents = []
       @children = []
-      @entries = {}
+      @forward_references = []
+      @forward_reference_terms = []
+      @entries = {@default_locale => []}
       @structured_entries = []
       @original_heading = {}
       @natural_language_name = {}
       @summary = {}
       @wikipedia_links = []
+
+      lines.each do |line|
+        case
+
+          when matches = line.match(/^UI = (.*)/)
+            @unique_id = matches[1]
+
+          when matches = line.match(/^MN = (.*)/)
+            @tree_numbers << matches[1]
+            @roots << matches[1][0] unless @roots.include?(matches[1][0])
+
+          when matches = line.match(/^MS = (.*)/)
+            set_summary(matches[1])
+
+          when matches = line.match(/^DC = (.*)/)
+            @descriptor_class = @@descriptor_classes[matches[1].to_i]
+
+          when matches = line.match(/^ST = (.*)/)
+            @semantic_types << MESH::SemanticTypes[matches[1]]
+
+          when matches = line.match(/^MH = (.*)/)
+            mh = matches[1]
+            set_original_heading(mh)
+            @entries[@default_locale] << mh unless @entries.include? mh
+            librarian_parts = mh.match(/(.*), (.*)/)
+            nln = librarian_parts.nil? ? mh : "#{librarian_parts[2]} #{librarian_parts[1]}"
+            set_natural_language_name(nln)
+
+          when matches = line.match(/^(?:PRINT )?ENTRY = (.*)/)
+            entry = matches[1]
+            term = entry.match(/([^|]+)/)
+            @entries[@default_locale] << term[1] unless @entries.include? term[1]
+            @structured_entries << MESH::Entry.new(self, entry)
+
+          when matches = line.match(/^FX = (.*)/)
+            @forward_reference_terms << matches[1]
+
+        end
+
+      end
+      @entries[@default_locale].sort!
+
     end
-
-
   end
 end
 

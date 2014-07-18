@@ -2,7 +2,6 @@ module MESH
 
   class Tree
 
-    @@descriptor_classes = [:make_array_start_at_1, :topical_descriptor, :publication_type, :check_tag, :geographic_descriptor]
     @@default_locale = :en_us
 
     def initialize
@@ -18,83 +17,40 @@ module MESH
       gzipped_file = File.open(filename)
       file = Zlib::GzipReader.new(gzipped_file)
 
-      current_heading = MESH::Heading.new(self)
-      current_heading.default_locale = @@default_locale
+      lines = []
       file.each_line do |line|
-
         case
-
           when line.match(/^\*NEWRECORD$/)
-            unless current_heading.unique_id.nil?
-              current_heading.entries.sort!
-              @headings << current_heading
-              @by_unique_id[current_heading.unique_id] = current_heading
-              @by_original_heading[current_heading.original_heading] = current_heading
-              current_heading.tree_numbers.each do |tree_number|
-                raise if @by_tree_number[tree_number]
-                @by_tree_number[tree_number] = current_heading
-              end
-              match_headings = current_heading.entries.map { |e| entry_match_key(e) }.uniq
-              match_headings.each do |entry|
-                raise "#{@by_entry[entry]} vs #{current_heading} on #{entry}\n\n#{@by_entry[entry].entries}\n\n#{current_heading.entries}" if @by_entry[entry]
-                @by_entry[entry] = current_heading
-              end
+            unless lines.empty?
+              mh = MESH::Heading.new(self, @@default_locale, lines)
+              add_heading_to_hashes(mh)
+              lines = [line]
             end
-            current_heading = MESH::Heading.new(self)
-            current_heading.default_locale = @@default_locale
-
-          when matches = line.match(/^UI = (.*)/)
-            current_heading.unique_id = matches[1]
-
-          when matches = line.match(/^MN = (.*)/)
-            current_heading.tree_numbers << matches[1]
-            current_heading.roots << matches[1][0] unless current_heading.roots.include?(matches[1][0])
-
-          when matches = line.match(/^MS = (.*)/)
-            current_heading.set_summary(matches[1])
-
-          when matches = line.match(/^DC = (.*)/)
-            current_heading.descriptor_class = @@descriptor_classes[matches[1].to_i]
-
-          when matches = line.match(/^ST = (.*)/)
-            current_heading.semantic_types << MESH::SemanticTypes[matches[1]]
-
-          when matches = line.match(/^MH = (.*)/)
-            mh = matches[1]
-            current_heading.set_original_heading(mh)
-            current_heading.entries << mh unless current_heading.entries.include? mh
-            librarian_parts = mh.match(/(.*), (.*)/)
-            nln = librarian_parts.nil? ? mh : "#{librarian_parts[2]} #{librarian_parts[1]}"
-            current_heading.set_natural_language_name(nln)
-
-          # when matches = line.match(/^(?:PRINT )?ENTRY = ([^|]+)/)
-          #   entry = matches[1].chomp
-          #   current_heading.entries << entry unless current_heading.entries.include? entry
-          #
-          when matches = line.match(/^(?:PRINT )?ENTRY = (.*)/)
-            entry = matches[1]
-            term = entry.match(/([^|]+)/)
-            current_heading.entries << term[1] unless current_heading.entries.include? term[1]
-            current_heading.structured_entries << MESH::Entry.new(current_heading, entry)
-
-        end
-
-      end
-
-      @by_unique_id.each do |id, heading|
-        heading.tree_numbers.each do |tree_number|
-          #D03.438.221.173
-          parts = tree_number.split('.')
-          if parts.size > 1
-            parts.pop
-            parent_tree_number = parts.join '.'
-            parent = @by_tree_number[parent_tree_number]
-            heading.parents << parent unless parent.nil? || heading.parents.include?(parent)
-            parent.children << heading unless parent.nil? || parent.children.include?(heading)
-          end
+          else
+            lines << line
         end
       end
 
+      @headings.each do |heading|
+        heading.connect_to_parents
+        heading.connect_to_forward_references
+      end
+
+    end
+
+    def add_heading_to_hashes(mh)
+      @headings << mh
+      @by_unique_id[mh.unique_id] = mh
+      @by_original_heading[mh.original_heading] = mh
+      mh.tree_numbers.each do |tree_number|
+        raise if @by_tree_number[tree_number]
+        @by_tree_number[tree_number] = mh
+      end
+      match_headings = mh.entries.map { |e| entry_match_key(e) }.uniq
+      match_headings.each do |entry|
+        raise if @by_entry[entry]
+        @by_entry[entry] = mh
+      end
     end
 
     def entry_match_key(e)
