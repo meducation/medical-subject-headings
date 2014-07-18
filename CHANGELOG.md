@@ -1,3 +1,6 @@
+#2.2.1 / 2014-07-18
+* [FEATURE] Headings now have forward references
+
 #2.2.0 / 2014-07-10
 * [FEATURE] Headings now have structured_entries which include semantic and lexical information
 
