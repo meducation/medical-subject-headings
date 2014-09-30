@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'MESH'
+require 'ruby-prof'
 
 class Numeric
   def duration
@@ -23,12 +24,12 @@ class Numeric
 end
 
 def time_this(name, &block)
-  print "#{name}"
-  STDOUT.flush
+  # print "#{name}"
+  # STDOUT.flush
   start = Time.now.to_f
   result = yield
   finish = Time.now.to_f
-  puts "\t#{(finish - start).duration}"
+  # puts "\t#{(finish - start).duration}"
   result
 end
 
@@ -39,13 +40,19 @@ time_this('Loading wikipedia') { mesh_tree.load_wikipedia }
 json_str = File.new('./example.json').read
 extracted = JSON.parse(json_str)
 
-title_headings = time_this('Matching in title') { mesh_tree.match_in_text(extracted['title']) }
-description_headings = time_this('Matching in description') { mesh_tree.match_in_text(extracted['description']) }
-content_headings = time_this('Matching in content') { mesh_tree.match_in_text(extracted['content']) }
+result = RubyProf.profile do
 
-classifier = MESH::Classifier.new()
-classification = time_this('Classifying from matches') { classifier.classify([
-                                                                                 {weight: 10.0, matches: title_headings},
-                                                                                 {weight: 5.0, matches: description_headings},
-                                                                                 {weight: 1.0, matches: content_headings}
-                                                                             ]) }
+  title_headings = time_this('Matching in title') { mesh_tree.match_in_text(extracted['title']) }
+  description_headings = time_this('Matching in description') { mesh_tree.match_in_text(extracted['description']) }
+  content_headings = time_this('Matching in content') { mesh_tree.match_in_text(extracted['content']) }
+
+  classifier = MESH::Classifier.new()
+  classification = time_this('Classifying from matches') { classifier.classify([
+                                                                                   {weight: 10.0, matches: title_headings},
+                                                                                   {weight: 5.0, matches: description_headings},
+                                                                                   {weight: 1.0, matches: content_headings}
+                                                                               ]) }
+end
+
+printer = RubyProf::GraphHtmlPrinter.new(result)
+printer.print(STDOUT)

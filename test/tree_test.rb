@@ -43,19 +43,19 @@ module MESH
     def test_find_by_entry
 
       expected_entries = [
-        'Adult Reye Syndrome',
-        'Adult Reye\'s Syndrome',
-        'Fatty Liver with Encephalopathy',
-        'Reye Johnson Syndrome',
-        'Reye Like Syndrome',
-        'Reye Syndrome',
-        'Reye Syndrome, Adult',
-        'Reye\'s Like Syndrome',
-        'Reye\'s Syndrome',
-        'Reye\'s Syndrome, Adult',
-        'Reye\'s-Like Syndrome',
-        'Reye-Johnson Syndrome',
-        'Reye-Like Syndrome'
+          'Adult Reye Syndrome',
+          'Adult Reye\'s Syndrome',
+          'Fatty Liver with Encephalopathy',
+          'Reye Johnson Syndrome',
+          'Reye Like Syndrome',
+          'Reye Syndrome',
+          'Reye Syndrome, Adult',
+          'Reye\'s Like Syndrome',
+          'Reye\'s Syndrome',
+          'Reye\'s Syndrome, Adult',
+          'Reye\'s-Like Syndrome',
+          'Reye-Johnson Syndrome',
+          'Reye-Like Syndrome'
       ]
 
       entries_to_test = expected_entries.flat_map do |e|
@@ -71,6 +71,27 @@ module MESH
 
     def test_find_by_entry_doesnt_match
       assert_nil @mesh_tree.find_by_entry('foo')
+    end
+
+    def test_find_by_entry_word
+      expected_ids = %w(D000003)
+      actual = @mesh_tree.find_by_entry_word('abattoir')
+      actual_ids = actual.map { |mh| mh.unique_id }
+      assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
+    end
+
+    def test_find_by_entry_word_case_insensitive
+      expected_ids = %w(D000003)
+      actual = @mesh_tree.find_by_entry_word('AbaTToir')
+      actual_ids = actual.map { |mh| mh.unique_id }
+      assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
+    end
+
+    def test_find_by_anglicised_entry_word
+      expected_ids = %w(D001471 D004938 D004947 D015154)
+      actual = @mesh_tree.find_by_entry_word('oesophagus')
+      actual_ids = actual.map { |mh| mh.unique_id }
+      assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
     end
 
     def test_linkifies_all_summaries

@@ -11,6 +11,7 @@ module MESH
       @by_tree_number = {}
       @by_original_heading = {}
       @by_entry = {}
+      @by_entry_word = Hash.new { |h, k| h[k] = Set.new }
       @locales = [@@default_locale]
 
       filename = File.expand_path('../../../data/mesh_data_2014/d2014.bin.gz', __FILE__)
@@ -42,6 +43,7 @@ module MESH
       @headings << mh
       @by_unique_id[mh.unique_id] = mh
       @by_original_heading[mh.original_heading] = mh
+      add_heading_by_entry_word(mh, mh.original_heading)
       mh.tree_numbers.each do |tree_number|
         raise if @by_tree_number[tree_number]
         @by_tree_number[tree_number] = mh
@@ -50,6 +52,14 @@ module MESH
       match_headings.each do |entry|
         raise if @by_entry[entry]
         @by_entry[entry] = mh
+        add_heading_by_entry_word(mh, entry)
+      end
+    end
+
+    def add_heading_by_entry_word(mh, entry)
+      entry.split.each do |word|
+        word.downcase!
+        @by_entry_word[word] << mh
       end
     end
 
@@ -80,7 +90,10 @@ module MESH
                 heading.set_original_heading(original_heading, locale) unless original_heading.nil?
                 heading.set_natural_language_name(natural_language_name, locale) unless natural_language_name.nil?
                 heading.set_summary(summary, locale) unless summary.nil?
-                entries.each { |entry| heading.entries(locale) << entry }
+                entries.each do |entry|
+                  heading.entries(locale) << entry
+                  add_heading_by_entry_word(heading, entry)
+                end
               end
 
               entries = []
@@ -185,6 +198,10 @@ module MESH
 
     def find_by_entry(entry)
       return @by_entry[entry_match_key(entry)]
+    end
+
+    def find_by_entry_word(word)
+      return @by_entry_word[word.downcase]
     end
 
     def where(conditions)
