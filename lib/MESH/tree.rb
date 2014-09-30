@@ -21,7 +21,7 @@ module MESH
       lines = []
       file.each_line do |line|
         case
-          when line.match(/^\*NEWRECORD$/)
+          when line.start_with?('*NEWRECORD')
             unless lines.empty?
               mh = MESH::Heading.new(self, @@default_locale, lines)
               add_heading_to_hashes(mh)
@@ -82,7 +82,7 @@ module MESH
 
         case
 
-          when line.match(/^\*NEWRECORD$/)
+          when line.start_with?('*NEWRECORD')
             unless unique_id.nil?
               entries.sort!
               entries.uniq!
@@ -228,18 +228,21 @@ module MESH
       matches = []
       candidate_headings.each do |heading|
         next unless heading.useful
+        entries = []
         @locales.each do |locale|
-          heading.entries(locale).each do |entry|
-            if downcased.include? entry.downcase #This is a looser check than the regex but much, much faster
-              if /^[A-Z0-9]+$/ =~ entry
-                regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/
-              else
-                regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
-              end
-              text.to_enum(:scan, regex).map do |m,|
-                match = Regexp.last_match
-                matches << {heading: heading, matched: entry, index: match.offset(0)}
-              end
+          entries += heading.entries(locale)
+        end
+        entries.uniq!
+        entries.each do |entry|
+          if downcased.include? entry.downcase #This is a looser check than the regex but much, much faster
+            if /^[A-Z0-9]+$/ =~ entry
+              regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/
+            else
+              regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
+            end
+            text.to_enum(:scan, regex).map do |m,|
+              match = Regexp.last_match
+              matches << {heading: heading, matched: entry, index: match.offset(0)}
             end
           end
         end
