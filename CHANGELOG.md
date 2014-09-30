@@ -1,3 +1,6 @@
+#2.3.0 / 2014-09-30
+* [FEATURE] Significant performance improvements to entity recognition in text
+
 #2.2.1 / 2014-07-18
 * [FEATURE] Headings now have forward references
 

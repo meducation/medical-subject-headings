@@ -81,10 +81,11 @@ module MESH
     end
 
     def test_find_by_entry_word_case_insensitive
-      expected_ids = %w(D000003)
-      actual = @mesh_tree.find_by_entry_word('AbaTToir')
-      actual_ids = actual.map { |mh| mh.unique_id }
-      assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
+      skip 'find by word does not support case insensitive searches'
+      # expected_ids = %w(D000003)
+      # actual = @mesh_tree.find_by_entry_word('AbaTToir')
+      # actual_ids = actual.map { |mh| mh.unique_id }
+      # assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
     end
 
     def test_find_by_anglicised_entry_word

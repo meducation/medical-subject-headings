@@ -201,7 +201,7 @@ module MESH
     end
 
     def find_by_entry_word(word)
-      return @by_entry_word[word.downcase]
+      return @by_entry_word[word]
     end
 
     def where(conditions)
@@ -220,11 +220,11 @@ module MESH
 
     def match_in_text(text)
       return [] if text.nil?
+      downcased = text.downcase
       candidate_headings = Set.new
-      text.split(/\W+/).uniq.each do |word|
+      downcased.split(/\W+/).uniq.each do |word|
         candidate_headings.merge(find_by_entry_word(word))
       end
-      downcased = text.downcase
       matches = []
       candidate_headings.each do |heading|
         next unless heading.useful
