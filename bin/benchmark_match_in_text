@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+
+require 'MESH'
+
+class Numeric
+  def duration
+    secs, millisecs = self.divmod 1
+    # secs = self.to_int
+    mins = secs / 60
+    hours = mins / 60
+    days = hours / 24
+
+    if days > 0
+      "#{days} days and #{hours % 24} hours"
+    elsif hours > 0
+      "#{hours} hours and #{mins % 60} minutes"
+    elsif mins > 0
+      "#{mins} minutes and #{secs % 60} seconds"
+    elsif secs >= 0
+      "#{(millisecs + secs).round(3)} seconds"
+    end
+  end
+end
+
+def time_this(name, &block)
+  print "#{name}"
+  STDOUT.flush
+  start = Time.now.to_f
+  result = yield
+  finish = Time.now.to_f
+  puts "\t#{(finish - start).duration}"
+  result
+end
+
+mesh_tree = time_this('Loading MeSH Tree') { MESH::Tree.new }
+time_this('Loading en_gb translation') { mesh_tree.load_translation(:en_gb) }
+time_this('Loading wikipedia') { mesh_tree.load_wikipedia }
+
+json_str = File.new('./example.json').read
+extracted = JSON.parse(json_str)
+
+title_headings = time_this('Matching in title') { mesh_tree.match_in_text(extracted['title']) }
+description_headings = time_this('Matching in description') { mesh_tree.match_in_text(extracted['description']) }
+content_headings = time_this('Matching in content') { mesh_tree.match_in_text(extracted['content']) }
+
+classifier = MESH::Classifier.new()
+classification = time_this('Classifying from matches') { classifier.classify([
+                                                                                 {weight: 10.0, matches: title_headings},
+                                                                                 {weight: 5.0, matches: description_headings},
+                                                                                 {weight: 1.0, matches: content_headings}
+                                                                             ]) }
