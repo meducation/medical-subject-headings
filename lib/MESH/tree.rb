@@ -216,7 +216,8 @@ module MESH
                 regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
               end
               text.to_enum(:scan, regex).map do |m,|
-                matches << {heading: heading, matched: entry, index: $`.size}
+                match = Regexp.last_match
+                matches << {heading: heading, matched: entry, index: match.offset(0)}
               end
             end
           end
@@ -224,10 +225,10 @@ module MESH
       end
       confirmed_matches = []
       matches.combination(2) do |l, r|
-        if (r[:index] >= l[:index]) && (r[:index] + r[:matched].length <= l[:index] + l[:matched].length)
+        if (r[:index][0] >= l[:index][0]) && (r[:index][1] <= l[:index][1])
           #r is within l
           r[:delete] = true
-        elsif (l[:index] >= r[:index]) && (l[:index] + l[:matched].length <= r[:index] + r[:matched].length)
+        elsif (l[:index][0] >= r[:index][0]) && (l[:index][1] <= r[:index][1])
           #l is within r
           l[:delete] = true
         end
