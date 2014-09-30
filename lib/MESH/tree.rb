@@ -220,9 +220,13 @@ module MESH
 
     def match_in_text(text)
       return [] if text.nil?
+      candidate_headings = Set.new
+      text.split(/\W+/).uniq.each do |word|
+        candidate_headings.merge(find_by_entry_word(word))
+      end
       downcased = text.downcase
       matches = []
-      @headings.each do |heading|
+      candidate_headings.each do |heading|
         next unless heading.useful
         @locales.each do |locale|
           heading.entries(locale).each do |entry|

@@ -128,7 +128,7 @@ module MESH
         expected = expected_ids.map { |id| @mesh_tree.find(id) }
         matches = @mesh_tree.match_in_text(@example_text)
         actual = matches.map { |match| match[:heading] }.uniq
-        assert_equal expected, actual
+        assert_equal expected.sort, actual.sort
       ensure
         not_useful_ids.each { |id| @mesh_tree.find(id).useful = true }
       end
