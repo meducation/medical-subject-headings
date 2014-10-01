@@ -51,7 +51,7 @@ module MESH
       assert_equal 'Panadol', entry.term
       assert_equal ['Organic Chemical', 'Pharmacologic Substance'], entry.semantic_types
     end
-    
+
     def test_datril
       # ENTRY = 
       entry = Entry.new(@parent_heading, 'Datril|T109|T121|NON|NRW|UNK (19XX)|861119|abbcdef')
@@ -59,6 +59,14 @@ module MESH
       assert_equal ['Organic Chemical', 'Pharmacologic Substance'], entry.semantic_types
       assert_nil entry.lexical_type
       assert_equal :narrower, entry.semantic_relationship
+    end
+
+    def test_acetamidophenol
+      entry = Entry.new(@parent_heading, 'p-Acetamidophenol|T109|T121|NON|EQV|UNK (19XX)|800813|abbcdef')
+      assert_equal 'p-Acetamidophenol', entry.term
+      assert_equal ['Organic Chemical', 'Pharmacologic Substance'], entry.semantic_types
+      assert_nil entry.lexical_type
+      assert_equal :equivalent, entry.semantic_relationship
     end
 
     # def test_semantic_relationship

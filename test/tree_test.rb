@@ -69,6 +69,11 @@ module MESH
 
     end
 
+    def test_find_by_translated_entry
+      assert_equal @mesh_tree.find('D000011'), @mesh_tree.find_by_entry('Leukaemia Virus, Abelson')
+      assert_equal @mesh_tree.find('D000250'), @mesh_tree.find_by_entry('Adenylyl Sulphate')
+    end
+
     def test_find_by_entry_doesnt_match
       assert_nil @mesh_tree.find_by_entry('foo')
     end
@@ -88,11 +93,18 @@ module MESH
       # assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
     end
 
-    def test_find_by_anglicised_entry_word
+    def test_find_by_translated_entry_word
       expected_ids = %w(D001471 D004938 D004947 D015154)
       actual = @mesh_tree.find_by_entry_word('oesophagus')
       actual_ids = actual.map { |mh| mh.unique_id }
       assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
+    end
+
+    def find_entries_by_word
+      expected_terms = %w()
+      actual_entries = @mesh_tree.find_entries_by_word('abattoir')
+      actual_terms = actual_entries.map { |entry| entry.term }
+      assert_equal expected_terms, actual_terms
     end
 
     def test_linkifies_all_summaries

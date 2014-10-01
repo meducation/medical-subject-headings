@@ -1,15 +1,25 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/MESH'
-
-mesh_tree = MESH::Tree.new
 tr = MESH::Translator.new(MESH::Translator.enus_to_engb)
 
-mesh_tree.each do |h|
-  puts "*NEWRECORD"
-  puts "MH = #{tr.translate(h.original_heading)}"
-  puts "MS = #{tr.translate(h.summary)}"
-  h.entries.each { |e| puts "ENTRY = #{tr.translate(e)}" }
-  puts "UI = #{h.unique_id}"
-  puts ''
+filename = File.expand_path('../../data/mesh_data_2014/d2014.bin.gz', __FILE__)
+gzipped_file = File.open(filename)
+file = Zlib::GzipReader.new(gzipped_file)
+
+file.each_line do |line|
+  case
+    when line.start_with?('*NEWRECORD')
+      puts "\n*NEWRECORD"
+    when line.start_with?('UI = ')
+      puts line
+    when line.start_with?('MH = ')
+      puts tr.translate(line)
+    when line.start_with?('MS = ')
+      puts tr.translate(line)
+    when line.start_with?('PRINT ENTRY = ')
+      puts tr.translate(line)
+    when line.start_with?('ENTRY = ')
+      puts tr.translate(line)
+  end
 end

@@ -12,6 +12,7 @@ module MESH
       @by_original_heading = {}
       @by_entry = {}
       @by_entry_word = Hash.new { |h, k| h[k] = Set.new }
+      @entries_by_word = Hash.new { |h, k| h[k] = Set.new }
       @locales = [@@default_locale]
 
       filename = File.expand_path('../../../data/mesh_data_2014/d2014.bin.gz', __FILE__)
@@ -57,9 +58,10 @@ module MESH
     end
 
     def add_heading_by_entry_word(mh, entry)
-      entry.split.each do |word|
+      entry.split(/W+/).each do |word|
         word.downcase!
         @by_entry_word[word] << mh
+        @entries_by_word[word] << entry
       end
     end
 
@@ -92,8 +94,11 @@ module MESH
                 heading.set_summary(summary, locale) unless summary.nil?
                 entries.each do |entry|
                   heading.entries(locale) << entry
+                  @by_entry[entry_match_key(entry)] = heading
                   add_heading_by_entry_word(heading, entry)
                 end
+              else
+                raise 'Translation provided for missing header'
               end
 
               entries = []
@@ -204,6 +209,10 @@ module MESH
       return @by_entry_word[word]
     end
 
+    def find_entries_by_word(word)
+      return @entries_by_word[word]
+    end
+
     def where(conditions)
       matches = []
       @headings.each do |heading|
@@ -221,33 +230,27 @@ module MESH
     def match_in_text(text)
       return [] if text.nil?
       downcased = text.downcase
-      candidate_headings = Set.new
+      candidate_entries = Set.new
       downcased.split(/\W+/).uniq.each do |word|
-        candidate_headings.merge(find_by_entry_word(word))
+        candidate_entries.merge(find_entries_by_word(word))
       end
       matches = []
-      candidate_headings.each do |heading|
+      candidate_entries.each do |entry|
+        heading = find_by_entry(entry)
         next unless heading.useful
-        entries = []
-        @locales.each do |locale|
-          entries += heading.entries(locale)
-        end
-        entries.uniq!
-        entries.each do |entry|
-          if downcased.include? entry.downcase #This is a looser check than the regex but much, much faster
-            if /^[A-Z0-9]+$/ =~ entry
-              regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/
-            else
-              regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
-            end
-            text.to_enum(:scan, regex).map do |m,|
-              match = Regexp.last_match
-              matches << {heading: heading, matched: entry, index: match.offset(0)}
-            end
+        if downcased.include? entry.downcase #This is a looser check than the regex but much, much faster
+          if /^[A-Z0-9]+$/ =~ entry
+            regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/
+          else
+            regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
+          end
+          text.to_enum(:scan, regex).map do |m,|
+            match = Regexp.last_match
+            matches << {heading: heading, matched: entry, index: match.offset(0)}
           end
         end
       end
-      confirmed_matches = []
+
       matches.combination(2) do |l, r|
         if (r[:index][0] >= l[:index][0]) && (r[:index][1] <= l[:index][1])
           #r is within l
