@@ -58,7 +58,7 @@ module MESH
     end
 
     def add_heading_by_entry_word(mh, entry)
-      entry.split(/W+/).each do |word|
+      entry.split(/\W+/).each do |word|
         word.downcase!
         @by_entry_word[word] << mh
         @entries_by_word[word] << entry
@@ -234,6 +234,7 @@ module MESH
       downcased.split(/\W+/).uniq.each do |word|
         candidate_entries.merge(find_entries_by_word(word))
       end
+      puts "\n\n*****\n#{candidate_entries.size}\n*****\n\n"
       matches = []
       candidate_entries.each do |entry|
         heading = find_by_entry(entry)
@@ -262,7 +263,6 @@ module MESH
       end
       matches.delete_if { |match| match[:delete] }
     end
-
 
   end
 
