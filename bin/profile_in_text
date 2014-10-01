@@ -42,9 +42,9 @@ extracted = JSON.parse(json_str)
 
 result = RubyProf.profile do
 
-  title_headings = time_this('Matching in title') { mesh_tree.match_in_text(extracted['title']) }
+  # title_headings = time_this('Matching in title') { mesh_tree.match_in_text(extracted['title']) }
   # description_headings = time_this('Matching in description') { mesh_tree.match_in_text(extracted['description']) }
-  # content_headings = time_this('Matching in content') { mesh_tree.match_in_text(extracted['content']) }
+  content_headings = time_this('Matching in content') { mesh_tree.match_in_text(extracted['content']) }
 
   # classifier = MESH::Classifier.new()
   # classification = time_this('Classifying from matches') { classifier.classify([

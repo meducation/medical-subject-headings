@@ -227,25 +227,65 @@ module MESH
       end
     end
 
-    def match_in_text(text)
+    # def match_in_text(text)
+    #   return [] if text.nil?
+    #   downcased = text.downcase
+    #   candidate_headings = Set.new
+    #   downcased.split(/\W+/).uniq.each do |word|
+    #     candidate_headings.merge(find_by_entry_word(word))
+    #   end
+    #   matches = []
+    #   candidate_headings.each do |heading|
+    #     next unless heading.useful
+    #     @locales.each do |locale|
+    #       heading.entries(locale).each do |entry|
+    #         if downcased.include? entry.downcase #This is a looser check than the regex but much, much faster
+    #           if /^[A-Z0-9]+$/ =~ entry
+    #             regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/
+    #           else
+    #             regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
+    #           end
+    #           text.to_enum(:scan, regex).map do |m,|
+    #             match = Regexp.last_match
+    #             matches << {heading: heading, matched: entry, index: match.offset(0)}
+    #           end
+    #         end
+    #       end
+    #     end
+    #   end
+    #   confirmed_matches = []
+    #   matches.combination(2) do |l, r|
+    #     if (r[:index][0] >= l[:index][0]) && (r[:index][1] <= l[:index][1])
+    #       #r is within l
+    #       r[:delete] = true
+    #     elsif (l[:index][0] >= r[:index][0]) && (l[:index][1] <= r[:index][1])
+    #       #l is within r
+    #       l[:delete] = true
+    #     end
+    #   end
+    #   matches.delete_if { |match| match[:delete] }
+    # end
+
+
+    def match_in_text (text)
       return [] if text.nil?
       downcased = text.downcase
       candidate_entries = Set.new
       downcased.split(/\W+/).uniq.each do |word|
         candidate_entries.merge(find_entries_by_word(word))
       end
-      puts "\n\n*****\n#{candidate_entries.size}\n*****\n\n"
       matches = []
       candidate_entries.each do |entry|
-        heading = find_by_entry(entry)
-        next unless heading.useful
         if downcased.include? entry.downcase #This is a looser check than the regex but much, much faster
           if /^[A-Z0-9]+$/ =~ entry
             regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/
           else
             regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
           end
+          heading = nil
           text.to_enum(:scan, regex).map do |m,|
+            heading ||= find_by_entry(entry)
+            next unless heading.useful
             match = Regexp.last_match
             matches << {heading: heading, matched: entry, index: match.offset(0)}
           end
