@@ -100,6 +100,71 @@ module MESH
       assert_equal expected_matches, actual_matches
     end
 
+    def test_matches_itself_in_text
+      entry = Entry.new(@parent_heading, 'Leukaemia')
+
+      expected_matches = [
+          {heading: @parent_heading, matched: entry, index: [0, 10]},
+          {heading: @parent_heading, matched: entry, index: [51, 62]},
+          {heading: @parent_heading, matched: entry, index: [97, 108]},
+          {heading: @parent_heading, matched: entry, index: [678, 689]},
+          {heading: @parent_heading, matched: entry, index: [703, 714]},
+          {heading: @parent_heading, matched: entry, index: [807, 818]},
+          {heading: @parent_heading, matched: entry, index: [972, 983]},
+          {heading: @parent_heading, matched: entry, index: [1002, 1013]},
+          {heading: @parent_heading, matched: entry, index: [1085, 1096]},
+          {heading: @parent_heading, matched: entry, index: [1109, 1120]},
+          {heading: @parent_heading, matched: entry, index: [1190, 1201]},
+          {heading: @parent_heading, matched: entry, index: [1223, 1234]},
+          {heading: @parent_heading, matched: entry, index: [1326, 1337]},
+          {heading: @parent_heading, matched: entry, index: [1383, 1394]},
+          {heading: @parent_heading, matched: entry, index: [1411, 1422]},
+          {heading: @parent_heading, matched: entry, index: [1441, 1452]},
+          {heading: @parent_heading, matched: entry, index: [1568, 1579]},
+          {heading: @parent_heading, matched: entry, index: [1598, 1609]},
+          {heading: @parent_heading, matched: entry, index: [1754, 1765]},
+          {heading: @parent_heading, matched: entry, index: [1941, 1952]},
+          {heading: @parent_heading, matched: entry, index: [1961, 1972]},
+          {heading: @parent_heading, matched: entry, index: [1981, 1992]},
+          {heading: @parent_heading, matched: entry, index: [2412, 2423]},
+          {heading: @parent_heading, matched: entry, index: [2451, 2462]},
+          {heading: @parent_heading, matched: entry, index: [2594, 2605]},
+          {heading: @parent_heading, matched: entry, index: [2922, 2933]},
+          {heading: @parent_heading, matched: entry, index: [3038, 3049]},
+          {heading: @parent_heading, matched: entry, index: [3433, 3444]},
+          {heading: @parent_heading, matched: entry, index: [3555, 3566]},
+          {heading: @parent_heading, matched: entry, index: [3686, 3697]},
+          {heading: @parent_heading, matched: entry, index: [3899, 3910]},
+          {heading: @parent_heading, matched: entry, index: [3980, 3991]},
+          {heading: @parent_heading, matched: entry, index: [4031, 4042]},
+          {heading: @parent_heading, matched: entry, index: [4499, 4510]},
+          {heading: @parent_heading, matched: entry, index: [4677, 4688]},
+          {heading: @parent_heading, matched: entry, index: [4762, 4773]},
+          {heading: @parent_heading, matched: entry, index: [4847, 4858]},
+          {heading: @parent_heading, matched: entry, index: [5569, 5580]},
+          {heading: @parent_heading, matched: entry, index: [5606, 5617]},
+          {heading: @parent_heading, matched: entry, index: [5707, 5718]},
+          {heading: @parent_heading, matched: entry, index: [5924, 5935]},
+          {heading: @parent_heading, matched: entry, index: [6347, 6358]},
+          {heading: @parent_heading, matched: entry, index: [7905, 7916]},
+          {heading: @parent_heading, matched: entry, index: [8065, 8076]},
+          {heading: @parent_heading, matched: entry, index: [8394, 8405]},
+          {heading: @parent_heading, matched: entry, index: [8416, 8427]},
+          {heading: @parent_heading, matched: entry, index: [8581, 8592]},
+          {heading: @parent_heading, matched: entry, index: [8603, 8614]},
+          {heading: @parent_heading, matched: entry, index: [9168, 9179]},
+          {heading: @parent_heading, matched: entry, index: [9246, 9257]},
+          {heading: @parent_heading, matched: entry, index: [10403, 10414]},
+          {heading: @parent_heading, matched: entry, index: [10958, 10969]},
+          {heading: @parent_heading, matched: entry, index: [11249, 11260]}
+      ]
+
+      actual_matches = entry.match_in_text(@example_text)
+
+      refute_nil actual_matches
+      assert_equal expected_matches, actual_matches
+    end
+
     def test_datril
       # ENTRY = 
       entry = Entry.new(@parent_heading, 'Datril|T109|T121|NON|NRW|UNK (19XX)|861119|abbcdef')
