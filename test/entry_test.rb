@@ -1,7 +1,7 @@
 require_relative 'test_helper'
 
 module MESH
-  class HeadingTest < TestBase
+  class EntryTest < TestBase
 
     # PRINT ENTRY = Acetamidophenol|T109|T121|NON|EQV|UNK (19XX)|771118|abbcdef
     # PRINT ENTRY = Hydroxyacetanilide|T109|T121|NON|EQV|UNK (19XX)|740329|abbcdef
@@ -52,6 +52,17 @@ module MESH
       assert_equal ['Organic Chemical', 'Pharmacologic Substance'], entry.semantic_types
     end
 
+    def test_knows_own_case_sensitivity
+      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      refute entry.case_sensitive
+      entry = Entry.new(@parent_heading, 'AND|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      assert entry.case_sensitive
+      entry = Entry.new(@parent_heading, 'A122|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      assert entry.case_sensitive
+      entry = Entry.new(@parent_heading, 'Panadol978|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      refute entry.case_sensitive
+    end
+
     def test_has_correct_case_insensitive_regex
       entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
       assert_equal /(^|\W)Panadol(\W|$)/i, entry.regex
@@ -60,6 +71,33 @@ module MESH
     def test_has_correct_case_sensitive_regex
       entry = Entry.new(@parent_heading, 'AND|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
       assert_equal /(^|\W)AND(\W|$)/, entry.regex
+    end
+
+    def test_matches_nil_or_empty_with_nil
+      entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      assert_nil entry.match_in_text(nil)
+      assert_nil entry.match_in_text('')
+      assert_nil entry.match_in_text("")
+    end
+
+    def test_matches_nil_when_no_matches
+      entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      assert_nil entry.match_in_text('text that does not include the term')
+    end
+
+    def test_matches_itself_in_text_when_all_caps
+      entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+
+      expected_matches = [
+          {heading: entry.heading, matched: entry, index: [720, 725]},
+          {heading: entry.heading, matched: entry, index: [795, 800]},
+          {heading: entry.heading, matched: entry, index: [7854, 7859]}
+      ]
+
+      actual_matches = entry.match_in_text(@example_text)
+
+      refute_nil actual_matches
+      assert_equal expected_matches, actual_matches
     end
 
     def test_datril
