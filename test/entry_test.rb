@@ -52,6 +52,16 @@ module MESH
       assert_equal ['Organic Chemical', 'Pharmacologic Substance'], entry.semantic_types
     end
 
+    def test_has_correct_case_insensitive_regex
+      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      assert_equal /(^|\W)Panadol(\W|$)/i, entry.regex
+    end
+
+    def test_has_correct_case_sensitive_regex
+      entry = Entry.new(@parent_heading, 'AND|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      assert_equal /(^|\W)AND(\W|$)/, entry.regex
+    end
+
     def test_datril
       # ENTRY = 
       entry = Entry.new(@parent_heading, 'Datril|T109|T121|NON|NRW|UNK (19XX)|861119|abbcdef')

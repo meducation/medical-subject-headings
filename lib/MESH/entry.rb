@@ -2,7 +2,7 @@ module MESH
 
   class Entry
 
-    attr_accessor :heading, :term, :semantic_types, :semantic_relationship, :lexical_type
+    attr_accessor :heading, :term, :semantic_types, :semantic_relationship, :lexical_type, :regex
 
     def initialize(heading, entry_text)
       @heading = heading
@@ -29,6 +29,12 @@ module MESH
       else
         @term = entry_text
       end
+      if /^[A-Z0-9]+$/ =~ @term
+        @regex = /(^|\W)#{Regexp.quote(@term)}(\W|$)/
+      else
+        @regex = /(^|\W)#{Regexp.quote(@term)}(\W|$)/i
+      end
+
     end
 
   end
