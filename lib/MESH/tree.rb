@@ -183,10 +183,12 @@ module MESH
       downcased = text.downcase
       candidate_entries = Set.new
       downcased.split(/\W+/).uniq.each do |word|
-        candidate_entries.merge(find_entries_by_word(word))
+        entries_by_word = find_entries_by_word(word)
+        candidate_entries = candidate_entries.union(entries_by_word) unless entries_by_word.nil?
       end
       matches = []
       candidate_entries.each do |entry|
+        next if !entry.heading.useful
         entry_matches = entry.match_in_text(text)
         matches += entry_matches unless entry_matches.nil?
       end
