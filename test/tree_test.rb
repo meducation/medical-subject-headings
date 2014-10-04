@@ -23,7 +23,7 @@ module MESH
     def test_find_by_unique_id
       mh = @mesh_tree.find_heading_by_unique_id('D000001')
       refute_nil mh
-      assert_equal '', mh.original_heading
+      assert_equal 'Calcimycin', mh.original_heading
     end
 
     def test_find_by_tree_number
@@ -76,18 +76,18 @@ module MESH
     end
 
     def test_find_by_translated_entry
-      assert_equal @mesh_tree.find('D000011'), @mesh_tree.find_by_entry('Leukaemia Virus, Abelson')
-      assert_equal @mesh_tree.find('D000250'), @mesh_tree.find_by_entry('Adenylyl Sulphate')
+      assert_equal @mesh_tree.find_heading_by_unique_id('D000011'), @mesh_tree.find_entry_by_term('Leukaemia Virus, Abelson').heading
+      assert_equal @mesh_tree.find_heading_by_unique_id('D000250'), @mesh_tree.find_entry_by_term('Adenylyl Sulphate').heading
     end
 
     def test_find_by_entry_doesnt_match
-      assert_nil @mesh_tree.find_by_entry('foo')
+      assert_nil @mesh_tree.find_entries_by_word('foo')
     end
 
     def test_find_by_entry_word
       expected_ids = %w(D000003)
-      actual = @mesh_tree.find_by_entry_word('abattoir')
-      actual_ids = actual.map { |mh| mh.unique_id }
+      actual = @mesh_tree.find_entries_by_word('abattoir')
+      actual_ids = actual.map { |entry| entry.heading.unique_id }
       assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
     end
 
@@ -99,18 +99,67 @@ module MESH
       # assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
     end
 
-    def test_find_by_translated_entry_word
-      expected_ids = %w(D001471 D004938 D004947 D015154)
-      actual = @mesh_tree.find_by_entry_word('oesophagus')
-      actual_ids = actual.map { |mh| mh.unique_id }
-      assert_equal expected_ids, actual_ids, 'Should return all headings with this word in any entry'
+    def test_find_translated_entries_by_word
+      expected_terms = [
+          'Barrett Oesophagus', 'Barrett\'s Oesophagus', 'Barretts Oesophagus', 'Cancer of Oesophagus',
+          'Cancer of the Oesophagus', 'Cancer, Oesophagus', 'Cancers, Oesophagus', 'Neoplasm, Oesophagus',
+          'Neoplasms, Oesophagus', 'Nutcracker Oesophagus', 'Oesophagus', 'Oesophagus Cancer', 'Oesophagus Cancers',
+          'Oesophagus Neoplasm', 'Oesophagus Neoplasms', 'Oesophagus, Barrett', 'Oesophagus, Barrett\'s', 'Oesophagus, Nutcracker'
+      ]
+      expected_entries = expected_terms.map { |term| @mesh_tree.find_entry_by_term(term) }
+
+      actual_entries = @mesh_tree.find_entries_by_word('oesophagus')
+      assert_equal expected_entries.sort, actual_entries.sort, 'Should return all entries with this word in'
     end
 
-    def find_entries_by_word
-      expected_terms = %w()
-      actual_entries = @mesh_tree.find_entries_by_word('abattoir')
+    def test_find_single_entry_by_word
+      actual_entries = @mesh_tree.find_entries_by_word('abattoir').to_a
+      assert_equal 1, actual_entries.length, 'Should only find one entry for abattoir'
+      assert_equal 'Abattoir', actual_entries[0].term
+    end
+
+    def test_find_multiple_entries_by_word
+      expected_terms = ['Achalasia, Esophageal', 'Achalasias, Esophageal', 'Ambulatory 24 hour Esophageal pH Monitoring',
+                        'Ambulatory 24-hour Esophageal pH Monitoring', 'Ambulatory Esophageal pH Monitoring',
+                        'Atresia, Esophageal', 'Atresias, Esophageal',
+                        'Calcinosis, Raynaud\'s phenomenon, Esophageal dismobility, Sclerodactyly, Telangiectasia Syndrome',
+                        'Cancer, Esophageal', 'Cancers, Esophageal', 'Cyst, Esophageal', 'Cysts, Esophageal',
+                        'Diffuse Esophageal Spasm', 'Diffuse Esophageal Spasms', 'Disease, Esophageal',
+                        'Diseases, Esophageal', 'Disorder, Esophageal Motility', 'Disorders, Esophageal Motility',
+                        'Diverticula, Esophageal', 'Diverticula, Pharyngo-Esophageal', 'Diverticulosis, Esophageal',
+                        'Diverticulum, Esophageal', 'Diverticulum, Pharyngo-Esophageal', 'Dysmotilities, Esophageal',
+                        'Dysmotility, Esophageal', 'Dysphagia, Esophageal', 'Esophageal Achalasia', 'Esophageal Achalasias',
+                        'Esophageal Atresia', 'Esophageal Atresias', 'Esophageal Cancer', 'Esophageal Cancers',
+                        'Esophageal Cyst', 'Esophageal Cysts', 'Esophageal Disease', 'Esophageal Diseases',
+                        'Esophageal Diverticula', 'Esophageal Diverticulosis', 'Esophageal Diverticulum',
+                        'Esophageal Dysmotilities', 'Esophageal Dysmotility', 'Esophageal Dysphagia', 'Esophageal Fistula',
+                        'Esophageal Fistulas', 'Esophageal Hernia', 'Esophageal Hernia, Sliding', 'Esophageal Hernias',
+                        'Esophageal Hernias, Sliding', 'Esophageal Motility Disorder', 'Esophageal Motility Disorders',
+                        'Esophageal Neoplasm', 'Esophageal Neoplasms', 'Esophageal Perforation', 'Esophageal Perforations',
+                        'Esophageal Reflux', 'Esophageal Spasm', 'Esophageal Spasm, Diffuse', 'Esophageal Spasms',
+                        'Esophageal Spasms, Diffuse', 'Esophageal Speech', 'Esophageal Speechs',
+                        'Esophageal Sphincter, Lower', 'Esophageal Sphincter, Upper', 'Esophageal Stenoses',
+                        'Esophageal Stenosis', 'Esophageal Stricture', 'Esophageal Varices', 'Esophageal Varix',
+                        'Esophageal and Gastric Varices', 'Esophageal pH Monitoring', 'Esophageal pH Monitorings',
+                        'Esophageal pH Recording', 'Esophageal pH Recordings', 'Fistula, Esophageal', 'Fistulas, Esophageal',
+                        'Gastro Esophageal Reflux', 'Gastro-Esophageal Reflux', 'Hernia, Esophageal',
+                        'Hernia, Sliding Esophageal', 'Hernias, Esophageal', 'Hernias, Sliding Esophageal',
+                        'Lower Esophageal Sphincter', 'Monitoring, Esophageal pH', 'Monitorings, Esophageal pH',
+                        'Motility Disorder, Esophageal', 'Motility Disorders, Esophageal', 'Neoplasm, Esophageal',
+                        'Neoplasms, Esophageal', 'Perforation, Esophageal', 'Perforations, Esophageal',
+                        'Pharyngo Esophageal Diverticula', 'Pharyngo Esophageal Diverticulum',
+                        'Pharyngo-Esophageal Diverticula', 'Pharyngo-Esophageal Diverticulum',
+                        'Recording, Esophageal pH', 'Recordings, Esophageal pH', 'Reflux, Gastro-Esophageal',
+                        'Sliding Esophageal Hernia', 'Sliding Esophageal Hernias', 'Spasm, Diffuse Esophageal',
+                        'Spasm, Esophageal', 'Spasms, Diffuse Esophageal', 'Spasms, Esophageal', 'Speech, Esophageal',
+                        'Speechs, Esophageal', 'Sphincter, Lower Esophageal', 'Sphincter, Upper Esophageal',
+                        'Stenoses, Esophageal', 'Stenosis, Esophageal', 'Stricture, Esophageal', 'Upper Esophageal Sphincter',
+                        'Varices, Esophageal', 'Varix, Esophageal', 'pH Monitoring, Esophageal', 'pH Monitorings, Esophageal',
+                        'pH Recording, Esophageal', 'pH Recordings, Esophageal']
+
+      actual_entries = @mesh_tree.find_entries_by_word('esophageal')
       actual_terms = actual_entries.map { |entry| entry.term }
-      assert_equal expected_terms, actual_terms
+      assert_equal expected_terms.sort, actual_terms.sort
     end
 
     def test_linkifies_all_summaries
@@ -118,20 +167,22 @@ module MESH
       mesh.linkify_summaries do |text, heading|
         "<bar>#{text.downcase}</bar>"
       end
-      mh = mesh.find('D001471')
-      assert_equal 'A condition with damage to the lining of the lower <bar>esophagus</bar> resulting from chronic acid reflux (<bar>esophagitis, reflux</bar>). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the <bar>intestine</bar> or the salmon-pink mucosa of the <bar>stomach</bar>. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to <bar>adenocarcinoma</bar> of the esophagus.', mh.linkified_summary
+      mh = mesh.find_heading_by_unique_id('D001471')
+
+      expected_summary = 'A condition with damage to the lining of the lower <bar>esophagus</bar> resulting from chronic acid reflux (<bar>esophagitis, reflux</bar>). Through the process of metaplasia, the squamous cells are replaced by a columnar epithelium with cells resembling those of the <bar>intestine</bar> or the salmon-pink mucosa of the <bar>stomach</bar>. Barrett\'s columnar epithelium is a marker for severe reflux and precursor to <bar>adenocarcinoma</bar> of the esophagus.'
+      assert_equal expected_summary, mh.linkified_summary
     end
 
     def test_match_headings_that_occur_in_given_text
       expected_ids = %w(D001491 D001769 D001792 D001853 D002470 D002477 D002648 D002965 D002999 D003561 D003593 D003643 D004194 D004314 D004813 D004912 D005091 D005123 D005293 D005333 D005385 D005544 D005796 D006128 D006225 D006309 D006321 D006331 D006405 D007107 D007223 D007231 D007239 D007246 D007938 D007947 D008099 D008168 D008214 D008423 D008533 D008607 D008722 D009035 D009055 D009132 D009154 D009190 D009196 D009369 D009666 D010372 D010641 D011153 D012008 D012106 D012146 D012306 D012307 D012380 D012680 D012867 D013534 D013601 D013812 D013921 D013961 D014034 D014157 D014171 D014960 D015032 D015470 D015994 D015995 D016424 D016433 D017584 D017668 D018387 D018388 D019021 D019070 D019368 D019369 D032882 D036801 D038042 D041905 D052016 D054198 D055016)
-      expected = expected_ids.map { |id| @mesh_tree.find(id) }
+      expected = expected_ids.map { |id| @mesh_tree.find_heading_by_unique_id(id) }
       matches = @mesh_tree.match_in_text(@example_text)
       actual = matches.map { |match| match[:heading] }.uniq
       assert_equal expected.sort, actual.sort
     end
 
     def test_only_match_the_most_specific_matches_in_given_text
-      expected = @mesh_tree.find('D054144')
+      expected = @mesh_tree.find_heading_by_unique_id('D054144')
       actual = @mesh_tree.match_in_text('Diastolic Heart Failure')
       assert_equal 1, actual.length
       assert_equal expected, actual.first[:heading]
@@ -142,14 +193,14 @@ module MESH
 
       not_useful_ids = %w(D007246 D002477 D014960 D008533 D016433 D006664 D055016 D002999 D007223)
       begin
-        not_useful_ids.each { |id| @mesh_tree.find(id).useful = false }
+        not_useful_ids.each { |id| @mesh_tree.find_heading_by_unique_id(id).useful = false }
 
-        expected = expected_ids.map { |id| @mesh_tree.find(id) }
+        expected = expected_ids.map { |id| @mesh_tree.find_heading_by_unique_id(id) }
         matches = @mesh_tree.match_in_text(@example_text)
         actual = matches.map { |match| match[:heading] }.uniq
         assert_equal expected.sort, actual.sort
       ensure
-        not_useful_ids.each { |id| @mesh_tree.find(id).useful = true }
+        not_useful_ids.each { |id| @mesh_tree.find_heading_by_unique_id(id).useful = true }
       end
     end
 
@@ -157,14 +208,14 @@ module MESH
       text = 'Leukemia, lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu.'
       matches = @mesh_tree.match_in_text(text)
       assert_equal 1, matches.length
-      assert_equal @mesh_tree.find('D007938'), matches[0][:heading]
+      assert_equal @mesh_tree.find_heading_by_unique_id('D007938'), matches[0][:heading]
     end
 
     def test_match_headings_at_end_of_text
       text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu leukemia'
       matches = @mesh_tree.match_in_text(text)
       assert_equal 1, matches.length
-      assert_equal @mesh_tree.find('D007938'), matches[0][:heading]
+      assert_equal @mesh_tree.find_heading_by_unique_id('D007938'), matches[0][:heading]
     end
 
     def test_return_no_matches_when_given_nil_text
@@ -175,7 +226,7 @@ module MESH
       text = 'Lorem amet, consectetur adipiscing elit. Donec pretium ATP leo diam, quis adipiscing purus bibendum.'
       matches = @mesh_tree.match_in_text(text)
       assert_equal 1, matches.length
-      assert_equal @mesh_tree.find('D000255'), matches[0][:heading]
+      assert_equal @mesh_tree.find_heading_by_unique_id('D000255'), matches[0][:heading]
       text = 'Lorem ipsum consectetur adipiscing elit. Donec pretium atp leo diam, quis adipiscing purus bibendum.'
       assert_equal [], @mesh_tree.match_in_text(text)
     end
@@ -184,31 +235,31 @@ module MESH
       text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pretium leo diam, quis adipiscing purus bibendum eu leukaemia'
       matches = @mesh_tree.match_in_text(text)
       assert_equal 1, matches.length
-      assert_equal @mesh_tree.find('D007938'), matches[0][:heading]
+      assert_equal @mesh_tree.find_heading_by_unique_id('D007938'), matches[0][:heading]
     end
 
     def test_allow_headings_to_be_found_with_a_where_match_on_original_heading
-      expected = [@mesh_tree.find('D003561'), @mesh_tree.find('D016238')]
+      expected = [@mesh_tree.find_heading_by_unique_id('D003561'), @mesh_tree.find_heading_by_unique_id('D016238')]
       actual = @mesh_tree.where(original_heading: /^Cyta/)
       assert_equal expected, actual
     end
 
     def test_match_on_entries_in_where
       expected_ids = %w( D002397 D003064 D003400 D003532 D004284 D004289 D004555 D005412 D006054 D006196 D007059 D007497 D007695 D009990 D010473 D012091 D012487 D012758 D013215 D015027 D020410 D023721 D023761 D023781 D024541 D029961 D037401 D037462 D048251 D049832 D052656 D057096 )
-      expected = expected_ids.map { |id| @mesh_tree.find(id) }
+      expected = expected_ids.map { |id| @mesh_tree.find_heading_by_unique_id(id) }
       actual = @mesh_tree.where(entries: /fish/)
       assert_equal expected, actual
     end
 
     def test_match_on_tree_numbers_in_where
       expected_ids = %w( D000005 D001415 D010388 D013909 )
-      expected = expected_ids.map { |id| @mesh_tree.find(id) }
+      expected = expected_ids.map { |id| @mesh_tree.find_heading_by_unique_id(id) }
       actual = @mesh_tree.where(tree_numbers: /^A01\.923\.[0-9]{3}$/)
       assert_equal expected, actual
     end
 
     def test_match_on_useful_in_where
-      expected = [@mesh_tree.find('D012000'), @mesh_tree.find('D064906'), @mesh_tree.find('D064966')]
+      expected = [@mesh_tree.find_heading_by_unique_id('D012000'), @mesh_tree.find_heading_by_unique_id('D064906'), @mesh_tree.find_heading_by_unique_id('D064966')]
       begin
         expected.each { |mh| mh.useful = false }
         actual = @mesh_tree.where(useful: false)
@@ -219,7 +270,7 @@ module MESH
     end
 
     def test_match_on_descriptor_class_in_where
-      expected = [@mesh_tree.find('D012000'), @mesh_tree.find('D064906'), @mesh_tree.find('D064966')]
+      expected = [@mesh_tree.find_heading_by_unique_id('D012000'), @mesh_tree.find_heading_by_unique_id('D064906'), @mesh_tree.find_heading_by_unique_id('D064966')]
       begin
         expected.each { |mh| mh.descriptor_class = :foo }
         actual = @mesh_tree.where(descriptor_class: :foo)

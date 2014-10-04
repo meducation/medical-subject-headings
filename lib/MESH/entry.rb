@@ -2,8 +2,13 @@ module MESH
 
   class Entry
 
+    include Comparable
     attr_accessor :heading, :term, :semantic_types, :semantic_relationship, :lexical_type, :regex, :case_sensitive,
                   :downcased, :locales, :loose_match_term
+
+    def <=> other
+      self.term <=> other.term
+    end
 
     def initialize(heading, entry_text, locale)
       @heading = heading

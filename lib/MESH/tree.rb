@@ -35,6 +35,9 @@ module MESH
               mh.structured_entries.each do |entry|
                 @entries_by_term[entry.term] = entry
                 @entries_by_loose_match_term[entry.loose_match_term] = entry
+                entry.term.downcase.split(/\W+/).each do |word|
+                  @entries_by_word[word] << entry
+                end
               end
               lines = [line]
             end
@@ -69,7 +72,7 @@ module MESH
                 new_entries.each do |entry|
                   @entries_by_term[entry.term] = entry
                   @entries_by_loose_match_term[entry.loose_match_term] = entry
-                  entry.term.split(/\W+/).each do |word|
+                  entry.term.downcase.split(/\W+/).each do |word|
                     @entries_by_word[word] << entry
                   end
                 end
@@ -158,7 +161,7 @@ module MESH
     end
 
     def find_entries_by_word(word)
-      return @entries_by_word[word]
+      return @entries_by_word[word] unless @entries_by_word[word].empty?
     end
 
     def where(conditions)
@@ -184,7 +187,8 @@ module MESH
       end
       matches = []
       candidate_entries.each do |entry|
-        matches += entry.match_in_text(text)
+        entry_matches = entry.match_in_text(text)
+        matches += entry_matches unless entry_matches.nil?
       end
 
       matches.combination(2) do |l, r|
