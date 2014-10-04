@@ -21,30 +21,31 @@ module MESH
     end
 
     def test_find_by_unique_id
-      mh = @mesh_tree.find('D000001')
+      mh = @mesh_tree.find_heading_by_unique_id('D000001')
       refute_nil mh
+      assert_equal '', mh.original_heading
     end
 
     def test_find_by_tree_number
-      mh = @mesh_tree.find_by_tree_number('G14.640.079')
+      mh = @mesh_tree.find_heading_by_tree_number('G14.640.079')
       refute_nil mh
       assert_equal 'D000065', mh.unique_id
     end
 
-    def test_find_by_original_heading
-      mh = @mesh_tree.find_by_original_heading('Allergens')
+    def test_find_heading_by_main_heading
+      mh = @mesh_tree.find_heading_by_main_heading('Allergens')
       refute_nil mh
       assert_equal 'D000485', mh.unique_id
     end
 
     def test_not_find_original_heading_that_doesnt_exist
-      mh = @mesh_tree.find_by_original_heading('Lorem')
+      mh = @mesh_tree.find_heading_by_main_heading('Lorem')
       assert_nil mh
     end
 
-    def test_find_by_entry
+    def test_entry_by_term
 
-      expected_entries = [
+      expected_terms = [
           'Adult Reye Syndrome',
           'Adult Reye\'s Syndrome',
           'Fatty Liver with Encephalopathy',
@@ -60,13 +61,16 @@ module MESH
           'Reye-Like Syndrome'
       ]
 
-      entries_to_test = expected_entries.flat_map do |e|
-        [e, e.upcase, e.downcase, " #{e.downcase} ", "\n\n\t #{e.downcase}\t "]
-      end
+      expected_heading = @mesh_tree.find_heading_by_unique_id('D012202')
 
-      entries_to_test.each do |entry|
-        refute_nil mh = @mesh_tree.find_by_entry(entry), "Failed to find heading by entry '#{entry}'"
-        assert_equal 'D012202', mh.unique_id, "Found wrong heading by entry '#{entry}'"
+      # entries_to_test = expected_entries.flat_map do |e|
+      #   [e, e.upcase, e.downcase, " #{e.downcase} ", "\n\n\t #{e.downcase}\t "]
+      # end
+
+      expected_terms.each do |term|
+        entry = @mesh_tree.find_entry_by_term(term)
+        refute_nil entry, "Failed to find entry by term '#{term}'"
+        assert_equal expected_heading, entry.heading, "Found wrong heading by entry '#{entry}'"
       end
 
     end

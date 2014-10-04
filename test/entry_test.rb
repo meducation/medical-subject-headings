@@ -24,69 +24,82 @@ module MESH
     # ENTRY = Anacin3
 
     def test_has_heading
-      entry = Entry.new(@parent_heading, 'Anacin3')
+      entry = Entry.new(@parent_heading, 'Anacin3', :en_gb)
       assert_equal @parent_heading, entry.heading
     end
 
+    def test_has_locale
+      entry = Entry.new(@parent_heading, 'Anacin3', :en_gb)
+      assert_equal 1, entry.locales.length
+      assert_includes entry.locales, :en_gb
+    end
+
     def test_construct_from_plain_string
-      entry = Entry.new(@parent_heading, 'Anacin3')
+      entry = Entry.new(@parent_heading, 'Anacin3', :en_gb)
       assert_equal 'Anacin3', entry.term
       assert_nil entry.semantic_relationship
     end
 
+    def test_has_match_key
+      entry = Entry.new(@parent_heading, 'Anacin3', :en_gb)
+      assert_equal 'ANACIN3', entry.loose_match_term
+      entry = Entry.new(@parent_heading, 'Anacin  - 3', :en_gb)
+      assert_equal 'ANACIN 3', entry.loose_match_term
+    end
+
     def test_has_lexical_type
-      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       assert_equal 'Panadol', entry.term
       assert_equal :trade_name, entry.lexical_type
     end
 
     def test_has_semantic_relationship
-      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       assert_equal 'Panadol', entry.term
       assert_equal :narrower, entry.semantic_relationship
     end
 
     def test_has_semantic_types
-      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       assert_equal 'Panadol', entry.term
       assert_equal ['Organic Chemical', 'Pharmacologic Substance'], entry.semantic_types
     end
 
     def test_knows_own_case_sensitivity
-      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       refute entry.case_sensitive
-      entry = Entry.new(@parent_heading, 'AND|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'AND|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       assert entry.case_sensitive
-      entry = Entry.new(@parent_heading, 'A122|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'A122|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       assert entry.case_sensitive
-      entry = Entry.new(@parent_heading, 'Panadol978|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'Panadol978|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       refute entry.case_sensitive
     end
 
     def test_has_correct_case_insensitive_regex
-      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'Panadol|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       assert_equal /(^|\W)Panadol(\W|$)/i, entry.regex
     end
 
     def test_has_correct_case_sensitive_regex
-      entry = Entry.new(@parent_heading, 'AND|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'AND|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       assert_equal /(^|\W)AND(\W|$)/, entry.regex
     end
 
     def test_matches_nil_or_empty_with_nil
-      entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       assert_nil entry.match_in_text(nil)
       assert_nil entry.match_in_text('')
       assert_nil entry.match_in_text("")
     end
 
     def test_matches_nil_when_no_matches
-      entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       assert_nil entry.match_in_text('text that does not include the term')
     end
 
     def test_matches_itself_in_text_when_all_caps
-      entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef')
+      entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
 
       expected_matches = [
           {heading: entry.heading, matched: entry, index: [720, 725]},
@@ -101,7 +114,7 @@ module MESH
     end
 
     def test_matches_itself_in_text
-      entry = Entry.new(@parent_heading, 'Leukaemia')
+      entry = Entry.new(@parent_heading, 'Leukaemia', :en_gb)
 
       expected_matches = [
           {heading: @parent_heading, matched: entry, index: [0, 10]},
@@ -167,7 +180,7 @@ module MESH
 
     def test_datril
       # ENTRY = 
-      entry = Entry.new(@parent_heading, 'Datril|T109|T121|NON|NRW|UNK (19XX)|861119|abbcdef')
+      entry = Entry.new(@parent_heading, 'Datril|T109|T121|NON|NRW|UNK (19XX)|861119|abbcdef', :en_gb)
       assert_equal 'Datril', entry.term
       assert_equal ['Organic Chemical', 'Pharmacologic Substance'], entry.semantic_types
       assert_nil entry.lexical_type
@@ -175,7 +188,7 @@ module MESH
     end
 
     def test_acetamidophenol
-      entry = Entry.new(@parent_heading, 'p-Acetamidophenol|T109|T121|NON|EQV|UNK (19XX)|800813|abbcdef')
+      entry = Entry.new(@parent_heading, 'p-Acetamidophenol|T109|T121|NON|EQV|UNK (19XX)|800813|abbcdef', :en_gb)
       assert_equal 'p-Acetamidophenol', entry.term
       assert_equal ['Organic Chemical', 'Pharmacologic Substance'], entry.semantic_types
       assert_nil entry.lexical_type
@@ -205,7 +218,7 @@ module MESH
 
     def setup
       @mesh_tree = @@mesh_tree
-      @parent_heading = @mesh_tree.find('D000234')
+      @parent_heading = @mesh_tree.find_heading_by_unique_id('D000234')
     end
 
   end

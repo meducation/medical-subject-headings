@@ -2,10 +2,13 @@ module MESH
 
   class Entry
 
-    attr_accessor :heading, :term, :semantic_types, :semantic_relationship, :lexical_type, :regex, :case_sensitive, :downcased
+    attr_accessor :heading, :term, :semantic_types, :semantic_relationship, :lexical_type, :regex, :case_sensitive,
+                  :downcased, :locales, :loose_match_term
 
-    def initialize(heading, entry_text)
+    def initialize(heading, entry_text, locale)
       @heading = heading
+      @locales = Set.new
+      @locales << locale
       @semantic_types = []
       parts = entry_text.split('|')
       if entry_text.include? '|'
@@ -28,7 +31,6 @@ module MESH
         end
       else
         @term = entry_text
-        @downcased = entry_text.downcase
       end
       if /^[A-Z0-9]+$/ =~ @term
         @regex = /(^|\W)#{Regexp.quote(@term)}(\W|$)/
@@ -38,6 +40,13 @@ module MESH
         @case_sensitive = false
       end
 
+      @downcased = @term.downcase
+      @loose_match_term = Entry.loose_match(@term)
+
+    end
+
+    def self.loose_match(term)
+      term.gsub(/\W+/, ' ').upcase
     end
 
     def match_in_text(text)
