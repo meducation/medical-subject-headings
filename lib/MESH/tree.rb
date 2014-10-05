@@ -186,12 +186,15 @@ module MESH
       return [] if text.nil?
       downcased = text.downcase
       candidate_entries = []
-      downcased.split(/\W+/).uniq.each do |word|
+      text_words = downcased.split(/\W+/)
+      text_words.uniq!
+      text_words.each do |word|
         entries_by_word = find_entries_by_word(word)
         candidate_entries << entries_by_word.to_a
       end
       candidate_entries.compact!
-      candidate_entries.flatten!.uniq! #30% in this uniq
+      candidate_entries.flatten!
+      candidate_entries.uniq! #30% in this uniq
       candidate_entries.keep_if { |entry| entry.heading.useful }
       # puts "\n\n****\n#{candidate_entries.length}\n*****\n\n"
       matches = []
@@ -200,7 +203,8 @@ module MESH
         matches << entry_matches
       end
 
-      matches.compact!.flatten!
+      matches.compact!
+      matches.flatten!
 
       matches.combination(2) do |l, r|
         if (r[:index][0] >= l[:index][0]) && (r[:index][1] <= l[:index][1])
