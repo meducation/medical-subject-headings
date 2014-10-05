@@ -92,7 +92,8 @@ module MESH
         end
       end
 
-      matches.empty? ? nil : matches
+      # matches.empty? ? nil : matches
+      matches
 
     end
 

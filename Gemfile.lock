@@ -2,11 +2,13 @@ PATH
   remote: .
   specs:
     mesh-medical-subject-headings (2.3.0)
+      clarifier
       google_hash
 
 GEM
   remote: https://rubygems.org/
   specs:
+    clarifier (0.0.3)
     google_hash (0.8.4)
       sane (~> 0)
     metaclass (0.0.4)

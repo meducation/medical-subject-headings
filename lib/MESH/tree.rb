@@ -3,6 +3,7 @@ module MESH
   class Tree
 
     @@default_locale = :en_us
+    @@sw = Clarifier::StopWords.new()
 
     def initialize
 
@@ -191,7 +192,7 @@ module MESH
       return [] if text.nil?
       downcased = text.downcase
       candidate_entries = []
-      text_words = downcased.split(/\W+/)
+      text_words = @@sw.clarify(downcased).split(/\W+/)
       text_words.uniq!
       text_words.each do |word|
         entries_by_word = find_entries_by_word(word)

@@ -1,3 +1,4 @@
+require 'clarifier'
 require 'google_hash'
 require 'json'
 require 'set'
