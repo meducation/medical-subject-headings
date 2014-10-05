@@ -2,10 +2,13 @@ PATH
   remote: .
   specs:
     mesh-medical-subject-headings (2.3.0)
+      google_hash
 
 GEM
   remote: https://rubygems.org/
   specs:
+    google_hash (0.8.4)
+      sane (~> 0)
     metaclass (0.0.4)
     mini_portile (0.6.0)
     minitest (5.0.8)
@@ -13,8 +16,11 @@ GEM
       metaclass (~> 0.0.1)
     nokogiri (1.6.2.1)
       mini_portile (= 0.6.0)
+    os (0.9.6)
     rake (10.2.2)
     ruby-prof (0.14.2)
+    sane (0.25.8)
+      os (~> 0)
     yard (0.8.7.4)
 
 PLATFORMS

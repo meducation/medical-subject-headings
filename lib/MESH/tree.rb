@@ -12,7 +12,8 @@ module MESH
       @headings_by_original_heading = {}
       @entries_by_term = {}
       @entries_by_loose_match_term = {} #case insensitive, no punctuation, normalised whitespace
-      @entries_by_word = Hash.new { |h, k| h[k] = Set.new }
+      # @entries_by_word = Hash.new { |h, k| h[k] = Set.new }
+      @entries_by_word = GoogleHashDenseLongToRuby.new
       @locales = [@@default_locale]
 
       filename = File.expand_path('../../../data/mesh_data_2014/d2014.bin.gz', __FILE__)
@@ -38,7 +39,9 @@ module MESH
                 entry_words = entry.term.downcase.split(/\W+/)
                 entry_words.uniq!
                 entry_words.each do |word|
-                  @entries_by_word[word] << entry
+                  hash = word.hash
+                  @entries_by_word[hash] ||= Set.new
+                  @entries_by_word[hash] << entry
                 end
               end
               lines = [line]
@@ -77,7 +80,9 @@ module MESH
                   entry_words = entry.term.downcase.split(/\W+/)
                   entry_words.uniq!
                   entry_words.each do |word|
-                    @entries_by_word[word] << entry
+                    hash = word.hash
+                    @entries_by_word[hash] ||= Set.new
+                    @entries_by_word[hash] << entry
                   end
                 end
               else
@@ -165,7 +170,7 @@ module MESH
     end
 
     def find_entries_by_word(word)
-      return @entries_by_word[word] unless @entries_by_word[word].empty?
+      return @entries_by_word[word.hash]
     end
 
     def where(conditions)
