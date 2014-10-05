@@ -6,7 +6,9 @@ module MESH
     attr_accessor :heading, :term, :semantic_types, :semantic_relationship, :lexical_type, :regex, :case_sensitive,
                   :downcased, :locales, :loose_match_term
 
-    def <=> other
+    @@wordy_characters = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
+
+        def <=> other
       self.term <=> other.term
     end
 
@@ -54,18 +56,36 @@ module MESH
       term.gsub(/\W+/, ' ').upcase
     end
 
-    def match_in_text(text)
+    def match_in_text(text, downcased)
       return nil if text.nil? || text.empty?
-      if !@case_sensitive
-        text = text.downcase
-      end
+      # if !@case_sensitive
+      #   text = text.downcase
+      # end
       matches = []
 
-      loose_match = @case_sensitive ? (text.include? @term) : (text.include? @downcased)
-      if loose_match
-        text.to_enum(:scan, @regex).map do |m,|
-          match = Regexp.last_match
-          matches << {heading: @heading, matched: self, index: match.offset(0)}
+      # loose_match = @case_sensitive ? (text.include? @term) : (downcased.include? @downcased)
+      # if loose_match
+      #   text.to_enum(:scan, @regex).map do |m,|
+      #     match = Regexp.last_match
+      #     matches << {heading: @heading, matched: self, index: match.offset(0)}
+      #   end
+      # end
+
+
+      offset = 0
+      while offset < text.length
+        found_at = @case_sensitive ? text.index(@term, offset) : downcased.index(@downcased, offset)
+        # found_at = text.index(@term, offset)
+        if found_at
+          found_end = found_at + term.length - 1
+          whitespace_before = found_at.zero? ? true : (!@@wordy_characters.include? text[found_at - 1])
+          whitespace_after = (found_end == text.length) ? true : (!@@wordy_characters.include? text[found_end + 1])
+          if whitespace_before && whitespace_after
+            matches << {heading: @heading, matched: self, index: [found_at, found_end]}#, source: text[found_at, term.length]}
+          end
+          offset = found_end + 1
+        else
+          offset = text.length
         end
       end
 

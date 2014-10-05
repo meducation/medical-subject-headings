@@ -35,7 +35,9 @@ module MESH
               mh.structured_entries.each do |entry|
                 @entries_by_term[entry.term] = entry
                 @entries_by_loose_match_term[entry.loose_match_term] = entry
-                entry.term.downcase.split(/\W+/).each do |word|
+                entry_words = entry.term.downcase.split(/\W+/)
+                entry_words.uniq!
+                entry_words.each do |word|
                   @entries_by_word[word] << entry
                 end
               end
@@ -72,7 +74,9 @@ module MESH
                 new_entries.each do |entry|
                   @entries_by_term[entry.term] = entry
                   @entries_by_loose_match_term[entry.loose_match_term] = entry
-                  entry.term.downcase.split(/\W+/).each do |word|
+                  entry_words = entry.term.downcase.split(/\W+/)
+                  entry_words.uniq!
+                  entry_words.each do |word|
                     @entries_by_word[word] << entry
                   end
                 end
@@ -181,17 +185,22 @@ module MESH
     def match_in_text (text)
       return [] if text.nil?
       downcased = text.downcase
-      candidate_entries = Set.new
+      candidate_entries = []
       downcased.split(/\W+/).uniq.each do |word|
         entries_by_word = find_entries_by_word(word)
-        candidate_entries = candidate_entries.union(entries_by_word) unless entries_by_word.nil?
+        candidate_entries << entries_by_word.to_a
       end
+      candidate_entries.compact!
+      candidate_entries.flatten!.uniq! #30% in this uniq
+      candidate_entries.keep_if { |entry| entry.heading.useful }
+      # puts "\n\n****\n#{candidate_entries.length}\n*****\n\n"
       matches = []
       candidate_entries.each do |entry|
-        next if !entry.heading.useful
-        entry_matches = entry.match_in_text(text)
-        matches += entry_matches unless entry_matches.nil?
+        entry_matches = entry.match_in_text(text, downcased)
+        matches << entry_matches
       end
+
+      matches.compact!.flatten!
 
       matches.combination(2) do |l, r|
         if (r[:index][0] >= l[:index][0]) && (r[:index][1] <= l[:index][1])
