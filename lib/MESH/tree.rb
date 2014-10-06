@@ -7,7 +7,8 @@ module MESH
 
     def initialize
 
-      @headings = []
+      @headings_last_position = -1
+      @headings = GoogleHashDenseLongToRuby.new
       @headings_by_unique_id = GoogleHashDenseLongToRuby.new
       @headings_by_tree_number = GoogleHashDenseLongToRuby.new
       @headings_by_original_heading = GoogleHashDenseLongToRuby.new
@@ -28,7 +29,8 @@ module MESH
           when line.start_with?('*NEWRECORD')
             unless lines.empty?
               mh = MESH::Heading.new(self, @@default_locale, lines)
-              @headings << mh
+              @headings_last_position += 1
+              @headings[@headings_last_position] = mh
               @headings_by_unique_id[mh.unique_id.hash] = mh
               @headings_by_original_heading[mh.original_heading.hash] = mh
               mh.tree_numbers.each do |tree_number|
@@ -51,9 +53,10 @@ module MESH
         end
       end
 
-      @headings.each do |heading|
-        heading.connect_to_parents
-        heading.connect_to_forward_references
+      (0..@headings_last_position).each do |i|
+        # @headings.each do |heading|
+        @headings[i].connect_to_parents
+        @headings[i].connect_to_forward_references
       end
 
     end
@@ -141,7 +144,9 @@ module MESH
 
 
     def linkify_summaries &block
-      @headings.each do |h|
+      (0..@headings_last_position).each do |i|
+        h = @headings[i]
+      # @headings.each do |h|
         h.linkify_summary &block
       end
     end
@@ -172,14 +177,17 @@ module MESH
 
     def where(conditions)
       matches = []
-      @headings.each do |heading|
+      (0..@headings_last_position).each do |i|
+      # @headings.each do |heading|
+        heading = @headings[i]
         matches << heading if heading.matches(conditions)
       end
       matches
     end
 
     def each
-      for i in 0 ... @headings.size
+      (0..@headings_last_position).each do |i|
+        # for i in 0 ... @headings.size
         yield @headings[i] if @headings[i].useful
       end
     end
