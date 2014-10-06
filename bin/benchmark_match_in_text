@@ -23,12 +23,12 @@ class Numeric
 end
 
 def time_this(name, &block)
-  print "#{name}"
-  STDOUT.flush
+  # print "#{name}"
+  # STDOUT.flush
   start = Time.now.to_f
   result = yield
   finish = Time.now.to_f
-  puts "\t#{(finish - start).duration}"
+  # puts "\t#{(finish - start).duration}"
   finish - start
 end
 
@@ -43,25 +43,27 @@ timings = Hash.new { |h, k| h[k] = [] }
 
 (0..10).each do |i|
   time = time_this('Matching in title') { mesh_tree.match_in_text(extracted['title']) }
-  timings[:title_headings] << time.round(3)
+  timings[:title_headings] << time
   time = time_this('Matching in description') { mesh_tree.match_in_text(extracted['description']) }
-  timings[:description_headings] << time.round(3)
+  timings[:description_headings] << time
   time = time_this('Matching in content') { mesh_tree.match_in_text(extracted['content']) }
-  timings[:content_headings] << time.round(3)
+  timings[:content_headings] << time
 end
 
-(0..10).each do |i|
-  time = time_this('Matching in title') { mesh_tree.match_in_text_2(extracted['title']) }
-  timings[:title_entries] << time.round(3)
-  time = time_this('Matching in description') { mesh_tree.match_in_text_2(extracted['description']) }
-  timings[:description_entries] << time.round(3)
-  time = time_this('Matching in content') { mesh_tree.match_in_text_2(extracted['content']) }
-  timings[:content_entries] << time.round(3)
-end
+# (0..10).each do |i|
+#   time = time_this('Matching in title') { mesh_tree.match_in_text_2(extracted['title']) }
+#   timings[:title_entries_2] << time
+#   time = time_this('Matching in description') { mesh_tree.match_in_text_2(extracted['description']) }
+#   timings[:description_entries_2] << time
+#   time = time_this('Matching in content') { mesh_tree.match_in_text_2(extracted['content']) }
+#   timings[:content_entries_2] << time
+# end
 
-timings.each do |k,v|
-  t = v.join("\t")
+timings.each do |k, v|
+  t = v.map { |e| e.round(3) }.join("\t")
   puts "#{k}\t#{t}"
+  avg = v.inject { |sum, el| sum + el }.to_f / v.size
+  puts "#{k}\t#{avg.round(3)}"
 end
 
 # classifier = MESH::Classifier.new()

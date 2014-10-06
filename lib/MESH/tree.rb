@@ -3,16 +3,20 @@ module MESH
   class Tree
 
     @@default_locale = :en_us
+    @@sw = Clarifier::StopWords.new()
 
     def initialize
 
-      @headings = []
-      @by_unique_id = {}
-      @by_tree_number = {}
-      @by_original_heading = {}
-      @by_entry = {}
-      @by_entry_word = Hash.new { |h, k| h[k] = Set.new }
-      @entries_by_word = Hash.new { |h, k| h[k] = Set.new }
+      @headings_last_position = -1
+      @headings = GoogleHashDenseLongToRuby.new
+      @headings_by_unique_id = GoogleHashDenseLongToRuby.new
+      @headings_by_tree_number = GoogleHashDenseLongToRuby.new
+      @headings_by_original_heading = GoogleHashDenseLongToRuby.new
+      @entries_by_term = GoogleHashDenseLongToRuby.new
+      @entries_by_loose_match_term = GoogleHashDenseLongToRuby.new #case insensitive, no punctuation, normalised whitespace
+      # @entries_by_word = Hash.new { |h, k| h[k] = Set.new }
+      @entries_by_first_word = GoogleHashDenseLongToRuby.new
+      # @entries_by_first_word = Hash.new { |h, k| h[k] = Set.new }
       @locales = [@@default_locale]
 
       filename = File.expand_path('../../../data/mesh_data_2014/d2014.bin.gz', __FILE__)
@@ -25,7 +29,23 @@ module MESH
           when line.start_with?('*NEWRECORD')
             unless lines.empty?
               mh = MESH::Heading.new(self, @@default_locale, lines)
-              add_heading_to_hashes(mh)
+              @headings_last_position += 1
+              @headings[@headings_last_position] = mh
+              @headings_by_unique_id[mh.unique_id.hash] = mh
+              @headings_by_original_heading[mh.original_heading.hash] = mh
+              mh.tree_numbers.each do |tree_number|
+                hash = tree_number.hash
+                raise if @headings_by_tree_number[hash]
+                @headings_by_tree_number[hash] = mh
+              end
+              mh.structured_entries.each do |entry|
+                @entries_by_term[entry.term.hash] = entry
+                @entries_by_loose_match_term[entry.loose_match_term.hash] = entry
+                entry_words = entry.term.downcase.split(/\W+/)
+                hash = entry_words[0].hash
+                @entries_by_first_word[hash] ||= Set.new
+                @entries_by_first_word[hash] << entry
+              end
               lines = [line]
             end
           else
@@ -33,40 +53,12 @@ module MESH
         end
       end
 
-      @headings.each do |heading|
-        heading.connect_to_parents
-        heading.connect_to_forward_references
+      (0..@headings_last_position).each do |i|
+        # @headings.each do |heading|
+        @headings[i].connect_to_parents
+        @headings[i].connect_to_forward_references
       end
 
-    end
-
-    def add_heading_to_hashes(mh)
-      @headings << mh
-      @by_unique_id[mh.unique_id] = mh
-      @by_original_heading[mh.original_heading] = mh
-      add_heading_by_entry_word(mh, mh.original_heading)
-      mh.tree_numbers.each do |tree_number|
-        raise if @by_tree_number[tree_number]
-        @by_tree_number[tree_number] = mh
-      end
-      match_headings = mh.entries.map { |e| entry_match_key(e) }.uniq
-      match_headings.each do |entry|
-        raise if @by_entry[entry]
-        @by_entry[entry] = mh
-        add_heading_by_entry_word(mh, entry)
-      end
-    end
-
-    def add_heading_by_entry_word(mh, entry)
-      entry.split(/\W+/).each do |word|
-        word.downcase!
-        @by_entry_word[word] << mh
-        @entries_by_word[word] << entry
-      end
-    end
-
-    def entry_match_key(e)
-      e.strip.upcase
     end
 
     def load_translation(locale)
@@ -75,56 +67,38 @@ module MESH
       gzipped_file = File.open(filename)
       file = Zlib::GzipReader.new(gzipped_file)
 
-      entries = []
-      original_heading = nil
-      natural_language_name = nil
-      summary = nil
       unique_id = nil
+      lines = []
       file.each_line do |line|
 
         case
 
           when line.start_with?('*NEWRECORD')
-            unless unique_id.nil?
-              entries.sort!
-              entries.uniq!
-              if heading = find(unique_id)
-                heading.set_original_heading(original_heading, locale) unless original_heading.nil?
-                heading.set_natural_language_name(natural_language_name, locale) unless natural_language_name.nil?
-                heading.set_summary(summary, locale) unless summary.nil?
-                entries.each do |entry|
-                  heading.entries(locale) << entry
-                  @by_entry[entry_match_key(entry)] = heading
-                  add_heading_by_entry_word(heading, entry)
+            unless unique_id.nil? || lines.empty?
+              if heading = find_heading_by_unique_id(unique_id)
+                new_entries = heading.load_translation(lines, locale)
+                new_entries.each do |entry|
+                  @entries_by_term[entry.term.hash] = entry
+                  @entries_by_loose_match_term[entry.loose_match_term.hash] = entry
+                  entry_words = entry.term.downcase.split(/\W+/)
+                  hash = entry_words[0].hash
+                  @entries_by_first_word[hash] ||= Set.new
+                  @entries_by_first_word[hash] << entry
                 end
               else
                 raise 'Translation provided for missing header'
               end
 
-              entries = []
-              original_heading = nil
-              summary = nil
               unique_id = nil
+              lines = []
             end
 
           when matches = line.match(/^UI = (.*)/)
             unique_id = matches[1]
 
-          when matches = line.match(/^MS = (.*)/)
-            summary = matches[1]
-
-          when matches = line.match(/^MH = (.*)/)
-            mh = matches[1]
-            original_heading = mh
-            entries << mh
-            librarian_parts = mh.match(/(.*), (.*)/)
-            natural_language_name = librarian_parts.nil? ? mh : "#{librarian_parts[2]} #{librarian_parts[1]}"
-
-          when matches = line.match(/^(?:PRINT )?ENTRY = ([^|]+)/)
-            entry = matches[1].chomp
-            entries << entry
-
         end
+
+        lines << line
 
       end
       @locales << locale
@@ -144,9 +118,9 @@ module MESH
 
           when line.match(/^\*NEWRECORD$/)
             unless unique_id.nil?
-              if heading = find(unique_id)
+              if heading = find_heading_by_unique_id(unique_id)
                 wikipedia_links.each do |wl|
-                  wl[:score] = (wl[:score].to_f / heading.entries.length.to_f).round(2)
+                  wl[:score] = (wl[:score].to_f / heading.structured_entries.length.to_f).round(2)
                 end
                 heading.wikipedia_links = wikipedia_links
               end
@@ -170,127 +144,77 @@ module MESH
 
 
     def linkify_summaries &block
-      @headings.each do |h|
+      (0..@headings_last_position).each do |i|
+        h = @headings[i]
+      # @headings.each do |h|
         h.linkify_summary &block
       end
     end
 
-    # NO LONGER COVERED BY TESTS
-    # def translate(locale, tr)
-    #   return if @locales.include? locale
-    #   @headings.each_with_index do |h, i|
-    #     h.set_original_heading(tr.translate(h.original_heading), locale)
-    #     h.set_natural_language_name(tr.translate(h.natural_language_name), locale)
-    #     h.set_summary(tr.translate(h.summary), locale)
-    #     h.entries.each { |entry| h.entries(locale) << tr.translate(entry) }
-    #     h.entries(locale).sort!
-    #   end
-    #
-    #   @locales << locale
-    # end
-
-    def find(unique_id)
-      return @by_unique_id[unique_id]
+    def find_heading_by_unique_id(unique_id)
+      return @headings_by_unique_id[unique_id.hash]
     end
 
-    def find_by_tree_number(tree_number)
-      return @by_tree_number[tree_number]
+    def find_heading_by_tree_number(tree_number)
+      return @headings_by_tree_number[tree_number.hash]
     end
 
-    def find_by_original_heading(heading)
-      return @by_original_heading[heading]
+    def find_heading_by_main_heading(heading)
+      return @headings_by_original_heading[heading.hash]
     end
 
-    def find_by_entry(entry)
-      return @by_entry[entry_match_key(entry)]
+    def find_entry_by_term(term)
+      return @entries_by_term[term.hash]
     end
 
-    def find_by_entry_word(word)
-      return @by_entry_word[word]
+    def find_entry_by_loose_match(term)
+      return @entries_by_loose_match_term[Entry.loose_match(term).hash]
     end
 
     def find_entries_by_word(word)
-      return @entries_by_word[word]
+      return @entries_by_first_word[word.hash]
     end
 
     def where(conditions)
       matches = []
-      @headings.each do |heading|
+      (0..@headings_last_position).each do |i|
+      # @headings.each do |heading|
+        heading = @headings[i]
         matches << heading if heading.matches(conditions)
       end
       matches
     end
 
     def each
-      for i in 0 ... @headings.size
+      (0..@headings_last_position).each do |i|
+        # for i in 0 ... @headings.size
         yield @headings[i] if @headings[i].useful
       end
     end
 
-    # def match_in_text(text)
-    #   return [] if text.nil?
-    #   downcased = text.downcase
-    #   candidate_headings = Set.new
-    #   downcased.split(/\W+/).uniq.each do |word|
-    #     candidate_headings.merge(find_by_entry_word(word))
-    #   end
-    #   matches = []
-    #   candidate_headings.each do |heading|
-    #     next unless heading.useful
-    #     @locales.each do |locale|
-    #       heading.entries(locale).each do |entry|
-    #         if downcased.include? entry.downcase #This is a looser check than the regex but much, much faster
-    #           if /^[A-Z0-9]+$/ =~ entry
-    #             regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/
-    #           else
-    #             regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
-    #           end
-    #           text.to_enum(:scan, regex).map do |m,|
-    #             match = Regexp.last_match
-    #             matches << {heading: heading, matched: entry, index: match.offset(0)}
-    #           end
-    #         end
-    #       end
-    #     end
-    #   end
-    #   confirmed_matches = []
-    #   matches.combination(2) do |l, r|
-    #     if (r[:index][0] >= l[:index][0]) && (r[:index][1] <= l[:index][1])
-    #       #r is within l
-    #       r[:delete] = true
-    #     elsif (l[:index][0] >= r[:index][0]) && (l[:index][1] <= r[:index][1])
-    #       #l is within r
-    #       l[:delete] = true
-    #     end
-    #   end
-    #   matches.delete_if { |match| match[:delete] }
-    # end
-
-
     def match_in_text (text)
       return [] if text.nil?
       downcased = text.downcase
-      candidate_entries = Set.new
-      downcased.split(/\W+/).uniq.each do |word|
-        candidate_entries.merge(find_entries_by_word(word))
+      candidate_entries = []
+      text_words = @@sw.clarify(downcased).split(/\W+/)
+      text_words.uniq!
+      text_words.each do |word|
+        entries_by_word = find_entries_by_word(word)
+        candidate_entries << entries_by_word.to_a
       end
+      candidate_entries.compact!
+      candidate_entries.flatten!
+      # candidate_entries.uniq! #30% in this uniq
+      candidate_entries.keep_if { |entry| entry.heading.useful }
+      # puts "\n\n****\n#{candidate_entries.length}\n*****\n\n"
       matches = []
       candidate_entries.each do |entry|
-        if downcased.include? entry.downcase #This is a looser check than the regex but much, much faster
-          if /^[A-Z0-9]+$/ =~ entry
-            regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/
-          else
-            regex = /(^|\W)#{Regexp.quote(entry)}(\W|$)/i
-          end
-          heading = nil
-          text.to_enum(:scan, regex).map do |m,|
-            heading ||= find_by_entry(entry)
-            next unless heading.useful
-            match = Regexp.last_match
-            matches << {heading: heading, matched: entry, index: match.offset(0)}
-          end
-        end
+        entry_matches = entry.match_in_text(text, downcased)
+        matches << entry_matches
       end
+
+      matches.compact!
+      matches.flatten!
 
       matches.combination(2) do |l, r|
         if (r[:index][0] >= l[:index][0]) && (r[:index][1] <= l[:index][1])
@@ -303,6 +227,14 @@ module MESH
       end
       matches.delete_if { |match| match[:delete] }
     end
+
+    private
+
+
+    def entry_match_key(e)
+      e.strip.upcase
+    end
+
 
   end
 

@@ -1,3 +1,11 @@
+#3.0.0 / 2014-10-06
+* [FEATURE] Finder methods on MESH::Tree renamed for clarity
+* [FEATURE] Significant performance improvements to Tree.match_in_text
+* [FEATURE] Using google_hash to improve GC performance (best in 2.1.3+)
+* [FEATURE] Heading.entries replaced by heading.structured_entries (first introduced in 2.2.0)
+* [FEATURE] Matching in text now returns structured entry used for match, as well as heading
+* [FEATURE] Entries are now able to find themselves within given text (Entry.match_in_text)
+
 #2.3.0 / 2014-09-30
 * [FEATURE] Significant performance improvements to entity recognition in text
 

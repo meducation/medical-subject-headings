@@ -4,7 +4,8 @@ module MESH
     @@descriptor_classes = [:make_array_start_at_1, :topical_descriptor, :publication_type, :check_tag, :geographic_descriptor]
 
     include Comparable
-    attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class, :default_locale, :semantic_types, :wikipedia_links, :structured_entries, :forward_references
+    attr_accessor :unique_id, :tree_numbers, :roots, :parents, :children, :useful, :descriptor_class, :default_locale,
+                  :semantic_types, :wikipedia_links, :structured_entries, :forward_references
     attr_reader :linkified_summary
 
     def <=> other
@@ -23,16 +24,16 @@ module MESH
       @summary[locale]
     end
 
+    def entries
+      @structured_entries
+    end
+
     def linkify_summary
       return if summary.nil?
       @linkified_summary = summary.gsub(/[A-Z]+[A-Z,\s-]+[A-Z]+/).each do |text|
-        heading = @tree.find_by_entry(text)
-        heading ? yield(text, heading) : text
+        entry = @tree.find_entry_by_loose_match(text)
+        entry ? yield(text, entry) : text
       end
-    end
-
-    def entries(locale = default_locale)
-      @entries[locale] ||= []
     end
 
     def has_ancestor(heading)
@@ -68,6 +69,11 @@ module MESH
 
     def matches(conditions)
       conditions.each do |field, pattern|
+        if field == :entries
+          entries = @structured_entries.select { |entry| pattern =~ entry.term }
+          return !entries.nil? && !entries.empty?
+        end
+
         field_content = self.send(field)
         if field_content.kind_of?(Array)
           return false unless field_content.find { |fc| pattern =~ fc }
@@ -110,7 +116,7 @@ module MESH
           if parts.size > 1
             parts.pop
             parent_tree_number = parts.join '.'
-            parent = @tree.find_by_tree_number(parent_tree_number)
+            parent = @tree.find_heading_by_tree_number(parent_tree_number)
             @parents << parent unless parent.nil? || @parents.include?(parent)
             parent.children << self unless parent.nil? || parent.children.include?(self)
           end
@@ -122,13 +128,15 @@ module MESH
     def connect_to_forward_references
       if !@connected_to_forward_references
         @forward_references = @forward_reference_terms.map do |term|
-          @tree.find_by_original_heading(term)
+          @tree.find_heading_by_main_heading(term)
         end
         @connected_to_forward_references = true
       end
     end
 
-    private
+    def entries_by_term
+      Hash[@structured_entries.map { |entry| [entry.term, entry] }]
+    end
 
     def initialize(tree, default_locale, lines)
       @tree = tree
@@ -141,7 +149,6 @@ module MESH
       @children = []
       @forward_references = []
       @forward_reference_terms = []
-      @entries = {@default_locale => []}
       @structured_entries = []
       @original_heading = {}
       @natural_language_name = {}
@@ -170,16 +177,14 @@ module MESH
           when matches = line.match(/^MH = (.*)/)
             mh = matches[1]
             set_original_heading(mh)
-            @entries[@default_locale] << mh unless @entries.include? mh
+            @structured_entries << MESH::Entry.new(self, mh, default_locale)
             librarian_parts = mh.match(/(.*), (.*)/)
             nln = librarian_parts.nil? ? mh : "#{librarian_parts[2]} #{librarian_parts[1]}"
             set_natural_language_name(nln)
 
           when matches = line.match(/^(?:PRINT )?ENTRY = (.*)/)
             entry = matches[1]
-            term = entry.match(/([^|]+)/)
-            @entries[@default_locale] << term[1] unless @entries.include? term[1]
-            @structured_entries << MESH::Entry.new(self, entry)
+            @structured_entries << MESH::Entry.new(self, entry, default_locale)
 
           when matches = line.match(/^FX = (.*)/)
             @forward_reference_terms << matches[1]
@@ -187,8 +192,45 @@ module MESH
         end
 
       end
-      @entries[@default_locale].sort!
 
+    end
+
+
+    def load_translation(lines, locale)
+      new_entries = []
+      lines.each do |line|
+        case
+
+          when matches = line.match(/^MS = (.*)/)
+            set_summary(matches[1], locale)
+
+          when matches = line.match(/^MH = (.*)/)
+            set_original_heading(matches[1], locale)
+            librarian_parts = matches[1].match(/(.*), (.*)/)
+            natural_language_name = librarian_parts.nil? ? matches[1] : "#{librarian_parts[2]} #{librarian_parts[1]}"
+            set_natural_language_name(natural_language_name, locale)
+            entry = new_or_existing_entry(matches[1], locale)
+            new_entries << entry
+
+          when matches = line.match(/^(?:PRINT )?ENTRY = (.*)/)
+            entry = new_or_existing_entry(matches[1], locale)
+            new_entries << entry
+
+        end
+      end
+      new_entries
+    end
+
+    def new_or_existing_entry(term, locale)
+      existing_entries = @structured_entries.select { |entry| entry.term == term }
+      if existing_entries.empty?
+        new_entry = MESH::Entry.new(self, term, locale)
+        @structured_entries << new_entry
+      else
+        new_entry = existing_entries[0]
+        new_entry.locales << locale
+      end
+      new_entry
     end
   end
 end
