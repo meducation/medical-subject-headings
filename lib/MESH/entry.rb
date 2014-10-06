@@ -81,8 +81,8 @@ module MESH
     # end
 
     def match_in_text(text, downcased)
-      return nil if text.nil? || text.empty?
       matches = []
+      return matches if text.nil? || text.empty?
 
       loose_match = @case_sensitive ? (text.include? @term) : (downcased.include? @downcased)
       if loose_match

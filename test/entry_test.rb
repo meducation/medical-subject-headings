@@ -86,26 +86,26 @@ module MESH
       assert_equal /(^|\W)AND(\W|$)/, entry.regex
     end
 
-    def test_matches_nil_or_empty_with_nil
+    def test_matches_empty_when_given_empty_with_nil
       entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
-      assert_nil entry.match_in_text(nil, nil)
-      assert_nil entry.match_in_text('', '')
-      assert_nil entry.match_in_text("", "")
+      assert_empty entry.match_in_text(nil, nil)
+      assert_empty entry.match_in_text('', '')
+      assert_empty entry.match_in_text("", "")
     end
 
-    def test_matches_nil_when_no_matches
+    def test_matches_empty_when_no_matches
       entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
       text = 'text that does not include the term'
-      assert_nil entry.match_in_text(text, text.downcase)
+      assert_empty entry.match_in_text(text, text.downcase)
     end
 
     def test_matches_itself_in_text_when_all_caps
       entry = Entry.new(@parent_heading, 'WBC|T109|T121|TRD|NRW|UNK (19XX)|830915|abbcdef', :en_gb)
 
       expected_matches = [
-          {heading: entry.heading, matched: entry, index: [721, 723]},
-          {heading: entry.heading, matched: entry, index: [796, 798]},
-          {heading: entry.heading, matched: entry, index: [7855, 7857]}
+          {heading: entry.heading, matched: entry, index: [720, 725]},
+          {heading: entry.heading, matched: entry, index: [795, 800]},
+          {heading: entry.heading, matched: entry, index: [7854, 7859]}
       ]
 
       actual_matches = entry.match_in_text(@example_text, @example_text.downcase)
@@ -118,59 +118,59 @@ module MESH
       entry = Entry.new(@parent_heading, 'Leukaemia', :en_gb)
 
       expected_matches = [
-          {heading: @parent_heading, matched: entry, index: [0, 8]},
-          {heading: @parent_heading, matched: entry, index: [52, 60]},
-          {heading: @parent_heading, matched: entry, index: [98, 106]},
-          {heading: @parent_heading, matched: entry, index: [679, 687]},
-          {heading: @parent_heading, matched: entry, index: [704, 712]},
-          {heading: @parent_heading, matched: entry, index: [808, 816]},
-          {heading: @parent_heading, matched: entry, index: [973, 981]},
-          {heading: @parent_heading, matched: entry, index: [1003, 1011]},
-          {heading: @parent_heading, matched: entry, index: [1086, 1094]},
-          {heading: @parent_heading, matched: entry, index: [1110, 1118]},
-          {heading: @parent_heading, matched: entry, index: [1191, 1199]},
-          {heading: @parent_heading, matched: entry, index: [1224, 1232]},
-          {heading: @parent_heading, matched: entry, index: [1327, 1335]},
-          {heading: @parent_heading, matched: entry, index: [1384, 1392]},
-          {heading: @parent_heading, matched: entry, index: [1412, 1420]},
-          {heading: @parent_heading, matched: entry, index: [1442, 1450]},
-          {heading: @parent_heading, matched: entry, index: [1569, 1577]},
-          {heading: @parent_heading, matched: entry, index: [1599, 1607]},
-          {heading: @parent_heading, matched: entry, index: [1755, 1763]},
-          {heading: @parent_heading, matched: entry, index: [1942, 1950]},
-          {heading: @parent_heading, matched: entry, index: [1962, 1970]},
-          {heading: @parent_heading, matched: entry, index: [1982, 1990]},
-          {heading: @parent_heading, matched: entry, index: [2413, 2421]},
-          {heading: @parent_heading, matched: entry, index: [2452, 2460]},
-          {heading: @parent_heading, matched: entry, index: [2595, 2603]},
-          {heading: @parent_heading, matched: entry, index: [2923, 2931]},
-          {heading: @parent_heading, matched: entry, index: [3039, 3047]},
-          {heading: @parent_heading, matched: entry, index: [3434, 3442]},
-          {heading: @parent_heading, matched: entry, index: [3556, 3564]},
-          {heading: @parent_heading, matched: entry, index: [3687, 3695]},
-          {heading: @parent_heading, matched: entry, index: [3900, 3908]},
-          {heading: @parent_heading, matched: entry, index: [3981, 3989]},
-          {heading: @parent_heading, matched: entry, index: [4032, 4040]},
-          {heading: @parent_heading, matched: entry, index: [4500, 4508]},
-          {heading: @parent_heading, matched: entry, index: [4678, 4686]},
-          {heading: @parent_heading, matched: entry, index: [4763, 4771]},
-          {heading: @parent_heading, matched: entry, index: [4848, 4856]},
-          {heading: @parent_heading, matched: entry, index: [5570, 5578]},
-          {heading: @parent_heading, matched: entry, index: [5607, 5615]},
-          {heading: @parent_heading, matched: entry, index: [5708, 5716]},
-          {heading: @parent_heading, matched: entry, index: [5925, 5933]},
-          {heading: @parent_heading, matched: entry, index: [6348, 6356]},
-          {heading: @parent_heading, matched: entry, index: [7906, 7914]},
-          {heading: @parent_heading, matched: entry, index: [8066, 8074]},
-          {heading: @parent_heading, matched: entry, index: [8395, 8403]},
-          {heading: @parent_heading, matched: entry, index: [8417, 8425]},
-          {heading: @parent_heading, matched: entry, index: [8582, 8590]},
-          {heading: @parent_heading, matched: entry, index: [8604, 8612]},
-          {heading: @parent_heading, matched: entry, index: [9169, 9177]},
-          {heading: @parent_heading, matched: entry, index: [9247, 9255]},
-          {heading: @parent_heading, matched: entry, index: [10404, 10412]},
-          {heading: @parent_heading, matched: entry, index: [10959, 10967]},
-          {heading: @parent_heading, matched: entry, index: [11250, 11258]}
+          {heading: @parent_heading, matched: entry, index: [0, 10]},
+          {heading: @parent_heading, matched: entry, index: [51, 62]},
+          {heading: @parent_heading, matched: entry, index: [97, 108]},
+          {heading: @parent_heading, matched: entry, index: [678, 689]},
+          {heading: @parent_heading, matched: entry, index: [703, 714]},
+          {heading: @parent_heading, matched: entry, index: [807, 818]},
+          {heading: @parent_heading, matched: entry, index: [972, 983]},
+          {heading: @parent_heading, matched: entry, index: [1002, 1013]},
+          {heading: @parent_heading, matched: entry, index: [1085, 1096]},
+          {heading: @parent_heading, matched: entry, index: [1109, 1120]},
+          {heading: @parent_heading, matched: entry, index: [1190, 1201]},
+          {heading: @parent_heading, matched: entry, index: [1223, 1234]},
+          {heading: @parent_heading, matched: entry, index: [1326, 1337]},
+          {heading: @parent_heading, matched: entry, index: [1383, 1394]},
+          {heading: @parent_heading, matched: entry, index: [1411, 1422]},
+          {heading: @parent_heading, matched: entry, index: [1441, 1452]},
+          {heading: @parent_heading, matched: entry, index: [1568, 1579]},
+          {heading: @parent_heading, matched: entry, index: [1598, 1609]},
+          {heading: @parent_heading, matched: entry, index: [1754, 1765]},
+          {heading: @parent_heading, matched: entry, index: [1941, 1952]},
+          {heading: @parent_heading, matched: entry, index: [1961, 1972]},
+          {heading: @parent_heading, matched: entry, index: [1981, 1992]},
+          {heading: @parent_heading, matched: entry, index: [2412, 2423]},
+          {heading: @parent_heading, matched: entry, index: [2451, 2462]},
+          {heading: @parent_heading, matched: entry, index: [2594, 2605]},
+          {heading: @parent_heading, matched: entry, index: [2922, 2933]},
+          {heading: @parent_heading, matched: entry, index: [3038, 3049]},
+          {heading: @parent_heading, matched: entry, index: [3433, 3444]},
+          {heading: @parent_heading, matched: entry, index: [3555, 3566]},
+          {heading: @parent_heading, matched: entry, index: [3686, 3697]},
+          {heading: @parent_heading, matched: entry, index: [3899, 3910]},
+          {heading: @parent_heading, matched: entry, index: [3980, 3991]},
+          {heading: @parent_heading, matched: entry, index: [4031, 4042]},
+          {heading: @parent_heading, matched: entry, index: [4499, 4510]},
+          {heading: @parent_heading, matched: entry, index: [4677, 4688]},
+          {heading: @parent_heading, matched: entry, index: [4762, 4773]},
+          {heading: @parent_heading, matched: entry, index: [4847, 4858]},
+          {heading: @parent_heading, matched: entry, index: [5569, 5580]},
+          {heading: @parent_heading, matched: entry, index: [5606, 5617]},
+          {heading: @parent_heading, matched: entry, index: [5707, 5718]},
+          {heading: @parent_heading, matched: entry, index: [5924, 5935]},
+          {heading: @parent_heading, matched: entry, index: [6347, 6358]},
+          {heading: @parent_heading, matched: entry, index: [7905, 7916]},
+          {heading: @parent_heading, matched: entry, index: [8065, 8076]},
+          {heading: @parent_heading, matched: entry, index: [8394, 8405]},
+          {heading: @parent_heading, matched: entry, index: [8416, 8427]},
+          {heading: @parent_heading, matched: entry, index: [8581, 8592]},
+          {heading: @parent_heading, matched: entry, index: [8603, 8614]},
+          {heading: @parent_heading, matched: entry, index: [9168, 9179]},
+          {heading: @parent_heading, matched: entry, index: [9246, 9257]},
+          {heading: @parent_heading, matched: entry, index: [10403, 10414]},
+          {heading: @parent_heading, matched: entry, index: [10958, 10969]},
+          {heading: @parent_heading, matched: entry, index: [11249, 11260]}
       ]
 
       actual_matches = entry.match_in_text(@example_text, @example_text.downcase)

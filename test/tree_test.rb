@@ -100,12 +100,10 @@ module MESH
     end
 
     def test_find_translated_entries_by_word
-      expected_terms = [
-          'Barrett Oesophagus', 'Barrett\'s Oesophagus', 'Barretts Oesophagus', 'Cancer of Oesophagus',
-          'Cancer of the Oesophagus', 'Cancer, Oesophagus', 'Cancers, Oesophagus', 'Neoplasm, Oesophagus',
-          'Neoplasms, Oesophagus', 'Nutcracker Oesophagus', 'Oesophagus', 'Oesophagus Cancer', 'Oesophagus Cancers',
-          'Oesophagus Neoplasm', 'Oesophagus Neoplasms', 'Oesophagus, Barrett', 'Oesophagus, Barrett\'s', 'Oesophagus, Nutcracker'
-      ]
+      expected_terms = ["Oesophagus", "Oesophagus Cancer", "Oesophagus Cancers", "Oesophagus Neoplasm",
+                        "Oesophagus Neoplasms", "Oesophagus, Barrett", "Oesophagus, Barrett's", "Oesophagus, Nutcracker"]
+
+
       expected_entries = expected_terms.map { |term| @mesh_tree.find_entry_by_term(term) }
 
       actual_entries = @mesh_tree.find_entries_by_word('oesophagus')
@@ -119,43 +117,20 @@ module MESH
     end
 
     def test_find_multiple_entries_by_word
-      expected_terms = ['Achalasia, Esophageal', 'Achalasias, Esophageal', 'Ambulatory 24 hour Esophageal pH Monitoring',
-                        'Ambulatory 24-hour Esophageal pH Monitoring', 'Ambulatory Esophageal pH Monitoring',
-                        'Atresia, Esophageal', 'Atresias, Esophageal',
-                        'Calcinosis, Raynaud\'s phenomenon, Esophageal dismobility, Sclerodactyly, Telangiectasia Syndrome',
-                        'Cancer, Esophageal', 'Cancers, Esophageal', 'Cyst, Esophageal', 'Cysts, Esophageal',
-                        'Diffuse Esophageal Spasm', 'Diffuse Esophageal Spasms', 'Disease, Esophageal',
-                        'Diseases, Esophageal', 'Disorder, Esophageal Motility', 'Disorders, Esophageal Motility',
-                        'Diverticula, Esophageal', 'Diverticula, Pharyngo-Esophageal', 'Diverticulosis, Esophageal',
-                        'Diverticulum, Esophageal', 'Diverticulum, Pharyngo-Esophageal', 'Dysmotilities, Esophageal',
-                        'Dysmotility, Esophageal', 'Dysphagia, Esophageal', 'Esophageal Achalasia', 'Esophageal Achalasias',
-                        'Esophageal Atresia', 'Esophageal Atresias', 'Esophageal Cancer', 'Esophageal Cancers',
-                        'Esophageal Cyst', 'Esophageal Cysts', 'Esophageal Disease', 'Esophageal Diseases',
-                        'Esophageal Diverticula', 'Esophageal Diverticulosis', 'Esophageal Diverticulum',
-                        'Esophageal Dysmotilities', 'Esophageal Dysmotility', 'Esophageal Dysphagia', 'Esophageal Fistula',
-                        'Esophageal Fistulas', 'Esophageal Hernia', 'Esophageal Hernia, Sliding', 'Esophageal Hernias',
+      expected_terms = ['Esophageal Achalasia', 'Esophageal Achalasias', 'Esophageal Atresia', 'Esophageal Atresias',
+                        'Esophageal Cancer', 'Esophageal Cancers', 'Esophageal Cyst', 'Esophageal Cysts',
+                        'Esophageal Disease', 'Esophageal Diseases', 'Esophageal Diverticula',
+                        'Esophageal Diverticulosis', 'Esophageal Diverticulum', 'Esophageal Dysmotilities',
+                        'Esophageal Dysmotility', 'Esophageal Dysphagia', 'Esophageal Fistula', 'Esophageal Fistulas',
+                        'Esophageal Hernia', 'Esophageal Hernia, Sliding', 'Esophageal Hernias',
                         'Esophageal Hernias, Sliding', 'Esophageal Motility Disorder', 'Esophageal Motility Disorders',
-                        'Esophageal Neoplasm', 'Esophageal Neoplasms', 'Esophageal Perforation', 'Esophageal Perforations',
-                        'Esophageal Reflux', 'Esophageal Spasm', 'Esophageal Spasm, Diffuse', 'Esophageal Spasms',
-                        'Esophageal Spasms, Diffuse', 'Esophageal Speech', 'Esophageal Speechs',
+                        'Esophageal Neoplasm', 'Esophageal Neoplasms', 'Esophageal Perforation',
+                        'Esophageal Perforations', 'Esophageal Reflux', 'Esophageal Spasm', 'Esophageal Spasm, Diffuse',
+                        'Esophageal Spasms', 'Esophageal Spasms, Diffuse', 'Esophageal Speech', 'Esophageal Speechs',
                         'Esophageal Sphincter, Lower', 'Esophageal Sphincter, Upper', 'Esophageal Stenoses',
                         'Esophageal Stenosis', 'Esophageal Stricture', 'Esophageal Varices', 'Esophageal Varix',
                         'Esophageal and Gastric Varices', 'Esophageal pH Monitoring', 'Esophageal pH Monitorings',
-                        'Esophageal pH Recording', 'Esophageal pH Recordings', 'Fistula, Esophageal', 'Fistulas, Esophageal',
-                        'Gastro Esophageal Reflux', 'Gastro-Esophageal Reflux', 'Hernia, Esophageal',
-                        'Hernia, Sliding Esophageal', 'Hernias, Esophageal', 'Hernias, Sliding Esophageal',
-                        'Lower Esophageal Sphincter', 'Monitoring, Esophageal pH', 'Monitorings, Esophageal pH',
-                        'Motility Disorder, Esophageal', 'Motility Disorders, Esophageal', 'Neoplasm, Esophageal',
-                        'Neoplasms, Esophageal', 'Perforation, Esophageal', 'Perforations, Esophageal',
-                        'Pharyngo Esophageal Diverticula', 'Pharyngo Esophageal Diverticulum',
-                        'Pharyngo-Esophageal Diverticula', 'Pharyngo-Esophageal Diverticulum',
-                        'Recording, Esophageal pH', 'Recordings, Esophageal pH', 'Reflux, Gastro-Esophageal',
-                        'Sliding Esophageal Hernia', 'Sliding Esophageal Hernias', 'Spasm, Diffuse Esophageal',
-                        'Spasm, Esophageal', 'Spasms, Diffuse Esophageal', 'Spasms, Esophageal', 'Speech, Esophageal',
-                        'Speechs, Esophageal', 'Sphincter, Lower Esophageal', 'Sphincter, Upper Esophageal',
-                        'Stenoses, Esophageal', 'Stenosis, Esophageal', 'Stricture, Esophageal', 'Upper Esophageal Sphincter',
-                        'Varices, Esophageal', 'Varix, Esophageal', 'pH Monitoring, Esophageal', 'pH Monitorings, Esophageal',
-                        'pH Recording, Esophageal', 'pH Recordings, Esophageal']
+                        'Esophageal pH Recording', 'Esophageal pH Recordings']
 
       actual_entries = @mesh_tree.find_entries_by_word('esophageal')
       actual_terms = actual_entries.map { |entry| entry.term }

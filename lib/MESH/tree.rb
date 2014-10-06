@@ -14,7 +14,8 @@ module MESH
       @entries_by_term = {}
       @entries_by_loose_match_term = {} #case insensitive, no punctuation, normalised whitespace
       # @entries_by_word = Hash.new { |h, k| h[k] = Set.new }
-      @entries_by_word = GoogleHashDenseLongToRuby.new
+      @entries_by_first_word = GoogleHashDenseLongToRuby.new
+      # @entries_by_first_word = Hash.new { |h, k| h[k] = Set.new }
       @locales = [@@default_locale]
 
       filename = File.expand_path('../../../data/mesh_data_2014/d2014.bin.gz', __FILE__)
@@ -38,12 +39,9 @@ module MESH
                 @entries_by_term[entry.term] = entry
                 @entries_by_loose_match_term[entry.loose_match_term] = entry
                 entry_words = entry.term.downcase.split(/\W+/)
-                entry_words.uniq!
-                entry_words.each do |word|
-                  hash = word.hash
-                  @entries_by_word[hash] ||= Set.new
-                  @entries_by_word[hash] << entry
-                end
+                hash = entry_words[0].hash
+                @entries_by_first_word[hash] ||= Set.new
+                @entries_by_first_word[hash] << entry
               end
               lines = [line]
             end
@@ -79,12 +77,9 @@ module MESH
                   @entries_by_term[entry.term] = entry
                   @entries_by_loose_match_term[entry.loose_match_term] = entry
                   entry_words = entry.term.downcase.split(/\W+/)
-                  entry_words.uniq!
-                  entry_words.each do |word|
-                    hash = word.hash
-                    @entries_by_word[hash] ||= Set.new
-                    @entries_by_word[hash] << entry
-                  end
+                  hash = entry_words[0].hash
+                  @entries_by_first_word[hash] ||= Set.new
+                  @entries_by_first_word[hash] << entry
                 end
               else
                 raise 'Translation provided for missing header'
@@ -171,7 +166,7 @@ module MESH
     end
 
     def find_entries_by_word(word)
-      return @entries_by_word[word.hash]
+      return @entries_by_first_word[word.hash]
     end
 
     def where(conditions)
@@ -200,7 +195,7 @@ module MESH
       end
       candidate_entries.compact!
       candidate_entries.flatten!
-      candidate_entries.uniq! #30% in this uniq
+      # candidate_entries.uniq! #30% in this uniq
       candidate_entries.keep_if { |entry| entry.heading.useful }
       # puts "\n\n****\n#{candidate_entries.length}\n*****\n\n"
       matches = []
