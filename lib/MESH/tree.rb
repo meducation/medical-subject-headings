@@ -8,11 +8,11 @@ module MESH
     def initialize
 
       @headings = []
-      @headings_by_unique_id = {}
-      @headings_by_tree_number = {}
-      @headings_by_original_heading = {}
-      @entries_by_term = {}
-      @entries_by_loose_match_term = {} #case insensitive, no punctuation, normalised whitespace
+      @headings_by_unique_id = GoogleHashDenseLongToRuby.new
+      @headings_by_tree_number = GoogleHashDenseLongToRuby.new
+      @headings_by_original_heading = GoogleHashDenseLongToRuby.new
+      @entries_by_term = GoogleHashDenseLongToRuby.new
+      @entries_by_loose_match_term = GoogleHashDenseLongToRuby.new #case insensitive, no punctuation, normalised whitespace
       # @entries_by_word = Hash.new { |h, k| h[k] = Set.new }
       @entries_by_first_word = GoogleHashDenseLongToRuby.new
       # @entries_by_first_word = Hash.new { |h, k| h[k] = Set.new }
@@ -29,15 +29,16 @@ module MESH
             unless lines.empty?
               mh = MESH::Heading.new(self, @@default_locale, lines)
               @headings << mh
-              @headings_by_unique_id[mh.unique_id] = mh
-              @headings_by_original_heading[mh.original_heading] = mh
+              @headings_by_unique_id[mh.unique_id.hash] = mh
+              @headings_by_original_heading[mh.original_heading.hash] = mh
               mh.tree_numbers.each do |tree_number|
-                raise if @headings_by_tree_number[tree_number]
-                @headings_by_tree_number[tree_number] = mh
+                hash = tree_number.hash
+                raise if @headings_by_tree_number[hash]
+                @headings_by_tree_number[hash] = mh
               end
               mh.structured_entries.each do |entry|
-                @entries_by_term[entry.term] = entry
-                @entries_by_loose_match_term[entry.loose_match_term] = entry
+                @entries_by_term[entry.term.hash] = entry
+                @entries_by_loose_match_term[entry.loose_match_term.hash] = entry
                 entry_words = entry.term.downcase.split(/\W+/)
                 hash = entry_words[0].hash
                 @entries_by_first_word[hash] ||= Set.new
@@ -74,8 +75,8 @@ module MESH
               if heading = find_heading_by_unique_id(unique_id)
                 new_entries = heading.load_translation(lines, locale)
                 new_entries.each do |entry|
-                  @entries_by_term[entry.term] = entry
-                  @entries_by_loose_match_term[entry.loose_match_term] = entry
+                  @entries_by_term[entry.term.hash] = entry
+                  @entries_by_loose_match_term[entry.loose_match_term.hash] = entry
                   entry_words = entry.term.downcase.split(/\W+/)
                   hash = entry_words[0].hash
                   @entries_by_first_word[hash] ||= Set.new
@@ -146,23 +147,23 @@ module MESH
     end
 
     def find_heading_by_unique_id(unique_id)
-      return @headings_by_unique_id[unique_id]
+      return @headings_by_unique_id[unique_id.hash]
     end
 
     def find_heading_by_tree_number(tree_number)
-      return @headings_by_tree_number[tree_number]
+      return @headings_by_tree_number[tree_number.hash]
     end
 
     def find_heading_by_main_heading(heading)
-      return @headings_by_original_heading[heading]
+      return @headings_by_original_heading[heading.hash]
     end
 
     def find_entry_by_term(term)
-      return @entries_by_term[term]
+      return @entries_by_term[term.hash]
     end
 
-    def find_entry_by_loose_match(loose_match)
-      return @entries_by_loose_match_term[Entry.loose_match(loose_match)]
+    def find_entry_by_loose_match(term)
+      return @entries_by_loose_match_term[Entry.loose_match(term).hash]
     end
 
     def find_entries_by_word(word)
