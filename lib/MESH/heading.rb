@@ -24,6 +24,10 @@ module MESH
       @summary[locale]
     end
 
+    def entries
+      @structured_entries
+    end
+
     def linkify_summary
       return if summary.nil?
       @linkified_summary = summary.gsub(/[A-Z]+[A-Z,\s-]+[A-Z]+/).each do |text|

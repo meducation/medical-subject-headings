@@ -56,30 +56,6 @@ module MESH
       term.gsub(/\W+/, ' ').upcase
     end
 
-    # def match_in_text_2(text, downcased)
-    #   return nil if text.nil? || text.empty?
-    #   matches = []
-    #
-    #   offset = 0
-    #   while offset < text.length
-    #     found_at = @case_sensitive ? text.index(@term, offset) : downcased.index(@downcased, offset)
-    #     if found_at
-    #       found_end = found_at + term.length - 1
-    #       whitespace_before = found_at.zero? ? true : (!@@wordy_characters.include? text[found_at - 1])
-    #       whitespace_after = (found_end == text.length) ? true : (!@@wordy_characters.include? text[found_end + 1])
-    #       if whitespace_before && whitespace_after
-    #         matches << {heading: @heading, matched: self, index: [found_at, found_end]}#, source: text[found_at, term.length]}
-    #       end
-    #       offset = found_end + 1
-    #     else
-    #       offset = text.length
-    #     end
-    #   end
-    #
-    #   matches.empty? ? nil : matches
-    #
-    # end
-
     def match_in_text(text, downcased)
       matches = []
       return matches if text.nil? || text.empty?
@@ -92,7 +68,6 @@ module MESH
         end
       end
 
-      # matches.empty? ? nil : matches
       matches
 
     end
