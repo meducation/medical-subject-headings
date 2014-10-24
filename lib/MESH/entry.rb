@@ -8,7 +8,7 @@ module MESH
 
     @@wordy_characters = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
 
-        def <=> other
+    def <=> other
       self.term <=> other.term
     end
 
@@ -64,7 +64,12 @@ module MESH
       if loose_match
         text.to_enum(:scan, @regex).map do |m,|
           match = Regexp.last_match
-          matches << {heading: @heading, matched: self, index: match.offset(0)}
+          index = match.offset(0)
+
+          # Ignore whitespace and normalise Ruby offset behaviour
+          index[0] += match[1].length
+          index[1] -= (match[2].length + 1)
+          matches << {heading: @heading, matched: self, index: index}
         end
       end
 
